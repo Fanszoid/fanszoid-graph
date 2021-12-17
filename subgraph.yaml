@@ -1,0 +1,63 @@
+specVersion: 0.0.4
+description: Fanszoid Tickets Marketplace
+repository: https://github.com/Fanszoid/fanszoid-graph
+schema:
+  file: ./schema.graphql
+dataSources:
+  # ---------------------------------------------------------
+  # TicketsNFT
+  # ---------------------------------------------------------
+  - kind: ethereum/contract
+    name: TicketsNFT
+    network: mumbai
+    source:
+      address: '0x435Cb748fd8A3421b981e3E99f60a66ddb37de44'
+      abi: TicketsNFT
+      startBlock: 22571858
+    mapping:
+      kind: ethereum/events
+      apiVersion: 0.0.6
+      language: wasm/assemblyscript
+      entities:
+        - Event
+        - TicketType
+        - User
+      abis:
+        - name: TicketsNFT
+          file: ./abis/TicketsNFT.json
+      eventHandlers:
+        - event: ticketsPublished(uint256,uint256,uint256[],uint256[],uint256[],uint256[],address)
+          handler: handleTicketsPublished
+      file: ./src/handlers/ticketsHandler.ts
+  # ---------------------------------------------------------
+  # MARKETPLACE 
+  # ---------------------------------------------------------
+  - kind: ethereum/contract
+    name: FanszoidMarketplace
+    network: mumbai
+    source:
+      address: '0x158f539764707f544F02181C72dF0F750358bBb4'
+      abi: FanszoidMarketplace
+      startBlock: 22571854
+    mapping:
+      kind: ethereum/events
+      apiVersion: 0.0.6
+      language: wasm/assemblyscript
+      entities:
+        - Event
+        - Ticket
+        - TicketType
+        - User
+      abis:
+        - name: FanszoidMarketplace
+          file: ./abis/FanszoidMarketplace.json
+      eventHandlers:
+        - event: eventCreated(uint256,address)
+          handler: handleEventCreated
+        - event: ticketBought(uint256,address,address,uint256)
+          handler: handleTicketBought
+        - event: AskSetted(uint256,address,uint256)
+          handler: handleAskSetted
+        - event: AskRemoved(address,uint256)
+          handler: handleAskRemoved
+      file: ./src/handlers/marketplaceHandler.ts

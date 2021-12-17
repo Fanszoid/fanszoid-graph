@@ -1,0 +1,22 @@
+{
+  "name": "fanszoid-graph",
+  "version": "1.0.0",
+  "description": "Fanszoid subgraph for Mumbai",
+  "main": "index.js",
+  "scripts": {
+    "codegen": "graph codegen --debug --output-dir src/generated/"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Fanszoid/fanszoid-graph.git"
+  },
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/Fanszoid/fanszoid-graph/issues"
+  },
+  "homepage": "https://github.com/Fanszoid/fanszoid-graph#readme",
+  "dependencies": {
+    "@graphprotocol/graph-ts": "^0.24.1"
+  }
+}

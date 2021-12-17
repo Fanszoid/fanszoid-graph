@@ -1,0 +1,30 @@
+type Event @entity {
+  id: ID!
+  ticketTypes: [TicketType!]! @derivedFrom(field: "event")
+  organizer: User!
+}
+
+type TicketType @entity {
+  id: ID!
+  event: Event!
+  initialPrice: BigInt
+  mintedAmount: Int
+  sold: Int
+  creatorRoyalty: Int!
+  soldTickets: [Ticket!]! @derivedFrom(field: "ticketType")
+}
+
+type User @entity {
+  id: ID! # ETH addr
+  address: Bytes!
+  events: [Event!] @derivedFrom(field: "organizer")
+  tickets: [Ticket!] @derivedFrom(field: "owner")
+}
+
+type Ticket @entity {
+  id: ID!
+  ticketType: TicketType!
+  askingPrice: BigInt
+  amount: Int!
+  owner: User!
+}

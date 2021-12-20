@@ -7,10 +7,11 @@ export enum DataType {
 }
 
 export function loadOrCreateUser(id: Address):  User {
-    let user = new User(id.toHex())
+    let user = User.load(id.toHex())
     if (user == null) {
         user = new User(id.toHex())
         user.address = id
+        user.save()
     }
     return user
 }

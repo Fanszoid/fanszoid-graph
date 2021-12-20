@@ -107,41 +107,6 @@ export class TicketType extends Entity {
     this.set("event", Value.fromString(value));
   }
 
-  get initialPrice(): BigInt | null {
-    let value = this.get("initialPrice");
-    if (!value || value.kind == ValueKind.NULL) {
-      return null;
-    } else {
-      return value.toBigInt();
-    }
-  }
-
-  set initialPrice(value: BigInt | null) {
-    if (!value) {
-      this.unset("initialPrice");
-    } else {
-      this.set("initialPrice", Value.fromBigInt(<BigInt>value));
-    }
-  }
-
-  get mintedAmount(): i32 {
-    let value = this.get("mintedAmount");
-    return value!.toI32();
-  }
-
-  set mintedAmount(value: i32) {
-    this.set("mintedAmount", Value.fromI32(value));
-  }
-
-  get sold(): i32 {
-    let value = this.get("sold");
-    return value!.toI32();
-  }
-
-  set sold(value: i32) {
-    this.set("sold", Value.fromI32(value));
-  }
-
   get creatorRoyalty(): i32 {
     let value = this.get("creatorRoyalty");
     return value!.toI32();
@@ -300,13 +265,21 @@ export class Ticket extends Entity {
     }
   }
 
-  get amount(): i32 {
+  get amount(): BigInt | null {
     let value = this.get("amount");
-    return value!.toI32();
+    if (!value || value.kind == ValueKind.NULL) {
+      return null;
+    } else {
+      return value.toBigInt();
+    }
   }
 
-  set amount(value: i32) {
-    this.set("amount", Value.fromI32(value));
+  set amount(value: BigInt | null) {
+    if (!value) {
+      this.unset("amount");
+    } else {
+      this.set("amount", Value.fromBigInt(<BigInt>value));
+    }
   }
 
   get owner(): string {

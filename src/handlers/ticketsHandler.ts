@@ -10,7 +10,7 @@ export function handleTicketsPublished(event: ticketsPublished): void {
     for( let i=0 ; i < event.params.ticketTypesCount.toI32() ; i++ ){
         let ticketType = new TicketType(event.params.newTokenIds[i].toHex())
         ticketType.event = eventId
-        ticketType.creatorRoyalty = event.params.creatorRoyalties[i]
+        ticketType.creatorRoyalty = event.params.creatorRoyalties[i].toI32()
         ticketType.save()
 
         let ticket = new Ticket(event.params.newTokenIds[i].toHex() + '-' + event.params.publisher.toHex())

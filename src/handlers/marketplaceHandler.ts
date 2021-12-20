@@ -1,7 +1,7 @@
 import { eventCreated, ticketBought, AskSetted, AskRemoved } from '../generated/FanszoidMarketplace/FanszoidMarketplace'
 import { Event, Ticket, TicketType } from '../generated/schema'
 import { loadOrCreateUser } from '../modules/User'
-import { log } from '@graphprotocol/graph-ts'
+import { log, BigInt } from '@graphprotocol/graph-ts'
 
 export function handleEventCreated(event: eventCreated): void {
   let organizerUser  = loadOrCreateUser(event.params.organizer)
@@ -11,7 +11,7 @@ export function handleEventCreated(event: eventCreated): void {
   if (eventEntity == null) {
     eventEntity = new Event(eventId)
   }
-  eventEntity.organizer = organizerUser.id
+  eventEntity.organizer = organizerUser.address.toHex()
   eventEntity.save()
 }
 
@@ -25,20 +25,31 @@ export function handleTicketBought(event: ticketBought): void {
     let sellerTicket = Ticket.load(event.params.tokenId.toHex() + '-' + event.params.seller.toHex())
     let buyerTicket = Ticket.load(event.params.tokenId.toHex() + '-' + event.params.buyer.toHex())
 
-    if(sellerTicket != null && sellerTicket.amount > 0){
-      if( sellerTicket.askingPrice == null || sellerTicket.askingPrice != event.params.price) {
+    if(sellerTicket != null && sellerTicket.amount > BigInt.fromI32(0)){
+      if( !sellerTicket.askingPrice || sellerTicket.askingPrice != event.params.price) {
         log.error("Incorrect price on ticket sale, price: {}", [event.params.price.toHex()])
+        return;
       }
 
-      sellerTicket.amount -= 1
-
+      if(sellerTicket.amount) {
+        sellerTicket.amount = sellerTicket.amount - BigInt.fromI32(1)
+        sellerTicket.save()
+      } else {
+        log.error("sellerTicket.amount was null", [])
+        return;
+      }
+       
       if(buyerTicket == null) {
         buyerTicket = new Ticket(event.params.tokenId.toHex() + '-' + event.params.buyer.toHex())
         buyerTicket.ticketType = event.params.tokenId.toHex()
-        buyerTicket.amount = 1
+        buyerTicket.amount = BigInt.fromI32(1)
         buyerTicket.owner = event.params.buyer.toHex()
       } else {
-        buyerTicket.amount += 1
+        if(buyerTicket.amount) {
+          buyerTicket.amount =  buyerTicket.amount + BigInt.fromI32(1)
+        } else {
+          buyerTicket.amount = BigInt.fromI32(1)
+        }
       }
       buyerTicket.save()
     } else {
@@ -51,7 +62,7 @@ export function handleAskSetted(event: AskSetted): void {
   if(ticket == null) {
     ticket = new Ticket(event.params.tokenId.toHex() + '-' + event.params.seller.toHex())
     ticket.ticketType = event.params.tokenId.toHex()
-    ticket.amount = 0
+    ticket.amount = BigInt.fromI32(0)
     ticket.owner = event.params.seller.toHex()
     
   }
@@ -65,7 +76,7 @@ export function handleAskRemoved(event: AskRemoved): void {
   if(ticket == null) {
     ticket = new Ticket(event.params.tokenId.toHex() + '-' + event.params.seller.toHex())
     ticket.ticketType = event.params.tokenId.toHex()
-    ticket.amount = 0
+    ticket.amount = BigInt.fromI32(0)
     ticket.owner = event.params.seller.toHex()
     
   }

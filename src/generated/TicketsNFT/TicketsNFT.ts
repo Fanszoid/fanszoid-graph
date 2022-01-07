@@ -188,6 +188,36 @@ export class TicketsNFT extends ethereum.SmartContract {
     return ethereum.CallResult.fromValue(value[0].toBigInt());
   }
 
+  _owner(): Address {
+    let result = super.call("_owner", "_owner():(address)", []);
+
+    return result[0].toAddress();
+  }
+
+  try__owner(): ethereum.CallResult<Address> {
+    let result = super.tryCall("_owner", "_owner():(address)", []);
+    if (result.reverted) {
+      return new ethereum.CallResult();
+    }
+    let value = result.value;
+    return ethereum.CallResult.fromValue(value[0].toAddress());
+  }
+
+  _uri(): string {
+    let result = super.call("_uri", "_uri():(string)", []);
+
+    return result[0].toString();
+  }
+
+  try__uri(): ethereum.CallResult<string> {
+    let result = super.tryCall("_uri", "_uri():(string)", []);
+    if (result.reverted) {
+      return new ethereum.CallResult();
+    }
+    let value = result.value;
+    return ethereum.CallResult.fromValue(value[0].toString());
+  }
+
   balanceOf(account: Address, id: BigInt): BigInt {
     let result = super.call(
       "balanceOf",
@@ -609,6 +639,36 @@ export class SetAskCall__Outputs {
   _call: SetAskCall;
 
   constructor(call: SetAskCall) {
+    this._call = call;
+  }
+}
+
+export class SetTokenUriCall extends ethereum.Call {
+  get inputs(): SetTokenUriCall__Inputs {
+    return new SetTokenUriCall__Inputs(this);
+  }
+
+  get outputs(): SetTokenUriCall__Outputs {
+    return new SetTokenUriCall__Outputs(this);
+  }
+}
+
+export class SetTokenUriCall__Inputs {
+  _call: SetTokenUriCall;
+
+  constructor(call: SetTokenUriCall) {
+    this._call = call;
+  }
+
+  get uri(): string {
+    return this._call.inputValues[0].value.toString();
+  }
+}
+
+export class SetTokenUriCall__Outputs {
+  _call: SetTokenUriCall;
+
+  constructor(call: SetTokenUriCall) {
     this._call = call;
   }
 }

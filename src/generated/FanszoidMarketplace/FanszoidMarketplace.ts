@@ -78,6 +78,10 @@ export class eventCreated__Params {
   get organizer(): Address {
     return this._event.parameters[1].value.toAddress();
   }
+
+  get uri(): string {
+    return this._event.parameters[2].value.toString();
+  }
 }
 
 export class ticketBought extends ethereum.Event {
@@ -123,6 +127,23 @@ export class FanszoidMarketplace__creatorRoyaltiesResult {
     let map = new TypedMap<string, ethereum.Value>();
     map.set("value0", ethereum.Value.fromAddress(this.value0));
     map.set("value1", ethereum.Value.fromUnsignedBigInt(this.value1));
+    return map;
+  }
+}
+
+export class FanszoidMarketplace__eventsResult {
+  value0: Address;
+  value1: string;
+
+  constructor(value0: Address, value1: string) {
+    this.value0 = value0;
+    this.value1 = value1;
+  }
+
+  toMap(): TypedMap<string, ethereum.Value> {
+    let map = new TypedMap<string, ethereum.Value>();
+    map.set("value0", ethereum.Value.fromAddress(this.value0));
+    map.set("value1", ethereum.Value.fromString(this.value1));
     return map;
   }
 }
@@ -194,14 +215,25 @@ export class FanszoidMarketplace extends ethereum.SmartContract {
     return ethereum.CallResult.fromValue(value[0].toBigInt());
   }
 
-  createEvent(): BigInt {
-    let result = super.call("createEvent", "createEvent():(uint256)", []);
+  createEventForOrganizer(organizer: Address, uri: string): BigInt {
+    let result = super.call(
+      "createEventForOrganizer",
+      "createEventForOrganizer(address,string):(uint256)",
+      [ethereum.Value.fromAddress(organizer), ethereum.Value.fromString(uri)]
+    );
 
     return result[0].toBigInt();
   }
 
-  try_createEvent(): ethereum.CallResult<BigInt> {
-    let result = super.tryCall("createEvent", "createEvent():(uint256)", []);
+  try_createEventForOrganizer(
+    organizer: Address,
+    uri: string
+  ): ethereum.CallResult<BigInt> {
+    let result = super.tryCall(
+      "createEventForOrganizer",
+      "createEventForOrganizer(address,string):(uint256)",
+      [ethereum.Value.fromAddress(organizer), ethereum.Value.fromString(uri)]
+    );
     if (result.reverted) {
       return new ethereum.CallResult();
     }
@@ -244,23 +276,52 @@ export class FanszoidMarketplace extends ethereum.SmartContract {
     );
   }
 
-  events(param0: BigInt): Address {
-    let result = super.call("events", "events(uint256):(address)", [
+  eventUri(eventId: BigInt): string {
+    let result = super.call("eventUri", "eventUri(uint256):(string)", [
+      ethereum.Value.fromUnsignedBigInt(eventId)
+    ]);
+
+    return result[0].toString();
+  }
+
+  try_eventUri(eventId: BigInt): ethereum.CallResult<string> {
+    let result = super.tryCall("eventUri", "eventUri(uint256):(string)", [
+      ethereum.Value.fromUnsignedBigInt(eventId)
+    ]);
+    if (result.reverted) {
+      return new ethereum.CallResult();
+    }
+    let value = result.value;
+    return ethereum.CallResult.fromValue(value[0].toString());
+  }
+
+  events(param0: BigInt): FanszoidMarketplace__eventsResult {
+    let result = super.call("events", "events(uint256):(address,string)", [
       ethereum.Value.fromUnsignedBigInt(param0)
     ]);
 
-    return result[0].toAddress();
+    return new FanszoidMarketplace__eventsResult(
+      result[0].toAddress(),
+      result[1].toString()
+    );
   }
 
-  try_events(param0: BigInt): ethereum.CallResult<Address> {
-    let result = super.tryCall("events", "events(uint256):(address)", [
+  try_events(
+    param0: BigInt
+  ): ethereum.CallResult<FanszoidMarketplace__eventsResult> {
+    let result = super.tryCall("events", "events(uint256):(address,string)", [
       ethereum.Value.fromUnsignedBigInt(param0)
     ]);
     if (result.reverted) {
       return new ethereum.CallResult();
     }
     let value = result.value;
-    return ethereum.CallResult.fromValue(value[0].toAddress());
+    return ethereum.CallResult.fromValue(
+      new FanszoidMarketplace__eventsResult(
+        value[0].toAddress(),
+        value[1].toString()
+      )
+    );
   }
 
   fansNFTContract(): Address {
@@ -406,28 +467,36 @@ export class ConfigureCall__Outputs {
   }
 }
 
-export class CreateEventCall extends ethereum.Call {
-  get inputs(): CreateEventCall__Inputs {
-    return new CreateEventCall__Inputs(this);
+export class CreateEventForOrganizerCall extends ethereum.Call {
+  get inputs(): CreateEventForOrganizerCall__Inputs {
+    return new CreateEventForOrganizerCall__Inputs(this);
   }
 
-  get outputs(): CreateEventCall__Outputs {
-    return new CreateEventCall__Outputs(this);
+  get outputs(): CreateEventForOrganizerCall__Outputs {
+    return new CreateEventForOrganizerCall__Outputs(this);
   }
 }
 
-export class CreateEventCall__Inputs {
-  _call: CreateEventCall;
+export class CreateEventForOrganizerCall__Inputs {
+  _call: CreateEventForOrganizerCall;
 
-  constructor(call: CreateEventCall) {
+  constructor(call: CreateEventForOrganizerCall) {
     this._call = call;
   }
+
+  get organizer(): Address {
+    return this._call.inputValues[0].value.toAddress();
+  }
+
+  get uri(): string {
+    return this._call.inputValues[1].value.toString();
+  }
 }
 
-export class CreateEventCall__Outputs {
-  _call: CreateEventCall;
+export class CreateEventForOrganizerCall__Outputs {
+  _call: CreateEventForOrganizerCall;
 
-  constructor(call: CreateEventCall) {
+  constructor(call: CreateEventForOrganizerCall) {
     this._call = call;
   }
 
@@ -550,6 +619,40 @@ export class SetAskCall__Outputs {
   _call: SetAskCall;
 
   constructor(call: SetAskCall) {
+    this._call = call;
+  }
+}
+
+export class SetEventUriCall extends ethereum.Call {
+  get inputs(): SetEventUriCall__Inputs {
+    return new SetEventUriCall__Inputs(this);
+  }
+
+  get outputs(): SetEventUriCall__Outputs {
+    return new SetEventUriCall__Outputs(this);
+  }
+}
+
+export class SetEventUriCall__Inputs {
+  _call: SetEventUriCall;
+
+  constructor(call: SetEventUriCall) {
+    this._call = call;
+  }
+
+  get eventId(): BigInt {
+    return this._call.inputValues[0].value.toBigInt();
+  }
+
+  get uri(): string {
+    return this._call.inputValues[1].value.toString();
+  }
+}
+
+export class SetEventUriCall__Outputs {
+  _call: SetEventUriCall;
+
+  constructor(call: SetEventUriCall) {
     this._call = call;
   }
 }

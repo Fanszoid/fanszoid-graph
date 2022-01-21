@@ -1,6 +1,7 @@
 type Event @entity {
   id: ID!
   ticketTypes: [TicketType!]! @derivedFrom(field: "event")
+  metadata: String!
   organizer: User!
 }
 
@@ -8,6 +9,7 @@ type TicketType @entity {
   id: ID!
   event: Event!
   creatorRoyalty: Int!
+  metadata: String!
   soldTickets: [Ticket!]! @derivedFrom(field: "ticketType")
 }
 

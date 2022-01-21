@@ -163,8 +163,12 @@ export class ticketsPublished__Params {
     return this._event.parameters[5].value.toBigIntArray();
   }
 
+  get uris(): Array<string> {
+    return this._event.parameters[6].value.toStringArray();
+  }
+
   get publisher(): Address {
-    return this._event.parameters[6].value.toAddress();
+    return this._event.parameters[7].value.toAddress();
   }
 }
 
@@ -201,21 +205,6 @@ export class TicketsNFT extends ethereum.SmartContract {
     }
     let value = result.value;
     return ethereum.CallResult.fromValue(value[0].toAddress());
-  }
-
-  _uri(): string {
-    let result = super.call("_uri", "_uri():(string)", []);
-
-    return result[0].toString();
-  }
-
-  try__uri(): ethereum.CallResult<string> {
-    let result = super.tryCall("_uri", "_uri():(string)", []);
-    if (result.reverted) {
-      return new ethereum.CallResult();
-    }
-    let value = result.value;
-    return ethereum.CallResult.fromValue(value[0].toString());
   }
 
   balanceOf(account: Address, id: BigInt): BigInt {
@@ -277,6 +266,25 @@ export class TicketsNFT extends ethereum.SmartContract {
     }
     let value = result.value;
     return ethereum.CallResult.fromValue(value[0].toBigIntArray());
+  }
+
+  createEvent(metadataUri: string): BigInt {
+    let result = super.call("createEvent", "createEvent(string):(uint256)", [
+      ethereum.Value.fromString(metadataUri)
+    ]);
+
+    return result[0].toBigInt();
+  }
+
+  try_createEvent(metadataUri: string): ethereum.CallResult<BigInt> {
+    let result = super.tryCall("createEvent", "createEvent(string):(uint256)", [
+      ethereum.Value.fromString(metadataUri)
+    ]);
+    if (result.reverted) {
+      return new ethereum.CallResult();
+    }
+    let value = result.value;
+    return ethereum.CallResult.fromValue(value[0].toBigInt());
   }
 
   isApprovedForAll(account: Address, operator: Address): boolean {
@@ -357,17 +365,17 @@ export class TicketsNFT extends ethereum.SmartContract {
     return ethereum.CallResult.fromValue(value[0].toBoolean());
   }
 
-  uri(param0: BigInt): string {
+  uri(tokenId: BigInt): string {
     let result = super.call("uri", "uri(uint256):(string)", [
-      ethereum.Value.fromUnsignedBigInt(param0)
+      ethereum.Value.fromUnsignedBigInt(tokenId)
     ]);
 
     return result[0].toString();
   }
 
-  try_uri(param0: BigInt): ethereum.CallResult<string> {
+  try_uri(tokenId: BigInt): ethereum.CallResult<string> {
     let result = super.tryCall("uri", "uri(uint256):(string)", [
-      ethereum.Value.fromUnsignedBigInt(param0)
+      ethereum.Value.fromUnsignedBigInt(tokenId)
     ]);
     if (result.reverted) {
       return new ethereum.CallResult();
@@ -407,6 +415,90 @@ export class ConstructorCall__Outputs {
   }
 }
 
+export class CreateEventCall extends ethereum.Call {
+  get inputs(): CreateEventCall__Inputs {
+    return new CreateEventCall__Inputs(this);
+  }
+
+  get outputs(): CreateEventCall__Outputs {
+    return new CreateEventCall__Outputs(this);
+  }
+}
+
+export class CreateEventCall__Inputs {
+  _call: CreateEventCall;
+
+  constructor(call: CreateEventCall) {
+    this._call = call;
+  }
+
+  get metadataUri(): string {
+    return this._call.inputValues[0].value.toString();
+  }
+}
+
+export class CreateEventCall__Outputs {
+  _call: CreateEventCall;
+
+  constructor(call: CreateEventCall) {
+    this._call = call;
+  }
+
+  get value0(): BigInt {
+    return this._call.outputValues[0].value.toBigInt();
+  }
+}
+
+export class CreateEventAndPublishTicketsCall extends ethereum.Call {
+  get inputs(): CreateEventAndPublishTicketsCall__Inputs {
+    return new CreateEventAndPublishTicketsCall__Inputs(this);
+  }
+
+  get outputs(): CreateEventAndPublishTicketsCall__Outputs {
+    return new CreateEventAndPublishTicketsCall__Outputs(this);
+  }
+}
+
+export class CreateEventAndPublishTicketsCall__Inputs {
+  _call: CreateEventAndPublishTicketsCall;
+
+  constructor(call: CreateEventAndPublishTicketsCall) {
+    this._call = call;
+  }
+
+  get eventMetadataUri(): string {
+    return this._call.inputValues[0].value.toString();
+  }
+
+  get ticketTypesCount(): BigInt {
+    return this._call.inputValues[1].value.toBigInt();
+  }
+
+  get amounts(): Array<BigInt> {
+    return this._call.inputValues[2].value.toBigIntArray();
+  }
+
+  get askingPrices(): Array<BigInt> {
+    return this._call.inputValues[3].value.toBigIntArray();
+  }
+
+  get creatorRoyalties(): Array<BigInt> {
+    return this._call.inputValues[4].value.toBigIntArray();
+  }
+
+  get uris(): Array<string> {
+    return this._call.inputValues[5].value.toStringArray();
+  }
+}
+
+export class CreateEventAndPublishTicketsCall__Outputs {
+  _call: CreateEventAndPublishTicketsCall;
+
+  constructor(call: CreateEventAndPublishTicketsCall) {
+    this._call = call;
+  }
+}
+
 export class PublishEventTicketsCall extends ethereum.Call {
   get inputs(): PublishEventTicketsCall__Inputs {
     return new PublishEventTicketsCall__Inputs(this);
@@ -442,6 +534,10 @@ export class PublishEventTicketsCall__Inputs {
 
   get creatorRoyalties(): Array<BigInt> {
     return this._call.inputValues[4].value.toBigIntArray();
+  }
+
+  get uris(): Array<string> {
+    return this._call.inputValues[5].value.toStringArray();
   }
 }
 
@@ -639,36 +735,6 @@ export class SetAskCall__Outputs {
   _call: SetAskCall;
 
   constructor(call: SetAskCall) {
-    this._call = call;
-  }
-}
-
-export class SetTokenUriCall extends ethereum.Call {
-  get inputs(): SetTokenUriCall__Inputs {
-    return new SetTokenUriCall__Inputs(this);
-  }
-
-  get outputs(): SetTokenUriCall__Outputs {
-    return new SetTokenUriCall__Outputs(this);
-  }
-}
-
-export class SetTokenUriCall__Inputs {
-  _call: SetTokenUriCall;
-
-  constructor(call: SetTokenUriCall) {
-    this._call = call;
-  }
-
-  get uri(): string {
-    return this._call.inputValues[0].value.toString();
-  }
-}
-
-export class SetTokenUriCall__Outputs {
-  _call: SetTokenUriCall;
-
-  constructor(call: SetTokenUriCall) {
     this._call = call;
   }
 }

@@ -16,6 +16,7 @@ export class Event extends Entity {
     super();
     this.set("id", Value.fromString(id));
 
+    this.set("metadata", Value.fromString(""));
     this.set("organizer", Value.fromString(""));
   }
 
@@ -54,6 +55,15 @@ export class Event extends Entity {
     this.set("ticketTypes", Value.fromStringArray(value));
   }
 
+  get metadata(): string {
+    let value = this.get("metadata");
+    return value!.toString();
+  }
+
+  set metadata(value: string) {
+    this.set("metadata", Value.fromString(value));
+  }
+
   get organizer(): string {
     let value = this.get("organizer");
     return value!.toString();
@@ -70,6 +80,7 @@ export class TicketType extends Entity {
     this.set("id", Value.fromString(id));
 
     this.set("event", Value.fromString(""));
+    this.set("metadata", Value.fromString(""));
   }
 
   save(): void {
@@ -114,6 +125,15 @@ export class TicketType extends Entity {
 
   set creatorRoyalty(value: i32) {
     this.set("creatorRoyalty", Value.fromI32(value));
+  }
+
+  get metadata(): string {
+    let value = this.get("metadata");
+    return value!.toString();
+  }
+
+  set metadata(value: string) {
+    this.set("metadata", Value.fromString(value));
   }
 
   get soldTickets(): Array<string> {

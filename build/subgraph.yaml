@@ -8,9 +8,9 @@ dataSources:
     name: TicketsNFT
     network: mumbai
     source:
-      address: "0xD9b15f3258B0C7b3f69AcDBb5BCFf4D89495F6c3"
+      address: "0xc4a8B7fCFb11Dd80171bd2d129f9f2140DB20423"
       abi: TicketsNFT
-      startBlock: 22775822
+      startBlock: 24117000
     mapping:
       kind: ethereum/events
       apiVersion: 0.0.6
@@ -23,16 +23,16 @@ dataSources:
         - name: TicketsNFT
           file: TicketsNFT/abis/TicketsNFT.json
       eventHandlers:
-        - event: ticketsPublished(uint256,uint256,uint256[],uint256[],uint256[],uint256[],address)
+        - event: ticketsPublished(uint256,uint256,uint256[],uint256[],uint256[],uint256[],string[],address)
           handler: handleTicketsPublished
       file: TicketsNFT/TicketsNFT.wasm
   - kind: ethereum/contract
     name: FanszoidMarketplace
     network: mumbai
     source:
-      address: "0x158f539764707f544F02181C72dF0F750358bBb4"
+      address: "0x149Ab150C823b9614a973ff7c60FB99a959d0668"
       abi: FanszoidMarketplace
-      startBlock: 22571854
+      startBlock: 24116994
     mapping:
       kind: ethereum/events
       apiVersion: 0.0.6
@@ -46,7 +46,7 @@ dataSources:
         - name: FanszoidMarketplace
           file: FanszoidMarketplace/abis/FanszoidMarketplace.json
       eventHandlers:
-        - event: eventCreated(uint256,address)
+        - event: eventCreated(uint256,address,string)
           handler: handleEventCreated
         - event: ticketBought(uint256,address,address,uint256)
           handler: handleTicketBought

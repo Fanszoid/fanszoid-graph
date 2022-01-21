@@ -6,11 +6,14 @@ import { log, BigInt } from '@graphprotocol/graph-ts'
 export function handleEventCreated(event: eventCreated): void {
   let organizerUser  = loadOrCreateUser(event.params.organizer)
 
+  log.debug("EventCreated, event received: {}", [event.params.eventId.toHex(), event.params.organizer.toHex(), event.params.uri])
+
   let eventId = event.params.eventId.toHex()
   let eventEntity = Event.load(eventId)
   if (eventEntity == null) {
     eventEntity = new Event(eventId)
   }
+  eventEntity.metadata = event.params.uri
   eventEntity.organizer = organizerUser.address.toHex()
   eventEntity.save()
 }

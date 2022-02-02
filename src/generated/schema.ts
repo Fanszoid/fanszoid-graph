@@ -136,6 +136,41 @@ export class TicketType extends Entity {
     this.set("metadata", Value.fromString(value));
   }
 
+  get primaryAskingPrice(): BigInt | null {
+    let value = this.get("primaryAskingPrice");
+    if (!value || value.kind == ValueKind.NULL) {
+      return null;
+    } else {
+      return value.toBigInt();
+    }
+  }
+
+  set primaryAskingPrice(value: BigInt | null) {
+    if (!value) {
+      this.unset("primaryAskingPrice");
+    } else {
+      this.set("primaryAskingPrice", Value.fromBigInt(<BigInt>value));
+    }
+  }
+
+  get primarySupply(): i32 {
+    let value = this.get("primarySupply");
+    return value!.toI32();
+  }
+
+  set primarySupply(value: i32) {
+    this.set("primarySupply", Value.fromI32(value));
+  }
+
+  get initialAmount(): i32 {
+    let value = this.get("initialAmount");
+    return value!.toI32();
+  }
+
+  set initialAmount(value: i32) {
+    this.set("initialAmount", Value.fromI32(value));
+  }
+
   get soldTickets(): Array<string> {
     let value = this.get("soldTickets");
     return value!.toStringArray();
@@ -285,21 +320,13 @@ export class Ticket extends Entity {
     }
   }
 
-  get amount(): BigInt | null {
+  get amount(): i32 {
     let value = this.get("amount");
-    if (!value || value.kind == ValueKind.NULL) {
-      return null;
-    } else {
-      return value.toBigInt();
-    }
+    return value!.toI32();
   }
 
-  set amount(value: BigInt | null) {
-    if (!value) {
-      this.unset("amount");
-    } else {
-      this.set("amount", Value.fromBigInt(<BigInt>value));
-    }
+  set amount(value: i32) {
+    this.set("amount", Value.fromI32(value));
   }
 
   get owner(): string {

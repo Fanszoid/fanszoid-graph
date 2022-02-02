@@ -10,6 +10,9 @@ type TicketType @entity {
   event: Event!
   creatorRoyalty: Int!
   metadata: String!
+  primaryAskingPrice: BigInt
+  primarySupply: Int!
+  initialAmount: Int!
   soldTickets: [Ticket!]! @derivedFrom(field: "ticketType")
 }
 
@@ -24,6 +27,6 @@ type Ticket @entity {
   id: ID!
   ticketType: TicketType!
   askingPrice: BigInt
-  amount: BigInt
+  amount: Int!
   owner: User!
 }

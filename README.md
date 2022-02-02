@@ -2,7 +2,7 @@
 
 Fanszoid's Marketplace and Tickets Graph, currently on Mumbai testnet:
 
-https://thegraph.com/hosted-service/subgraph/fanszoid/fanszoid-tickets-mumbai (Qmet5aan4BBBVMANTmgwWiQrkXQK9Yir7SLuZEwxqqgv6X)
+https://thegraph.com/hosted-service/subgraph/fanszoid/fanszoid-tickets-mumbai (QmeuK8R9kdKoQyrSpnhUqSxS5GyeT7nS5vDRmUvz1meCZv)
 
 ## Queries
 

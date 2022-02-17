@@ -45,9 +45,11 @@ export function handleTicketBought(event: ticketBought): void {
     return;
   }
 
-  // Seller
+  let sellerUser = loadOrCreateUser(event.params.seller);
+  let buyerUser = loadOrCreateUser(event.params.buyer);
 
-  if (event.params.seller.toHex() === ticketEventEntity.organizer) {
+  // Seller
+  if (sellerUser.address.toHex() == ticketEventEntity.organizer) {
     // Ticket sold by the organizer ( primary market ).
 
     if (ticketTypeHasSupply(ticketType)) {
@@ -91,7 +93,7 @@ export function handleTicketBought(event: ticketBought): void {
 
   // Buyer
 
-  if (event.params.buyer.toHex() !== ticketEventEntity.organizer) {
+  if (buyerUser.address.toHex() != ticketEventEntity.organizer) {
     let buyerTicketId = getTicketId(event.params.tokenId, event.params.buyer);
     let buyerTicket = Ticket.load(buyerTicketId);
 
@@ -99,16 +101,18 @@ export function handleTicketBought(event: ticketBought): void {
       buyerTicket = new Ticket(buyerTicketId);
       buyerTicket.ticketType = ticketTypeId;
       buyerTicket.amount = 1;
-      buyerTicket.owner = event.params.buyer.toHex();
+      buyerTicket.owner = buyerUser.address.toHex();
+
+      buyerTicket.save();
     } else {
       if (ticketHasAmountAvailable(buyerTicket)) {
         buyerTicket.amount = buyerTicket.amount + 1;
       } else {
         buyerTicket.amount = 1;
       }
-    }
 
-    buyerTicket.save();
+      buyerTicket.save();
+    }
   } else {
     // Ticket bought by the organizer of the event, rather infrequent.
 
@@ -135,7 +139,7 @@ export function handleAskSetted(event: AskSetted): void {
     return;
   }
 
-  if (event.params.seller.toHex() !== ticketEventEntity.organizer) {
+  if (event.params.seller.toHex() != ticketEventEntity.organizer) {
     let sellerTicketId = getTicketId(event.params.tokenId, event.params.seller);
     let ticket = Ticket.load(sellerTicketId);
     if (ticket == null) {
@@ -168,7 +172,7 @@ export function handleAskRemoved(event: AskRemoved): void {
     return;
   }
 
-  if (event.params.seller.toHex() !== ticketEventEntity.organizer) {
+  if (event.params.seller.toHex() != ticketEventEntity.organizer) {
     let sellerTicketId = getTicketId(event.params.tokenId, event.params.seller);
     let ticket = Ticket.load(sellerTicketId);
     if (ticket == null) {

@@ -19,7 +19,7 @@ export function handleTicketsPublished(event: ticketsPublished): void {
         ticketType.primarySupply = event.params.amounts[i].toI32();
         ticketType.initialAmount = event.params.amounts[i].toI32();
       } else {
-        log.error("ticket supply to big!, ID : ", [eventId])
+        log.error("ticket supply too big!, ID : ", [eventId])
       }
       ticketType.metadata = event.params.uris[i];
       ticketType.save();

@@ -3,6 +3,8 @@ import {
   ticketBought,
   AskSetted,
   AskRemoved,
+  eventDeleted,
+  eventEdited
 } from "../generated/FanszoidMarketplace/FanszoidMarketplace";
 import { Event, Ticket, TicketType } from "../generated/schema";
 import { loadOrCreateUser } from "../modules/User";
@@ -12,12 +14,14 @@ import {
   ticketTypeHasSupply,
   ticketTypePriceMatches,
 } from "../modules/TicketType";
+import { getEventId } from "../modules/Event";
 import {
   getTicketId,
   ticketHasAmountAvailable,
   ticketPriceMatches,
 } from "../modules/Ticket";
 import { log, BigInt } from "@graphprotocol/graph-ts";
+import { store } from '@graphprotocol/graph-ts'
 
 export function handleEventCreated(event: eventCreated): void {
   let organizerUser = loadOrCreateUser(event.params.organizer);
@@ -100,6 +104,7 @@ export function handleTicketBought(event: ticketBought): void {
     if (buyerTicket == null) {
       buyerTicket = new Ticket(buyerTicketId);
       buyerTicket.ticketType = ticketTypeId;
+      buyerTicket.event = ticketType.event;
       buyerTicket.amount = 1;
       buyerTicket.owner = buyerUser.address.toHex();
 
@@ -145,6 +150,7 @@ export function handleAskSetted(event: AskSetted): void {
     if (ticket == null) {
       ticket = new Ticket(sellerTicketId);
       ticket.ticketType = ticketType.id;
+      ticket.ticketType = ticketType.event;
       ticket.amount = 0;
       ticket.owner = event.params.seller.toHex();
     }
@@ -178,6 +184,7 @@ export function handleAskRemoved(event: AskRemoved): void {
     if (ticket == null) {
       ticket = new Ticket(sellerTicketId);
       ticket.ticketType = ticketType.id;
+      ticket.event = ticketType.event;
       ticket.amount = 0;
       ticket.owner = event.params.seller.toHex();
     }
@@ -190,4 +197,21 @@ export function handleAskRemoved(event: AskRemoved): void {
 
     ticketType.save();
   }
+}
+
+
+export function handleEventEdited(event: eventEdited): void {
+  let eventEntity = Event.load(getEventId(event.params.eventId, event.params.organizer));
+  if (eventEntity == null) {
+    log.error("Event not found, id : {}", [event.params.eventId.toHex()]);
+    return;
+  }
+
+  eventEntity.metadata = event.params.uri;
+  eventEntity.save();
+}
+
+
+export function handleEventDeleted(event: eventDeleted): void {
+  store.remove('Event', getEventId(event.params.eventId, event.params.organizer))
 }

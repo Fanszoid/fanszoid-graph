@@ -6,11 +6,11 @@ schema:
 dataSources:
   - kind: ethereum/contract
     name: TicketsNFT
-    network: mumbai
+    network: matic
     source:
-      address: "0xc4a8B7fCFb11Dd80171bd2d129f9f2140DB20423"
+      address: "0x57374a7f837A782403468839C80F0F7700A762e7"
       abi: TicketsNFT
-      startBlock: 24117000
+      startBlock: 25657919
     mapping:
       kind: ethereum/events
       apiVersion: 0.0.6
@@ -28,11 +28,11 @@ dataSources:
       file: TicketsNFT/TicketsNFT.wasm
   - kind: ethereum/contract
     name: FanszoidMarketplace
-    network: mumbai
+    network: matic
     source:
-      address: "0x149Ab150C823b9614a973ff7c60FB99a959d0668"
+      address: "0xbC2E88848Add239a7d41F917216063B36d19975b"
       abi: FanszoidMarketplace
-      startBlock: 24116994
+      startBlock: 25657775
     mapping:
       kind: ethereum/events
       apiVersion: 0.0.6
@@ -54,4 +54,8 @@ dataSources:
           handler: handleAskSetted
         - event: AskRemoved(address,uint256)
           handler: handleAskRemoved
+        - event: eventEdited(uint256,address,string)
+          handler: handleEventEdited
+        - event: eventDeleted(uint256,address)
+          handler: handleEventDeleted
       file: FanszoidMarketplace/FanszoidMarketplace.wasm

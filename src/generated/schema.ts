@@ -265,6 +265,7 @@ export class Ticket extends Entity {
     this.set("id", Value.fromString(id));
 
     this.set("ticketType", Value.fromString(""));
+    this.set("event", Value.fromString(""));
     this.set("owner", Value.fromString(""));
   }
 
@@ -301,6 +302,15 @@ export class Ticket extends Entity {
 
   set ticketType(value: string) {
     this.set("ticketType", Value.fromString(value));
+  }
+
+  get event(): string {
+    let value = this.get("event");
+    return value!.toString();
+  }
+
+  set event(value: string) {
+    this.set("event", Value.fromString(value));
   }
 
   get askingPrice(): BigInt | null {

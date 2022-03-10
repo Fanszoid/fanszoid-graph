@@ -58,6 +58,64 @@ export class AskSetted__Params {
   }
 }
 
+export class OwnershipTransferred extends ethereum.Event {
+  get params(): OwnershipTransferred__Params {
+    return new OwnershipTransferred__Params(this);
+  }
+}
+
+export class OwnershipTransferred__Params {
+  _event: OwnershipTransferred;
+
+  constructor(event: OwnershipTransferred) {
+    this._event = event;
+  }
+
+  get previousOwner(): Address {
+    return this._event.parameters[0].value.toAddress();
+  }
+
+  get newOwner(): Address {
+    return this._event.parameters[1].value.toAddress();
+  }
+}
+
+export class Paused extends ethereum.Event {
+  get params(): Paused__Params {
+    return new Paused__Params(this);
+  }
+}
+
+export class Paused__Params {
+  _event: Paused;
+
+  constructor(event: Paused) {
+    this._event = event;
+  }
+
+  get account(): Address {
+    return this._event.parameters[0].value.toAddress();
+  }
+}
+
+export class Unpaused extends ethereum.Event {
+  get params(): Unpaused__Params {
+    return new Unpaused__Params(this);
+  }
+}
+
+export class Unpaused__Params {
+  _event: Unpaused;
+
+  constructor(event: Unpaused) {
+    this._event = event;
+  }
+
+  get account(): Address {
+    return this._event.parameters[0].value.toAddress();
+  }
+}
+
 export class eventCreated extends ethereum.Event {
   get params(): eventCreated__Params {
     return new eventCreated__Params(this);
@@ -81,6 +139,76 @@ export class eventCreated__Params {
 
   get uri(): string {
     return this._event.parameters[2].value.toString();
+  }
+}
+
+export class eventDeleted extends ethereum.Event {
+  get params(): eventDeleted__Params {
+    return new eventDeleted__Params(this);
+  }
+}
+
+export class eventDeleted__Params {
+  _event: eventDeleted;
+
+  constructor(event: eventDeleted) {
+    this._event = event;
+  }
+
+  get eventId(): BigInt {
+    return this._event.parameters[0].value.toBigInt();
+  }
+
+  get organizer(): Address {
+    return this._event.parameters[1].value.toAddress();
+  }
+}
+
+export class eventEdited extends ethereum.Event {
+  get params(): eventEdited__Params {
+    return new eventEdited__Params(this);
+  }
+}
+
+export class eventEdited__Params {
+  _event: eventEdited;
+
+  constructor(event: eventEdited) {
+    this._event = event;
+  }
+
+  get eventId(): BigInt {
+    return this._event.parameters[0].value.toBigInt();
+  }
+
+  get organizer(): Address {
+    return this._event.parameters[1].value.toAddress();
+  }
+
+  get uri(): string {
+    return this._event.parameters[2].value.toString();
+  }
+}
+
+export class marketRoyaltyModified extends ethereum.Event {
+  get params(): marketRoyaltyModified__Params {
+    return new marketRoyaltyModified__Params(this);
+  }
+}
+
+export class marketRoyaltyModified__Params {
+  _event: marketRoyaltyModified;
+
+  constructor(event: marketRoyaltyModified) {
+    this._event = event;
+  }
+
+  get eventId(): BigInt {
+    return this._event.parameters[0].value.toBigInt();
+  }
+
+  get newRoyalty(): BigInt {
+    return this._event.parameters[1].value.toBigInt();
   }
 }
 
@@ -114,23 +242,6 @@ export class ticketBought__Params {
   }
 }
 
-export class FanszoidMarketplace__creatorRoyaltiesResult {
-  value0: Address;
-  value1: BigInt;
-
-  constructor(value0: Address, value1: BigInt) {
-    this.value0 = value0;
-    this.value1 = value1;
-  }
-
-  toMap(): TypedMap<string, ethereum.Value> {
-    let map = new TypedMap<string, ethereum.Value>();
-    map.set("value0", ethereum.Value.fromAddress(this.value0));
-    map.set("value1", ethereum.Value.fromUnsignedBigInt(this.value1));
-    return map;
-  }
-}
-
 export class FanszoidMarketplace__eventsResult {
   value0: Address;
   value1: string;
@@ -148,9 +259,52 @@ export class FanszoidMarketplace__eventsResult {
   }
 }
 
+export class FanszoidMarketplace__sellingRoyaltiesResult {
+  value0: Address;
+  value1: BigInt;
+  value2: BigInt;
+
+  constructor(value0: Address, value1: BigInt, value2: BigInt) {
+    this.value0 = value0;
+    this.value1 = value1;
+    this.value2 = value2;
+  }
+
+  toMap(): TypedMap<string, ethereum.Value> {
+    let map = new TypedMap<string, ethereum.Value>();
+    map.set("value0", ethereum.Value.fromAddress(this.value0));
+    map.set("value1", ethereum.Value.fromUnsignedBigInt(this.value1));
+    map.set("value2", ethereum.Value.fromUnsignedBigInt(this.value2));
+    return map;
+  }
+}
+
 export class FanszoidMarketplace extends ethereum.SmartContract {
   static bind(address: Address): FanszoidMarketplace {
     return new FanszoidMarketplace("FanszoidMarketplace", address);
+  }
+
+  DEFAULT_MARKETPLACE_ROYALTY(): BigInt {
+    let result = super.call(
+      "DEFAULT_MARKETPLACE_ROYALTY",
+      "DEFAULT_MARKETPLACE_ROYALTY():(uint256)",
+      []
+    );
+
+    return result[0].toBigInt();
+  }
+
+  try_DEFAULT_MARKETPLACE_ROYALTY(): ethereum.CallResult<BigInt> {
+    let result = super.tryCall(
+      "DEFAULT_MARKETPLACE_ROYALTY",
+      "DEFAULT_MARKETPLACE_ROYALTY():(uint256)",
+      []
+    );
+    if (result.reverted) {
+      return new ethereum.CallResult();
+    }
+    let value = result.value;
+    return ethereum.CallResult.fromValue(value[0].toBigInt());
   }
 
   MINIMUM_ASK(): BigInt {
@@ -166,21 +320,6 @@ export class FanszoidMarketplace extends ethereum.SmartContract {
     }
     let value = result.value;
     return ethereum.CallResult.fromValue(value[0].toBigInt());
-  }
-
-  _owner(): Address {
-    let result = super.call("_owner", "_owner():(address)", []);
-
-    return result[0].toAddress();
-  }
-
-  try__owner(): ethereum.CallResult<Address> {
-    let result = super.tryCall("_owner", "_owner():(address)", []);
-    if (result.reverted) {
-      return new ethereum.CallResult();
-    }
-    let value = result.value;
-    return ethereum.CallResult.fromValue(value[0].toAddress());
   }
 
   askingPrices(param0: Address, param1: BigInt): BigInt {
@@ -239,41 +378,6 @@ export class FanszoidMarketplace extends ethereum.SmartContract {
     }
     let value = result.value;
     return ethereum.CallResult.fromValue(value[0].toBigInt());
-  }
-
-  creatorRoyalties(
-    param0: BigInt
-  ): FanszoidMarketplace__creatorRoyaltiesResult {
-    let result = super.call(
-      "creatorRoyalties",
-      "creatorRoyalties(uint256):(address,uint256)",
-      [ethereum.Value.fromUnsignedBigInt(param0)]
-    );
-
-    return new FanszoidMarketplace__creatorRoyaltiesResult(
-      result[0].toAddress(),
-      result[1].toBigInt()
-    );
-  }
-
-  try_creatorRoyalties(
-    param0: BigInt
-  ): ethereum.CallResult<FanszoidMarketplace__creatorRoyaltiesResult> {
-    let result = super.tryCall(
-      "creatorRoyalties",
-      "creatorRoyalties(uint256):(address,uint256)",
-      [ethereum.Value.fromUnsignedBigInt(param0)]
-    );
-    if (result.reverted) {
-      return new ethereum.CallResult();
-    }
-    let value = result.value;
-    return ethereum.CallResult.fromValue(
-      new FanszoidMarketplace__creatorRoyaltiesResult(
-        value[0].toAddress(),
-        value[1].toBigInt()
-      )
-    );
   }
 
   eventUri(eventId: BigInt): string {
@@ -347,59 +451,71 @@ export class FanszoidMarketplace extends ethereum.SmartContract {
     return ethereum.CallResult.fromValue(value[0].toAddress());
   }
 
-  globalBids(param0: Address, param1: BigInt): BigInt {
-    let result = super.call(
-      "globalBids",
-      "globalBids(address,uint256):(uint256)",
-      [
-        ethereum.Value.fromAddress(param0),
-        ethereum.Value.fromUnsignedBigInt(param1)
-      ]
-    );
+  owner(): Address {
+    let result = super.call("owner", "owner():(address)", []);
 
-    return result[0].toBigInt();
+    return result[0].toAddress();
   }
 
-  try_globalBids(param0: Address, param1: BigInt): ethereum.CallResult<BigInt> {
+  try_owner(): ethereum.CallResult<Address> {
+    let result = super.tryCall("owner", "owner():(address)", []);
+    if (result.reverted) {
+      return new ethereum.CallResult();
+    }
+    let value = result.value;
+    return ethereum.CallResult.fromValue(value[0].toAddress());
+  }
+
+  paused(): boolean {
+    let result = super.call("paused", "paused():(bool)", []);
+
+    return result[0].toBoolean();
+  }
+
+  try_paused(): ethereum.CallResult<boolean> {
+    let result = super.tryCall("paused", "paused():(bool)", []);
+    if (result.reverted) {
+      return new ethereum.CallResult();
+    }
+    let value = result.value;
+    return ethereum.CallResult.fromValue(value[0].toBoolean());
+  }
+
+  sellingRoyalties(
+    param0: BigInt
+  ): FanszoidMarketplace__sellingRoyaltiesResult {
+    let result = super.call(
+      "sellingRoyalties",
+      "sellingRoyalties(uint256):(address,uint256,uint256)",
+      [ethereum.Value.fromUnsignedBigInt(param0)]
+    );
+
+    return new FanszoidMarketplace__sellingRoyaltiesResult(
+      result[0].toAddress(),
+      result[1].toBigInt(),
+      result[2].toBigInt()
+    );
+  }
+
+  try_sellingRoyalties(
+    param0: BigInt
+  ): ethereum.CallResult<FanszoidMarketplace__sellingRoyaltiesResult> {
     let result = super.tryCall(
-      "globalBids",
-      "globalBids(address,uint256):(uint256)",
-      [
-        ethereum.Value.fromAddress(param0),
-        ethereum.Value.fromUnsignedBigInt(param1)
-      ]
+      "sellingRoyalties",
+      "sellingRoyalties(uint256):(address,uint256,uint256)",
+      [ethereum.Value.fromUnsignedBigInt(param0)]
     );
     if (result.reverted) {
       return new ethereum.CallResult();
     }
     let value = result.value;
-    return ethereum.CallResult.fromValue(value[0].toBigInt());
-  }
-}
-
-export class ConstructorCall extends ethereum.Call {
-  get inputs(): ConstructorCall__Inputs {
-    return new ConstructorCall__Inputs(this);
-  }
-
-  get outputs(): ConstructorCall__Outputs {
-    return new ConstructorCall__Outputs(this);
-  }
-}
-
-export class ConstructorCall__Inputs {
-  _call: ConstructorCall;
-
-  constructor(call: ConstructorCall) {
-    this._call = call;
-  }
-}
-
-export class ConstructorCall__Outputs {
-  _call: ConstructorCall;
-
-  constructor(call: ConstructorCall) {
-    this._call = call;
+    return ethereum.CallResult.fromValue(
+      new FanszoidMarketplace__sellingRoyaltiesResult(
+        value[0].toAddress(),
+        value[1].toBigInt(),
+        value[2].toBigInt()
+      )
+    );
   }
 }
 
@@ -505,6 +621,122 @@ export class CreateEventForOrganizerCall__Outputs {
   }
 }
 
+export class DeleteEventCall extends ethereum.Call {
+  get inputs(): DeleteEventCall__Inputs {
+    return new DeleteEventCall__Inputs(this);
+  }
+
+  get outputs(): DeleteEventCall__Outputs {
+    return new DeleteEventCall__Outputs(this);
+  }
+}
+
+export class DeleteEventCall__Inputs {
+  _call: DeleteEventCall;
+
+  constructor(call: DeleteEventCall) {
+    this._call = call;
+  }
+
+  get eventId(): BigInt {
+    return this._call.inputValues[0].value.toBigInt();
+  }
+}
+
+export class DeleteEventCall__Outputs {
+  _call: DeleteEventCall;
+
+  constructor(call: DeleteEventCall) {
+    this._call = call;
+  }
+}
+
+export class InitializeCall extends ethereum.Call {
+  get inputs(): InitializeCall__Inputs {
+    return new InitializeCall__Inputs(this);
+  }
+
+  get outputs(): InitializeCall__Outputs {
+    return new InitializeCall__Outputs(this);
+  }
+}
+
+export class InitializeCall__Inputs {
+  _call: InitializeCall;
+
+  constructor(call: InitializeCall) {
+    this._call = call;
+  }
+}
+
+export class InitializeCall__Outputs {
+  _call: InitializeCall;
+
+  constructor(call: InitializeCall) {
+    this._call = call;
+  }
+}
+
+export class ModifyMarketRoyaltyOnEventCall extends ethereum.Call {
+  get inputs(): ModifyMarketRoyaltyOnEventCall__Inputs {
+    return new ModifyMarketRoyaltyOnEventCall__Inputs(this);
+  }
+
+  get outputs(): ModifyMarketRoyaltyOnEventCall__Outputs {
+    return new ModifyMarketRoyaltyOnEventCall__Outputs(this);
+  }
+}
+
+export class ModifyMarketRoyaltyOnEventCall__Inputs {
+  _call: ModifyMarketRoyaltyOnEventCall;
+
+  constructor(call: ModifyMarketRoyaltyOnEventCall) {
+    this._call = call;
+  }
+
+  get eventId(): BigInt {
+    return this._call.inputValues[0].value.toBigInt();
+  }
+
+  get newRoyalty(): BigInt {
+    return this._call.inputValues[1].value.toBigInt();
+  }
+}
+
+export class ModifyMarketRoyaltyOnEventCall__Outputs {
+  _call: ModifyMarketRoyaltyOnEventCall;
+
+  constructor(call: ModifyMarketRoyaltyOnEventCall) {
+    this._call = call;
+  }
+}
+
+export class PauseCall extends ethereum.Call {
+  get inputs(): PauseCall__Inputs {
+    return new PauseCall__Inputs(this);
+  }
+
+  get outputs(): PauseCall__Outputs {
+    return new PauseCall__Outputs(this);
+  }
+}
+
+export class PauseCall__Inputs {
+  _call: PauseCall;
+
+  constructor(call: PauseCall) {
+    this._call = call;
+  }
+}
+
+export class PauseCall__Outputs {
+  _call: PauseCall;
+
+  constructor(call: PauseCall) {
+    this._call = call;
+  }
+}
+
 export class PublishEventTicketsCall extends ethereum.Call {
   get inputs(): PublishEventTicketsCall__Inputs {
     return new PublishEventTicketsCall__Inputs(this);
@@ -585,6 +817,32 @@ export class RemoveAskCall__Outputs {
   }
 }
 
+export class RenounceOwnershipCall extends ethereum.Call {
+  get inputs(): RenounceOwnershipCall__Inputs {
+    return new RenounceOwnershipCall__Inputs(this);
+  }
+
+  get outputs(): RenounceOwnershipCall__Outputs {
+    return new RenounceOwnershipCall__Outputs(this);
+  }
+}
+
+export class RenounceOwnershipCall__Inputs {
+  _call: RenounceOwnershipCall;
+
+  constructor(call: RenounceOwnershipCall) {
+    this._call = call;
+  }
+}
+
+export class RenounceOwnershipCall__Outputs {
+  _call: RenounceOwnershipCall;
+
+  constructor(call: RenounceOwnershipCall) {
+    this._call = call;
+  }
+}
+
 export class SetAskCall extends ethereum.Call {
   get inputs(): SetAskCall__Inputs {
     return new SetAskCall__Inputs(this);
@@ -653,6 +911,62 @@ export class SetEventUriCall__Outputs {
   _call: SetEventUriCall;
 
   constructor(call: SetEventUriCall) {
+    this._call = call;
+  }
+}
+
+export class TransferOwnershipCall extends ethereum.Call {
+  get inputs(): TransferOwnershipCall__Inputs {
+    return new TransferOwnershipCall__Inputs(this);
+  }
+
+  get outputs(): TransferOwnershipCall__Outputs {
+    return new TransferOwnershipCall__Outputs(this);
+  }
+}
+
+export class TransferOwnershipCall__Inputs {
+  _call: TransferOwnershipCall;
+
+  constructor(call: TransferOwnershipCall) {
+    this._call = call;
+  }
+
+  get newOwner(): Address {
+    return this._call.inputValues[0].value.toAddress();
+  }
+}
+
+export class TransferOwnershipCall__Outputs {
+  _call: TransferOwnershipCall;
+
+  constructor(call: TransferOwnershipCall) {
+    this._call = call;
+  }
+}
+
+export class UnpauseCall extends ethereum.Call {
+  get inputs(): UnpauseCall__Inputs {
+    return new UnpauseCall__Inputs(this);
+  }
+
+  get outputs(): UnpauseCall__Outputs {
+    return new UnpauseCall__Outputs(this);
+  }
+}
+
+export class UnpauseCall__Inputs {
+  _call: UnpauseCall;
+
+  constructor(call: UnpauseCall) {
+    this._call = call;
+  }
+}
+
+export class UnpauseCall__Outputs {
+  _call: UnpauseCall;
+
+  constructor(call: UnpauseCall) {
     this._call = call;
   }
 }

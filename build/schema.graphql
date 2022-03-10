@@ -26,6 +26,7 @@ type User @entity {
 type Ticket @entity {
   id: ID!
   ticketType: TicketType!
+  event: Event!
   askingPrice: BigInt
   amount: Int!
   owner: User!

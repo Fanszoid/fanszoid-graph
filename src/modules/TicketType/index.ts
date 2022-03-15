@@ -17,3 +17,7 @@ export function ticketTypePriceMatches(
 export function ticketTypeHasSupply(ticketType: TicketType): boolean {
   return ticketType.primarySupply && ticketType.primarySupply > 0;
 }
+
+export function ticketTypeHasNSupplyLeft(ticketType: TicketType, n: number): boolean {
+  return ticketType.primarySupply && ticketType.primarySupply >= n;
+}

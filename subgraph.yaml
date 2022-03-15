@@ -9,11 +9,11 @@ dataSources:
   # ---------------------------------------------------------
   - kind: ethereum/contract
     name: TicketsNFT
-    network: matic
+    network: mumbai
     source:
-      address: '0x57374a7f837A782403468839C80F0F7700A762e7'
+      address: '0x7Ebef62D0B8696A49Fd73667D67beD48148d83D4'
       abi: TicketsNFT
-      startBlock: 25657919
+      startBlock: 25405972
     mapping:
       kind: ethereum/events
       apiVersion: 0.0.6
@@ -28,17 +28,21 @@ dataSources:
       eventHandlers:
         - event: ticketsPublished(uint256,uint256,uint256[],uint256[],uint256[],uint256[],string[],address)
           handler: handleTicketsPublished
+        - event: TransferSingle(indexed address,indexed address,indexed address,uint256,uint256)
+          handler: handleTransferSingle
+        - event: TransferBatch(indexed address,indexed address,indexed address,uint256[],uint256[])
+          handler: handleTransferBatch
       file: ./src/handlers/ticketsHandler.ts
   # ---------------------------------------------------------
   # MARKETPLACE 
   # ---------------------------------------------------------
   - kind: ethereum/contract
     name: FanszoidMarketplace
-    network: matic
+    network: mumbai
     source:
-      address: '0xbC2E88848Add239a7d41F917216063B36d19975b'
+      address: '0x2b5224d135073f273F4787c360f5BF766f3f9362'
       abi: FanszoidMarketplace
-      startBlock: 25657775
+      startBlock: 25405958
     mapping:
       kind: ethereum/events
       apiVersion: 0.0.6
@@ -54,8 +58,6 @@ dataSources:
       eventHandlers:
         - event: eventCreated(uint256,address,string)
           handler: handleEventCreated
-        - event: ticketBought(uint256,address,address,uint256)
-          handler: handleTicketBought
         - event: AskSetted(uint256,address,uint256)
           handler: handleAskSetted
         - event: AskRemoved(address,uint256)

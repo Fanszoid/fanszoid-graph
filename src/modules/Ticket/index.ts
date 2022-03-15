@@ -12,3 +12,8 @@ export function ticketPriceMatches(price: BigInt, ticket: Ticket): boolean {
 export function ticketHasAmountAvailable(ticket: Ticket): boolean {
   return ticket.amount && ticket.amount > 0;
 }
+
+export function ticketHasNAmountAvailable(ticket: Ticket, n: number): boolean {
+  return ticket.amount && ticket.amount >= n;
+}
+

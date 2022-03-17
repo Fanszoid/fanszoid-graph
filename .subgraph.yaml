@@ -9,11 +9,11 @@ dataSources:
   # ---------------------------------------------------------
   - kind: ethereum/contract
     name: TicketsNFT
-    network: mumbai
+    network: {{network}}
     source:
-      address: '0x7Ebef62D0B8696A49Fd73667D67beD48148d83D4'
+      address: '{{address:tickets}}'
       abi: TicketsNFT
-      startBlock: 25405972
+      startBlock: {{startBlock:tickets}}
     mapping:
       kind: ethereum/events
       apiVersion: 0.0.6
@@ -38,11 +38,11 @@ dataSources:
   # ---------------------------------------------------------
   - kind: ethereum/contract
     name: FanszoidMarketplace
-    network: mumbai
+    network: {{network}}
     source:
-      address: '0x2b5224d135073f273F4787c360f5BF766f3f9362'
+      address: '{{address:marketplace}}'
       abi: FanszoidMarketplace
-      startBlock: 25405958
+      startBlock: {{startBlock:marketplace}}
     mapping:
       kind: ethereum/events
       apiVersion: 0.0.6

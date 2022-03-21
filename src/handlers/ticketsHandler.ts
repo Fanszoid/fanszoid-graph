@@ -19,6 +19,8 @@ import { loadOrCreateUser } from "../modules/User";
 import { User } from "../generated/schema";
 import { Address, log } from "@graphprotocol/graph-ts";
 import { BigInt } from "@graphprotocol/graph-ts/common/numbers";
+import { store } from "@graphprotocol/graph-ts";
+
 
 export function handleTicketsPublished(event: ticketsPublished): void {
   let eventId = getEventId(event.params.eventId, event.params.publisher);
@@ -126,7 +128,14 @@ function internalTransferToken(
           ticketHasNAmountAvailable(fromTicket, value.toI32())
         ) {
           fromTicket.amount = fromTicket.amount - value.toI32();
-          fromTicket.save();
+          if( fromTicket.amount > 0 ){
+            fromTicket.save();
+          } else {
+            store.remove(
+              "Ticket",
+              fromTicketId
+            );
+          }
         } else {
           log.error(
             "ticket not found or no enough amount left for id: {}, and user: {}",

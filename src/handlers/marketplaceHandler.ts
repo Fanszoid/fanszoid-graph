@@ -6,7 +6,7 @@ import {
   eventDeleted,
   eventEdited,
 } from "../generated/FanszoidMarketplace/FanszoidMarketplace";
-import { Event, Ticket, TicketType } from "../generated/schema";
+import { Event, Ticket, TicketBalance } from "../generated/schema";
 import { loadOrCreateUser } from "../modules/User";
 import { loadOrCreateEvent } from "../modules/Event";
 import {
@@ -23,11 +23,45 @@ import {
 import { log, BigInt } from "@graphprotocol/graph-ts";
 import { store } from "@graphprotocol/graph-ts";
 
-export function handleEventCreated(event: eventCreated): void {
+
+export function handleTicketPublished(event: TicketPublished): void {
+  let eventEntity = loadOrCreateEvent(
+    event.params.eventId
+  );
+
+  let ticketTypeId = getTicketTypeId(event.params.ticketId);
+  let ticketType = Ticket.load(ticketTypeId);
+  if (ticketType != null) {
+    log.error("handleTicketPublished: TicketType already existed, id : {}", [ticketTypeId]);
+    return;
+  }
+
+  ticketType = new Ticket(ticketTypeId);
+
+  ticketType.event = eventEntity.id;
+  ticketType.creatorRoyalty = event.params.creatorRoyalty.toI32();
+  ticketType.isResellable = event.params.isResellable;
+  ticketType.metadata = event.params.uri;
+  ticketType.totalAmount = event.params.amount.toI32();
+  
+  ticketType.save();
+
+  let ticketBalance = TicketBalance.loadOrCreateTicketBalance(event.params.ticketId, event.params.organizer);
+  ticketBalance.ticket = ticketTypeId;
+  ticketBalance.event = eventEntity.id;
+  ticketBalance.askingPrice = event.params.price;
+  ticketBalance.amountOnSell = event.params.amountToSell.toI32();
+  ticketBalance.amountOwned = event.params.amount.toI32();
+  ticketBalance.owner = event.params.organizer.toHex();
+  ticketBalance.isEventOwner = true;
+
+  ticketBalance.save();
+}
+
+export function handleEventCreated(event: EventCreated): void {
   let organizerUser = loadOrCreateUser(event.params.organizer);
   let eventEntity = loadOrCreateEvent(
-    event.params.eventId,
-    event.params.organizer
+    event.params.eventId
   );
 
   eventEntity.metadata = event.params.uri;
@@ -35,188 +69,152 @@ export function handleEventCreated(event: eventCreated): void {
   eventEntity.save();
 }
 
-/*
-export function handleTicketBought(event: ticketBought): void {
-  let ticketTypeId = getTicketTypeId(event.params.tokenId);
-  let ticketType = TicketType.load(ticketTypeId);
-  if (ticketType == null) {
-    log.error("TicketType not found, id : {}", [ticketTypeId]);
-    return;
-  }
-
-  let ticketEventEntity = Event.load(ticketType.event);
-  if (ticketEventEntity == null) {
-    log.error("Event not found for ticket type, id : {}", [ticketType.id]);
-    return;
-  }
-
-  let sellerUser = loadOrCreateUser(event.params.seller);
-  let buyerUser = loadOrCreateUser(event.params.buyer);
-
-  // Seller
-  if (sellerUser.address.toHex() == ticketEventEntity.organizer) {
-    // Ticket sold by the organizer ( primary market ).
-
-    if (ticketTypeHasSupply(ticketType)) {
-      if (!ticketTypePriceMatches(event.params.price, ticketType)) {
-        log.error("Incorrect price on primary ticket sale, price: {}", [
-          event.params.price.toHex(),
-        ]);
-        return;
-      }
-
-      ticketType.primarySupply = ticketType.primarySupply - 1;
-    } else {
-      log.error(
-        "No supply on primary market for ticket, id: {}, and user: {}",
-        [event.params.tokenId.toHex(), event.params.seller.toHex()]
-      );
-    }
-  } else {
-    // Ticket sold on Secondary market.
-
-    let sellerTicketId = getTicketId(event.params.tokenId, event.params.seller);
-    let sellerTicket = Ticket.load(sellerTicketId);
-
-    if (sellerTicket != null && ticketHasAmountAvailable(sellerTicket)) {
-      if (!ticketPriceMatches(event.params.price, sellerTicket)) {
-        log.error("Incorrect price on ticket sale, price: {}", [
-          event.params.price.toHex(),
-        ]);
-        return;
-      }
-
-      sellerTicket.amount = sellerTicket.amount - 1;
-      sellerTicket.save();
-    } else {
-      log.error(
-        "Seller ticket not found or no amount left for id: {}, and user: {}",
-        [event.params.tokenId.toHex(), event.params.seller.toHex()]
-      );
-    }
-  }
-
-  // Buyer
-
-  if (buyerUser.address.toHex() != ticketEventEntity.organizer) {
-    let buyerTicketId = getTicketId(event.params.tokenId, event.params.buyer);
-    let buyerTicket = Ticket.load(buyerTicketId);
-
-    if (buyerTicket == null) {
-      buyerTicket = new Ticket(buyerTicketId);
-      buyerTicket.ticketType = ticketTypeId;
-      buyerTicket.event = ticketType.event;
-      buyerTicket.amount = 1;
-      buyerTicket.owner = buyerUser.address.toHex();
-
-      buyerTicket.save();
-    } else {
-      if (ticketHasAmountAvailable(buyerTicket)) {
-        buyerTicket.amount = buyerTicket.amount + 1;
-      } else {
-        buyerTicket.amount = 1;
-      }
-
-      buyerTicket.save();
-    }
-  } else {
-    // Ticket bought by the organizer of the event, rather infrequent.
-
-    if (ticketTypeHasSupply(ticketType)) {
-      ticketType.primarySupply = ticketType.primarySupply + 1;
-    } else {
-      ticketType.primarySupply = 1;
-    }
-  }
-
-  ticketType.save();
+export function handleEventDeleted(event: EventDeleted): void {
+  store.remove(
+    "Event",
+    getEventId(event.params.eventId)
+  );
 }
-  */
+
+
+export function handleTicketDeleted(event: TicketDeleted): void {
+  for (let i = 0; i < event.params.ids.length; i++) {
+
+    let id = event.params.ids[i];
+    let amount = event.params.amounts[i].toI32();
+
+    let ticketBalance = TicketBalance.load(getTicketBalanceId(id, event.params.owner));
+    if(ticketBalance == null ){
+      log.error("ticketBalance not found, id : {}", [getTicketBalanceId(id, event.params.owner)]);
+      return;
+    }
+
+    if( ticketBalance.amountOwned < amount ) {
+      log.error("Not enough amount owned on ticketBalance, id : {}", [getTicketBalanceId(id, event.params.owner)]);
+      return;
+    }
+
+    ticketBalance.amountOwned = ticketBalance.amountOwned - amount;
+    if( ticketBalance.amountOwned == 0 ) {
+      store.remove(
+        "TicketBalance",
+        getTicketBalanceId(id, event.params.owner)
+      );
+    } else {
+      ticketBalance.save()
+    }
+
+  }
+}
+
+/* 
+  the handling on transferSingle/transferBatch does most of the entity updating for the ticket sale.
+*/
+export function handleTicketBought(event: TicketBought): void {
+  let amount = event.params.amount.toI32();
+
+  let sellerTicketBalance = TicketBalance.loadOrCreateTicketBalance(event.params.ticketId, event.params.seller);
+
+  if( sellerTicketBalance == null ){
+    log.error("sellerTicketBalance not found on handleTicketBought. id : {}", [sellerTicketBalance.id]);
+    return;
+  }
+  if(sellerTicketBalance.amountOnSell < amount){
+    log.error("fromTicketBalance.amountOnSell not enough on internalTransferToken. balance amount: {}, transfer value: {}", [sellerTicketBalance.amountOnSell, amount.toHex()]);
+    return;
+  }
+  if( sellerTicketBalance.askingPrice != event.params.price ) {
+    log.error("sellerTicketBalance incongruent price on handleTicketBought. id : {}, tx price: {}, askingPrice: {}", [getTicketBalanceId(event.params.ticketId, event.params.seller), event.params.price, sellerTicketBalance.askingPrice ]);
+    return;
+  }
+
+  sellerTicketBalance.amountOnSell = sellerTicketBalance.amountOnSell - amount;
+
+  sellerTicketBalance.save();
+
+  let transfer = loadOrCreateTransfer(event.transaction.hash.toHex());
+  transfer.price = event.params.price;
+  transfer.isSale = true;
+
+  transfer.save()
+}
 
 export function handleAskSetted(event: AskSetted): void {
-  let ticketType = TicketType.load(getTicketTypeId(event.params.tokenId));
-  if (ticketType == null) {
-    log.error("TicketType not found, id : {}", [event.params.tokenId.toHex()]);
-    return;
-  }
-
-  let ticketEventEntity = Event.load(ticketType.event);
-  if (ticketEventEntity == null) {
-    log.error("Event not found for ticket type, id : {}", [ticketType.id]);
-    return;
-  }
-
-  if (event.params.seller.toHex() != ticketEventEntity.organizer) {
-    let sellerTicketId = getTicketId(event.params.tokenId, event.params.seller);
-    let ticket = Ticket.load(sellerTicketId);
-    if (ticket == null) {
-      ticket = new Ticket(sellerTicketId);
-      ticket.ticketType = ticketType.id;
-      ticket.event = ticketType.event;
-      ticket.amount = 0;
-      ticket.owner = event.params.seller.toHex();
-    }
-    ticket.askingPrice = event.params.askingPrice;
-
-    ticket.save();
+  let ticketBalance = TicketBalance.load(getTicketBalanceId(event.params.ticketId, event.params.seller));
+  if(ticketBalance != null ) {
+    ticketBalance.amountOnSell = ticketBalance.amountOnSell + event.params.amount.toI32();
+    ticketBalance.askingPrice = event.params.ticketPrice;
+    
+    ticketBalance.save();
   } else {
-    // changed askingPrice on primary market.
-    ticketType.primaryAskingPrice = event.params.askingPrice;
-
-    ticketType.save();
+    log.error("ticketBalance not found on handleAskSetted. id : {}", [getTicketBalanceId(event.params.ticketId, event.params.seller)]);
+    return;
   }
 }
 
 export function handleAskRemoved(event: AskRemoved): void {
-  let ticketType = TicketType.load(getTicketTypeId(event.params.tokenId));
-  if (ticketType == null) {
-    log.error("TicketType not found, id : {}", [event.params.tokenId.toHex()]);
-    return;
-  }
-
-  let ticketEventEntity = Event.load(ticketType.event);
-  if (ticketEventEntity == null) {
-    log.error("Event not found for ticket type, id : {}", [ticketType.id]);
-    return;
-  }
-
-  if (event.params.seller.toHex() != ticketEventEntity.organizer) {
-    let sellerTicketId = getTicketId(event.params.tokenId, event.params.seller);
-    let ticket = Ticket.load(sellerTicketId);
-    if (ticket == null) {
-      ticket = new Ticket(sellerTicketId);
-      ticket.ticketType = ticketType.id;
-      ticket.event = ticketType.event;
-      ticket.amount = 0;
-      ticket.owner = event.params.seller.toHex();
-    }
-    ticket.askingPrice = null;
-
-    ticket.save();
+  let ticketBalance = TicketBalance.load(getTicketBalanceId(event.params.ticketId, event.params.seller));
+  if(ticketBalance != null ) {
+    ticketBalance.amountOnSell = null;
+    ticketBalance.askingPrice = null;
+    
+    ticketBalance.save();
   } else {
-    // removed askingPrice on primary market.
-    ticketType.primaryAskingPrice = null;
-
-    ticketType.save();
+    log.error("ticketBalance not found on handleAskRemoved. id : {}", [getTicketBalanceId(event.params.ticketId, event.params.seller)]);
+    return;
   }
 }
 
-export function handleEventEdited(event: eventEdited): void {
-  let eventEntity = Event.load(
-    getEventId(event.params.eventId, event.params.organizer)
-  );
-  if (eventEntity == null) {
-    log.error("Event not found, id : {}", [event.params.eventId.toHex()]);
+export function handleEventOwnershipTransferred(event: EventOwnershipTransferred): void {
+  let eventEntity = Event.load(event.params.eventId.toHex());
+  if(eventEntity == null ) {
+    log.error("Event not found on handleEventOwnershipTransferred. id : {}", [event.params.eventId.toHex()]);
     return;
   }
 
-  eventEntity.metadata = event.params.uri;
+  let ownerUser = loadOrCreateUser(event.params.newOwner);
+  eventEntity.organizer = ownerUser.id;
+
   eventEntity.save();
+
+  eventEntity.ticketBalances.forEach( tb => {
+    let ticketBalance = TicketBalances.load(tb);
+    if(ticketBalance == null ) {
+      log.error("TicketBalance not found on handleEventOwnershipTransferred. id : {}", [tb]);
+      return;
+    }
+
+    ticketBalance.isEventOwner = ticketBalance.owner == ownerUser.id;
+    ticketBalance.save();
+  });
 }
 
-export function handleEventDeleted(event: eventDeleted): void {
-  store.remove(
-    "Event",
-    getEventId(event.params.eventId, event.params.organizer)
-  );
+export function handleCreatorRoyaltyModifiedOnEvent(event: CreatorRoyaltyModifiedOnEvent): void {
+  let eventEntity = Event.load(event.params.eventId.toHex());
+  if(eventEntity == null ) {
+    log.error("Event not found on handleEventOwnershipTransferred. id : {}", [event.params.eventId.toHex()]);
+    return;
+  }
+
+  eventEntity.tickets.forEach( t => {
+    let ticket = Ticket.load(t);
+    if(ticket == null ) {
+      log.error("Ticket not found on handleCreatorRoyaltyModifiedOnEvent. id : {}", [t]);
+      return;
+    }
+
+    ticket.creatorRoyalty = event.params.newRoyalty.toI32();
+    ticket.save();
+  });
+}
+
+export function handleCreatorRoyaltyModifiedOnTicket(event: CreatorRoyaltyModifiedOnTicket): void {
+  let ticket = Ticket.load(event.params.ticketId.toHex());
+  if(ticket == null ) {
+    log.error("Ticket not found on handleCreatorRoyaltyModifiedOnTicket. id : {}", [event.params.ticketId.toHex()]);
+    return;
+  }
+
+  ticket.creatorRoyalty = event.params.newRoyalty.toI32();
+  ticket.save();
 }

@@ -1,33 +1,55 @@
 type Event @entity {
   id: ID!
-  ticketTypes: [TicketType!]! @derivedFrom(field: "event")
+  tickets: [Ticket!] @derivedFrom(field: "event")
+  ticketBalances: [TicketBalance!]! @derivedFrom(field: "event")
+  sentTickets: [Transfer!] @derivedFrom(field: "event")
   metadata: String!
   organizer: User!
 }
 
-type TicketType @entity {
+type Ticket @entity {
   id: ID!
-  event: Event!
+  event: Event
   creatorRoyalty: Int!
+  isResellable: Bool!
   metadata: String!
-  primaryAskingPrice: BigInt
-  primarySupply: Int!
-  initialAmount: Int!
-  soldTickets: [Ticket!]! @derivedFrom(field: "ticketType")
+  totalAmount: Int!
+  ticketBalances: [TicketBalance!]! @derivedFrom(field: "ticket")
+  sentTickets: [Transfer!] @derivedFrom(field: "ticket")
+}
+
+type TicketBalance @entity {
+  id: ID!
+  ticket: Ticket!
+  event: Event
+  askingPrice: BigInt
+  amountOnSell: Int!
+  amountOwned: Int!
+  owner: User!
+  isEventOwner: Bool!
+  sentTickets: [Transfer!] @derivedFrom(field: "sellerBalance")
+  receivedTickets: [Transfer!] @derivedFrom(field: "buyerBalance")
 }
 
 type User @entity {
   id: ID! # ETH addr
   address: Bytes!
   events: [Event!] @derivedFrom(field: "organizer")
-  tickets: [Ticket!] @derivedFrom(field: "owner")
+  ticketBalances: [TicketBalance!] @derivedFrom(field: "owner")
+  sentTickets: [Transfer!] @derivedFrom(field: "seller")
+  receivedTickets: [Transfer!] @derivedFrom(field: "buyer")
 }
 
-type Ticket @entity {
+type Transfer @entity {
   id: ID!
-  ticketType: TicketType!
   event: Event!
-  askingPrice: BigInt
+  ticket: Ticket!
+  sender: Seller!
+  senderBalance: TicketBalance!
+  receiver: Buyer!
+  receiverBalance: TicketBalance!
+  price: BigInt!
   amount: Int!
-  owner: User!
+  isSale: Bool!
 }
+

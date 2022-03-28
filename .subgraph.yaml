@@ -5,29 +5,28 @@ schema:
   file: ./schema.graphql
 dataSources:
   # ---------------------------------------------------------
-  # TicketsNFT
+  # Tickets
   # ---------------------------------------------------------
   - kind: ethereum/contract
-    name: TicketsNFT
+    name: Ticket
     network: {{network}}
     source:
-      address: '{{address:tickets}}'
-      abi: TicketsNFT
-      startBlock: {{startBlock:tickets}}
+      address: '{{address:ticket}}'
+      abi: Ticket
+      startBlock: {{startBlock:ticket}}
     mapping:
       kind: ethereum/events
       apiVersion: 0.0.6
       language: wasm/assemblyscript
       entities:
-        - Event
-        - TicketType
+        - Ticket
+        - TicketBalance
         - User
+        - Transfer
       abis:
-        - name: TicketsNFT
-          file: ./abis/TicketsNFT.json
+        - name: Ticket
+          file: ./abis/Ticket.json
       eventHandlers:
-        - event: ticketsPublished(uint256,uint256,uint256[],uint256[],uint256[],uint256[],string[],address)
-          handler: handleTicketsPublished
         - event: TransferSingle(indexed address,indexed address,indexed address,uint256,uint256)
           handler: handleTransferSingle
         - event: TransferBatch(indexed address,indexed address,indexed address,uint256[],uint256[])
@@ -37,11 +36,11 @@ dataSources:
   # MARKETPLACE 
   # ---------------------------------------------------------
   - kind: ethereum/contract
-    name: FanszoidMarketplace
+    name: Marketplace
     network: {{network}}
     source:
       address: '{{address:marketplace}}'
-      abi: FanszoidMarketplace
+      abi: Marketplace
       startBlock: {{startBlock:marketplace}}
     mapping:
       kind: ethereum/events
@@ -50,20 +49,31 @@ dataSources:
       entities:
         - Event
         - Ticket
-        - TicketType
+        - TicketBalance
         - User
+        - Transfer
       abis:
-        - name: FanszoidMarketplace
-          file: ./abis/FanszoidMarketplace.json
+        - name: Marketplace
+          file: ./abis/Marketplace.json
       eventHandlers:
-        - event: eventCreated(uint256,address,string)
+        - event: TicketPublished(uint256, address, uint256, uint256, uint256, uint256, uint256, bool, string)
+          handler: handleTicketPublished
+        - event: EventCreated(uint256, address, string)
           handler: handleEventCreated
-        - event: AskSetted(uint256,address,uint256)
+        - event: EventDeleted(uint256)
+          handler: handleEventDeleted
+        - event: TicketDeleted(uint256, address, uint256[], uint256[])
+          handler: handleTicketDeleted
+        - event: TicketBought(uint256, address, address, uint256, uint256)
+          handler: handleTicketBought
+        - event: AskSetted(uint256, address, uint256, uint256)
           handler: handleAskSetted
         - event: AskRemoved(address,uint256)
           handler: handleAskRemoved
-        - event: eventEdited(uint256,address,string)
-          handler: handleEventEdited
-        - event: eventDeleted(uint256,address)
-          handler: handleEventDeleted
+        - event: EventOwnershipTransferred(uint256, address)
+          handler: handleEventOwnershipTransferred
+        - event: CreatorRoyaltyModifiedOnEvent(uint256, uint256)
+          handler: handleCreatorRoyaltyModifiedOnEvent
+        - event: CreatorRoyaltyModifiedOnTicket(uint256, uint256)
+          handler: handleCreatorRoyaltyModifiedOnTicket
       file: ./src/handlers/marketplaceHandler.ts

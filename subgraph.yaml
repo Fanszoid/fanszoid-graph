@@ -9,11 +9,11 @@ dataSources:
   # ---------------------------------------------------------
   - kind: ethereum/contract
     name: Ticket
-    network: {{network}}
+    network: mumbai
     source:
-      address: '{{address:ticket}}'
+      address: '0x7Ebef62D0B8696A49Fd73667D67beD48148d83D4'
       abi: Ticket
-      startBlock: {{startBlock:ticket}}
+      startBlock: 25405972
     mapping:
       kind: ethereum/events
       apiVersion: 0.0.6
@@ -37,11 +37,11 @@ dataSources:
   # ---------------------------------------------------------
   - kind: ethereum/contract
     name: Marketplace
-    network: {{network}}
+    network: mumbai
     source:
-      address: '{{address:marketplace}}'
+      address: '0x2b5224d135073f273F4787c360f5BF766f3f9362'
       abi: Marketplace
-      startBlock: {{startBlock:marketplace}}
+      startBlock: 25405958
     mapping:
       kind: ethereum/events
       apiVersion: 0.0.6

@@ -5,7 +5,7 @@
   "main": "index.js",
   "scripts": {
     "codegen": "graph codegen --debug --output-dir src/generated/",
-    "build-data": "ts-node ./scripts/completeSubgraph.ts --network matic",
+    "build-data": "ts-node ./scripts/completeSubgraph.ts --network mumbai",
     "deploy:mumbai": "ts-node ./scripts/completeSubgraph.ts --network mumbai && graph deploy --product hosted-service fanszoid/fanszoid-tickets-mumbai",
     "deploy:matic": "ts-node ./scripts/completeSubgraph.ts --network matic && graph deploy --product hosted-service fanszoid/fanszoid-tickets-matic"
   },

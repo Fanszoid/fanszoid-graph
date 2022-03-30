@@ -46,13 +46,47 @@ export class Event extends Entity {
     this.set("id", Value.fromString(value));
   }
 
-  get ticketTypes(): Array<string> {
-    let value = this.get("ticketTypes");
+  get tickets(): Array<string> | null {
+    let value = this.get("tickets");
+    if (!value || value.kind == ValueKind.NULL) {
+      return null;
+    } else {
+      return value.toStringArray();
+    }
+  }
+
+  set tickets(value: Array<string> | null) {
+    if (!value) {
+      this.unset("tickets");
+    } else {
+      this.set("tickets", Value.fromStringArray(<Array<string>>value));
+    }
+  }
+
+  get ticketBalances(): Array<string> {
+    let value = this.get("ticketBalances");
     return value!.toStringArray();
   }
 
-  set ticketTypes(value: Array<string>) {
-    this.set("ticketTypes", Value.fromStringArray(value));
+  set ticketBalances(value: Array<string>) {
+    this.set("ticketBalances", Value.fromStringArray(value));
+  }
+
+  get sentTickets(): Array<string> | null {
+    let value = this.get("sentTickets");
+    if (!value || value.kind == ValueKind.NULL) {
+      return null;
+    } else {
+      return value.toStringArray();
+    }
+  }
+
+  set sentTickets(value: Array<string> | null) {
+    if (!value) {
+      this.unset("sentTickets");
+    } else {
+      this.set("sentTickets", Value.fromStringArray(<Array<string>>value));
+    }
   }
 
   get metadata(): string {
@@ -74,30 +108,29 @@ export class Event extends Entity {
   }
 }
 
-export class TicketType extends Entity {
+export class Ticket extends Entity {
   constructor(id: string) {
     super();
     this.set("id", Value.fromString(id));
 
-    this.set("event", Value.fromString(""));
     this.set("metadata", Value.fromString(""));
   }
 
   save(): void {
     let id = this.get("id");
-    assert(id != null, "Cannot save TicketType entity without an ID");
+    assert(id != null, "Cannot save Ticket entity without an ID");
     if (id) {
       assert(
         id.kind == ValueKind.STRING,
-        "Cannot save TicketType entity with non-string ID. " +
+        "Cannot save Ticket entity with non-string ID. " +
           'Considering using .toHex() to convert the "id" to a string.'
       );
-      store.set("TicketType", id.toString(), this);
+      store.set("Ticket", id.toString(), this);
     }
   }
 
-  static load(id: string): TicketType | null {
-    return changetype<TicketType | null>(store.get("TicketType", id));
+  static load(id: string): Ticket | null {
+    return changetype<Ticket | null>(store.get("Ticket", id));
   }
 
   get id(): string {
@@ -109,13 +142,21 @@ export class TicketType extends Entity {
     this.set("id", Value.fromString(value));
   }
 
-  get event(): string {
+  get event(): string | null {
     let value = this.get("event");
-    return value!.toString();
+    if (!value || value.kind == ValueKind.NULL) {
+      return null;
+    } else {
+      return value.toString();
+    }
   }
 
-  set event(value: string) {
-    this.set("event", Value.fromString(value));
+  set event(value: string | null) {
+    if (!value) {
+      this.unset("event");
+    } else {
+      this.set("event", Value.fromString(<string>value));
+    }
   }
 
   get creatorRoyalty(): i32 {
@@ -127,6 +168,15 @@ export class TicketType extends Entity {
     this.set("creatorRoyalty", Value.fromI32(value));
   }
 
+  get isResellable(): boolean {
+    let value = this.get("isResellable");
+    return value!.toBoolean();
+  }
+
+  set isResellable(value: boolean) {
+    this.set("isResellable", Value.fromBoolean(value));
+  }
+
   get metadata(): string {
     let value = this.get("metadata");
     return value!.toString();
@@ -136,8 +186,105 @@ export class TicketType extends Entity {
     this.set("metadata", Value.fromString(value));
   }
 
-  get primaryAskingPrice(): BigInt | null {
-    let value = this.get("primaryAskingPrice");
+  get totalAmount(): i32 {
+    let value = this.get("totalAmount");
+    return value!.toI32();
+  }
+
+  set totalAmount(value: i32) {
+    this.set("totalAmount", Value.fromI32(value));
+  }
+
+  get ticketBalances(): Array<string> {
+    let value = this.get("ticketBalances");
+    return value!.toStringArray();
+  }
+
+  set ticketBalances(value: Array<string>) {
+    this.set("ticketBalances", Value.fromStringArray(value));
+  }
+
+  get sentTickets(): Array<string> | null {
+    let value = this.get("sentTickets");
+    if (!value || value.kind == ValueKind.NULL) {
+      return null;
+    } else {
+      return value.toStringArray();
+    }
+  }
+
+  set sentTickets(value: Array<string> | null) {
+    if (!value) {
+      this.unset("sentTickets");
+    } else {
+      this.set("sentTickets", Value.fromStringArray(<Array<string>>value));
+    }
+  }
+}
+
+export class TicketBalance extends Entity {
+  constructor(id: string) {
+    super();
+    this.set("id", Value.fromString(id));
+
+    this.set("ticket", Value.fromString(""));
+    this.set("owner", Value.fromString(""));
+  }
+
+  save(): void {
+    let id = this.get("id");
+    assert(id != null, "Cannot save TicketBalance entity without an ID");
+    if (id) {
+      assert(
+        id.kind == ValueKind.STRING,
+        "Cannot save TicketBalance entity with non-string ID. " +
+          'Considering using .toHex() to convert the "id" to a string.'
+      );
+      store.set("TicketBalance", id.toString(), this);
+    }
+  }
+
+  static load(id: string): TicketBalance | null {
+    return changetype<TicketBalance | null>(store.get("TicketBalance", id));
+  }
+
+  get id(): string {
+    let value = this.get("id");
+    return value!.toString();
+  }
+
+  set id(value: string) {
+    this.set("id", Value.fromString(value));
+  }
+
+  get ticket(): string {
+    let value = this.get("ticket");
+    return value!.toString();
+  }
+
+  set ticket(value: string) {
+    this.set("ticket", Value.fromString(value));
+  }
+
+  get event(): string | null {
+    let value = this.get("event");
+    if (!value || value.kind == ValueKind.NULL) {
+      return null;
+    } else {
+      return value.toString();
+    }
+  }
+
+  set event(value: string | null) {
+    if (!value) {
+      this.unset("event");
+    } else {
+      this.set("event", Value.fromString(<string>value));
+    }
+  }
+
+  get askingPrice(): BigInt | null {
+    let value = this.get("askingPrice");
     if (!value || value.kind == ValueKind.NULL) {
       return null;
     } else {
@@ -145,39 +292,82 @@ export class TicketType extends Entity {
     }
   }
 
-  set primaryAskingPrice(value: BigInt | null) {
+  set askingPrice(value: BigInt | null) {
     if (!value) {
-      this.unset("primaryAskingPrice");
+      this.unset("askingPrice");
     } else {
-      this.set("primaryAskingPrice", Value.fromBigInt(<BigInt>value));
+      this.set("askingPrice", Value.fromBigInt(<BigInt>value));
     }
   }
 
-  get primarySupply(): i32 {
-    let value = this.get("primarySupply");
+  get amountOnSell(): i32 {
+    let value = this.get("amountOnSell");
     return value!.toI32();
   }
 
-  set primarySupply(value: i32) {
-    this.set("primarySupply", Value.fromI32(value));
+  set amountOnSell(value: i32) {
+    this.set("amountOnSell", Value.fromI32(value));
   }
 
-  get initialAmount(): i32 {
-    let value = this.get("initialAmount");
+  get amountOwned(): i32 {
+    let value = this.get("amountOwned");
     return value!.toI32();
   }
 
-  set initialAmount(value: i32) {
-    this.set("initialAmount", Value.fromI32(value));
+  set amountOwned(value: i32) {
+    this.set("amountOwned", Value.fromI32(value));
   }
 
-  get soldTickets(): Array<string> {
-    let value = this.get("soldTickets");
-    return value!.toStringArray();
+  get owner(): string {
+    let value = this.get("owner");
+    return value!.toString();
   }
 
-  set soldTickets(value: Array<string>) {
-    this.set("soldTickets", Value.fromStringArray(value));
+  set owner(value: string) {
+    this.set("owner", Value.fromString(value));
+  }
+
+  get isEventOwner(): boolean {
+    let value = this.get("isEventOwner");
+    return value!.toBoolean();
+  }
+
+  set isEventOwner(value: boolean) {
+    this.set("isEventOwner", Value.fromBoolean(value));
+  }
+
+  get sentTickets(): Array<string> | null {
+    let value = this.get("sentTickets");
+    if (!value || value.kind == ValueKind.NULL) {
+      return null;
+    } else {
+      return value.toStringArray();
+    }
+  }
+
+  set sentTickets(value: Array<string> | null) {
+    if (!value) {
+      this.unset("sentTickets");
+    } else {
+      this.set("sentTickets", Value.fromStringArray(<Array<string>>value));
+    }
+  }
+
+  get receivedTickets(): Array<string> | null {
+    let value = this.get("receivedTickets");
+    if (!value || value.kind == ValueKind.NULL) {
+      return null;
+    } else {
+      return value.toStringArray();
+    }
+  }
+
+  set receivedTickets(value: Array<string> | null) {
+    if (!value) {
+      this.unset("receivedTickets");
+    } else {
+      this.set("receivedTickets", Value.fromStringArray(<Array<string>>value));
+    }
   }
 }
 
@@ -241,8 +431,8 @@ export class User extends Entity {
     }
   }
 
-  get tickets(): Array<string> | null {
-    let value = this.get("tickets");
+  get ticketBalances(): Array<string> | null {
+    let value = this.get("ticketBalances");
     if (!value || value.kind == ValueKind.NULL) {
       return null;
     } else {
@@ -250,40 +440,78 @@ export class User extends Entity {
     }
   }
 
-  set tickets(value: Array<string> | null) {
+  set ticketBalances(value: Array<string> | null) {
     if (!value) {
-      this.unset("tickets");
+      this.unset("ticketBalances");
     } else {
-      this.set("tickets", Value.fromStringArray(<Array<string>>value));
+      this.set("ticketBalances", Value.fromStringArray(<Array<string>>value));
+    }
+  }
+
+  get sentTickets(): Array<string> | null {
+    let value = this.get("sentTickets");
+    if (!value || value.kind == ValueKind.NULL) {
+      return null;
+    } else {
+      return value.toStringArray();
+    }
+  }
+
+  set sentTickets(value: Array<string> | null) {
+    if (!value) {
+      this.unset("sentTickets");
+    } else {
+      this.set("sentTickets", Value.fromStringArray(<Array<string>>value));
+    }
+  }
+
+  get receivedTickets(): Array<string> | null {
+    let value = this.get("receivedTickets");
+    if (!value || value.kind == ValueKind.NULL) {
+      return null;
+    } else {
+      return value.toStringArray();
+    }
+  }
+
+  set receivedTickets(value: Array<string> | null) {
+    if (!value) {
+      this.unset("receivedTickets");
+    } else {
+      this.set("receivedTickets", Value.fromStringArray(<Array<string>>value));
     }
   }
 }
 
-export class Ticket extends Entity {
+export class Transfer extends Entity {
   constructor(id: string) {
     super();
     this.set("id", Value.fromString(id));
 
-    this.set("ticketType", Value.fromString(""));
     this.set("event", Value.fromString(""));
-    this.set("owner", Value.fromString(""));
+    this.set("ticket", Value.fromString(""));
+    this.set("sender", Value.fromString(""));
+    this.set("senderBalance", Value.fromString(""));
+    this.set("receiver", Value.fromString(""));
+    this.set("receiverBalance", Value.fromString(""));
+    this.set("price", Value.fromBigInt(BigInt.zero()));
   }
 
   save(): void {
     let id = this.get("id");
-    assert(id != null, "Cannot save Ticket entity without an ID");
+    assert(id != null, "Cannot save Transfer entity without an ID");
     if (id) {
       assert(
         id.kind == ValueKind.STRING,
-        "Cannot save Ticket entity with non-string ID. " +
+        "Cannot save Transfer entity with non-string ID. " +
           'Considering using .toHex() to convert the "id" to a string.'
       );
-      store.set("Ticket", id.toString(), this);
+      store.set("Transfer", id.toString(), this);
     }
   }
 
-  static load(id: string): Ticket | null {
-    return changetype<Ticket | null>(store.get("Ticket", id));
+  static load(id: string): Transfer | null {
+    return changetype<Transfer | null>(store.get("Transfer", id));
   }
 
   get id(): string {
@@ -295,15 +523,6 @@ export class Ticket extends Entity {
     this.set("id", Value.fromString(value));
   }
 
-  get ticketType(): string {
-    let value = this.get("ticketType");
-    return value!.toString();
-  }
-
-  set ticketType(value: string) {
-    this.set("ticketType", Value.fromString(value));
-  }
-
   get event(): string {
     let value = this.get("event");
     return value!.toString();
@@ -313,21 +532,58 @@ export class Ticket extends Entity {
     this.set("event", Value.fromString(value));
   }
 
-  get askingPrice(): BigInt | null {
-    let value = this.get("askingPrice");
-    if (!value || value.kind == ValueKind.NULL) {
-      return null;
-    } else {
-      return value.toBigInt();
-    }
+  get ticket(): string {
+    let value = this.get("ticket");
+    return value!.toString();
   }
 
-  set askingPrice(value: BigInt | null) {
-    if (!value) {
-      this.unset("askingPrice");
-    } else {
-      this.set("askingPrice", Value.fromBigInt(<BigInt>value));
-    }
+  set ticket(value: string) {
+    this.set("ticket", Value.fromString(value));
+  }
+
+  get sender(): string {
+    let value = this.get("sender");
+    return value!.toString();
+  }
+
+  set sender(value: string) {
+    this.set("sender", Value.fromString(value));
+  }
+
+  get senderBalance(): string {
+    let value = this.get("senderBalance");
+    return value!.toString();
+  }
+
+  set senderBalance(value: string) {
+    this.set("senderBalance", Value.fromString(value));
+  }
+
+  get receiver(): string {
+    let value = this.get("receiver");
+    return value!.toString();
+  }
+
+  set receiver(value: string) {
+    this.set("receiver", Value.fromString(value));
+  }
+
+  get receiverBalance(): string {
+    let value = this.get("receiverBalance");
+    return value!.toString();
+  }
+
+  set receiverBalance(value: string) {
+    this.set("receiverBalance", Value.fromString(value));
+  }
+
+  get price(): BigInt {
+    let value = this.get("price");
+    return value!.toBigInt();
+  }
+
+  set price(value: BigInt) {
+    this.set("price", Value.fromBigInt(value));
   }
 
   get amount(): i32 {
@@ -339,12 +595,12 @@ export class Ticket extends Entity {
     this.set("amount", Value.fromI32(value));
   }
 
-  get owner(): string {
-    let value = this.get("owner");
-    return value!.toString();
+  get isSale(): boolean {
+    let value = this.get("isSale");
+    return value!.toBoolean();
   }
 
-  set owner(value: string) {
-    this.set("owner", Value.fromString(value));
+  set isSale(value: boolean) {
+    this.set("isSale", Value.fromBoolean(value));
   }
 }

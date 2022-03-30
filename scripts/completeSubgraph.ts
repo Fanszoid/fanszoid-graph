@@ -13,28 +13,28 @@ enum Network {
 
 enum ContractName {
     marketplace = 'marketplace',
-    tickets = 'tickets'
+    ticket = 'ticket'
 }
 
 const startBlockByNetwork: Record<Network, Record<string, number>> = {
     [Network.MATIC]: {
       marketplace: 25657775,
-      tickets: 	25657919,
+      ticket: 	25657919,
     },
     [Network.MUMBAI]: {
       marketplace: 25405958,
-      tickets: 25405972,
+      ticket: 25405972,
     }
 }
 
 const contractAddressByNetwork: Record<Network, Record<string, string>> = {
     [Network.MATIC]: {
       marketplace: "0xbC2E88848Add239a7d41F917216063B36d19975b",
-      tickets: 	"0x57374a7f837A782403468839C80F0F7700A762e7",
+      ticket: 	"0x57374a7f837A782403468839C80F0F7700A762e7",
     },
     [Network.MUMBAI]: {
       marketplace: "0x2b5224d135073f273F4787c360f5BF766f3f9362",
-      tickets: "0x7Ebef62D0B8696A49Fd73667D67beD48148d83D4",
+      ticket: "0x7Ebef62D0B8696A49Fd73667D67beD48148d83D4",
     }
 }
 

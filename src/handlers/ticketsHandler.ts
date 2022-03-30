@@ -2,18 +2,20 @@ import {
   TransferBatch,
   TransferSingle,
 } from "../generated/Ticket/Ticket";
-import { Event, TicketType, Ticket } from "../generated/schema";
+import { Event, Ticket, TicketBalance } from "../generated/schema";
 import { getEventId } from "../modules/Event";
 import {
-  getTicketTypeId,
-  ticketTypeHasSupply,
-  ticketTypeHasNSupplyLeft,
-} from "../modules/TicketType";
+  getTicketBalanceId,
+  loadOrCreateTicketBalance,
+  ticketHasNAmountAvailable,
+  ticketHasAmountAvailable
+} from "../modules/TicketBalance";
 import {
   getTicketId,
-  ticketHasAmountAvailable,
-  ticketHasNAmountAvailable,
 } from "../modules/Ticket";
+import {
+  loadOrCreateTransfer,
+} from "../modules/Transfer";
 import { loadOrCreateUser } from "../modules/User";
 import { User } from "../generated/schema";
 import { Address, log } from "@graphprotocol/graph-ts";
@@ -45,19 +47,19 @@ function internalTransferToken(
   from: Address,
   id: BigInt,
   value: BigInt,
-  txHash: String
+  txHash: string
 ): void {
   let zeroAddress = Address.fromString(
     "0x0000000000000000000000000000000000000000"
   );
   if (to != zeroAddress && from != zeroAddress) {
-    let fromTicketBalance = TicketBalance.loadOrCreateTicketBalance(id, from);
+    let fromTicketBalance = loadOrCreateTicketBalance(id, from);
     if( fromTicketBalance == null ){
       log.error("fromTicketBalance not found on internalTransferToken. id : {}", [fromTicketBalance.id]);
       return;
     }
-    if(fromTicketBalance.amount < value.toI32()){
-      log.error("fromTicketBalance.amount not enough on internalTransferToken. balance amount: {}, transfer value: {}", [fromTicketBalance.amount, value.toI32().toHex()]);
+    if( !ticketHasNAmountAvailable(fromTicketBalance, value.toI32()) ){
+      log.error("fromTicketBalance.amount not enough on internalTransferToken. balance amount: {}, transfer value: {}", [fromTicketBalance.amountOwned, value.toI32().toHex()]);
       return;
     }
 
@@ -69,15 +71,15 @@ function internalTransferToken(
 
     fromTicketBalance.amountOwned = fromTicketBalance.amountOwned - value.toI32();
 
-    let toTicketBalance = TicketBalance.loadOrCreateTicketBalance(getTicketBalanceId(id, to));
+    let toTicketBalance = loadOrCreateTicketBalance(id, to);
 
-    toTicketBalance.ticket = getTicketTypeId(id);
+    toTicketBalance.ticket = getTicketId(id);
     toTicketBalance.event = fromTicketBalance.event;
     toTicketBalance.owner = to.toHex();
 
     toTicketBalance.isEventOwner = to.toHex() == eventEntity.organizer;
 
-    if(toTicketBalance.amountOwned) {
+    if( !ticketHasAmountAvailable(toTicketBalance) ) {
       toTicketBalance.amountOwned = value.toI32();
     } else {
       toTicketBalance.amountOwned = toTicketBalance.amountOwned + value.toI32();

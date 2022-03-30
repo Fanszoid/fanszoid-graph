@@ -11,7 +11,7 @@ type Ticket @entity {
   id: ID!
   event: Event
   creatorRoyalty: Int!
-  isResellable: Bool!
+  isResellable: Boolean!
   metadata: String!
   totalAmount: Int!
   ticketBalances: [TicketBalance!]! @derivedFrom(field: "ticket")
@@ -26,9 +26,9 @@ type TicketBalance @entity {
   amountOnSell: Int!
   amountOwned: Int!
   owner: User!
-  isEventOwner: Bool!
-  sentTickets: [Transfer!] @derivedFrom(field: "sellerBalance")
-  receivedTickets: [Transfer!] @derivedFrom(field: "buyerBalance")
+  isEventOwner: Boolean!
+  sentTickets: [Transfer!] @derivedFrom(field: "senderBalance")
+  receivedTickets: [Transfer!] @derivedFrom(field: "receiverBalance")
 }
 
 type User @entity {
@@ -36,20 +36,20 @@ type User @entity {
   address: Bytes!
   events: [Event!] @derivedFrom(field: "organizer")
   ticketBalances: [TicketBalance!] @derivedFrom(field: "owner")
-  sentTickets: [Transfer!] @derivedFrom(field: "seller")
-  receivedTickets: [Transfer!] @derivedFrom(field: "buyer")
+  sentTickets: [Transfer!] @derivedFrom(field: "sender")
+  receivedTickets: [Transfer!] @derivedFrom(field: "receiver")
 }
 
 type Transfer @entity {
   id: ID!
   event: Event!
   ticket: Ticket!
-  sender: Seller!
+  sender: User!
   senderBalance: TicketBalance!
-  receiver: Buyer!
+  receiver: User!
   receiverBalance: TicketBalance!
   price: BigInt!
   amount: Int!
-  isSale: Bool!
+  isSale: Boolean!
 }
 

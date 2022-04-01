@@ -28,7 +28,7 @@ export function handleTransferSingle(event: TransferSingle): void {
   let id = event.params.id;
   let value =  event.params.value;
 
-  internalTransferToken(to, from, id, value, event.transaction.hash.toHex());
+  internalTransferToken(to, from, id, value, event.transaction.hash.toHex(), event.block.timestamp);
 }
 
 export function handleTransferBatch(event: TransferBatch): void {
@@ -38,7 +38,7 @@ export function handleTransferBatch(event: TransferBatch): void {
   let values = event.params.values;
 
   for (let i = 0; i < ids.length; i++) {
-    internalTransferToken(to, from, ids[i], values[i], event.transaction.hash.toHex());
+    internalTransferToken(to, from, ids[i], values[i], event.transaction.hash.toHex(), event.block.timestamp);
   }
 }
 
@@ -47,19 +47,23 @@ function internalTransferToken(
   from: Address,
   id: BigInt,
   value: BigInt,
-  txHash: string
+  txHash: string,
+  txTimestamp:BigInt 
 ): void {
   let zeroAddress = Address.fromString(
     "0x0000000000000000000000000000000000000000"
   );
   if (to != zeroAddress && from != zeroAddress) {
-    let fromTicketBalance = loadOrCreateTicketBalance(id, from);
+    loadOrCreateUser(from);
+    loadOrCreateUser(to);
+
+    let fromTicketBalance = TicketBalance.load(getTicketBalanceId(id, from));
     if( fromTicketBalance == null ){
-      log.error("fromTicketBalance not found on internalTransferToken. id : {}", [fromTicketBalance.id]);
+      log.error("fromTicketBalance not found on internalTransferToken. ticket id : {}, address: {}", [ id.toHex(),from.toHex()]);
       return;
     }
     if( !ticketHasNAmountAvailable(fromTicketBalance, value.toI32()) ){
-      log.error("fromTicketBalance.amount not enough on internalTransferToken. balance amount: {}, transfer value: {}", [fromTicketBalance.amountOwned, value.toI32().toHex()]);
+      log.error("fromTicketBalance.amount not enough on internalTransferToken. balance amount: {}, transfer value: {}", [fromTicketBalance.amountOwned.toString(), value.toI32().toString()]);
       return;
     }
 
@@ -71,16 +75,16 @@ function internalTransferToken(
 
     fromTicketBalance.amountOwned = fromTicketBalance.amountOwned - value.toI32();
 
-    let toTicketBalance = loadOrCreateTicketBalance(id, to);
-
-    toTicketBalance.ticket = getTicketId(id);
-    toTicketBalance.event = fromTicketBalance.event;
-    toTicketBalance.owner = to.toHex();
-
-    toTicketBalance.isEventOwner = to.toHex() == eventEntity.organizer;
-
-    if( !ticketHasAmountAvailable(toTicketBalance) ) {
+    let toTicketBalanceId = getTicketBalanceId(id, to)
+    let toTicketBalance = TicketBalance.load(toTicketBalanceId);
+    if( toTicketBalance == null ){
+      toTicketBalance = new TicketBalance(toTicketBalanceId);
+      toTicketBalance.ticket = getTicketId(id);
+      toTicketBalance.event = fromTicketBalance.event;
+      toTicketBalance.owner = to.toHex();
+      toTicketBalance.isEventOwner = to.toHex() == eventEntity.organizer;
       toTicketBalance.amountOwned = value.toI32();
+      toTicketBalance.amountOnSell = 0;
     } else {
       toTicketBalance.amountOwned = toTicketBalance.amountOwned + value.toI32();
     }
@@ -90,18 +94,15 @@ function internalTransferToken(
 
     let transfer = loadOrCreateTransfer(txHash);
 
+    // the isSale field on transfer is only setted on the ticketBought handler
     transfer.event = fromTicketBalance.event;
     transfer.ticket = fromTicketBalance.ticket;
     transfer.sender = from.toHex();
     transfer.senderBalance = fromTicketBalance.id;
     transfer.receiver = to.toHex();
     transfer.receiverBalance = toTicketBalance.id;
-    transfer.amount = value;
-
-    if(transfer.isSale !== true) {
-      transfer.isSale = false;
-    }
-    
+    transfer.amount = value.toI32();
+    transfer.createdAt = txTimestamp;
     transfer.save()
   } else {
     log.info("Transfer single, to: {}, from: {}. Nothing done...", [

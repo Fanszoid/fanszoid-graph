@@ -46,21 +46,13 @@ export class Event extends Entity {
     this.set("id", Value.fromString(value));
   }
 
-  get tickets(): Array<string> | null {
+  get tickets(): Array<string> {
     let value = this.get("tickets");
-    if (!value || value.kind == ValueKind.NULL) {
-      return null;
-    } else {
-      return value.toStringArray();
-    }
+    return value!.toStringArray();
   }
 
-  set tickets(value: Array<string> | null) {
-    if (!value) {
-      this.unset("tickets");
-    } else {
-      this.set("tickets", Value.fromStringArray(<Array<string>>value));
-    }
+  set tickets(value: Array<string>) {
+    this.set("tickets", Value.fromStringArray(value));
   }
 
   get ticketBalances(): Array<string> {
@@ -228,6 +220,7 @@ export class TicketBalance extends Entity {
     this.set("id", Value.fromString(id));
 
     this.set("ticket", Value.fromString(""));
+    this.set("event", Value.fromString(""));
     this.set("owner", Value.fromString(""));
   }
 
@@ -266,21 +259,13 @@ export class TicketBalance extends Entity {
     this.set("ticket", Value.fromString(value));
   }
 
-  get event(): string | null {
+  get event(): string {
     let value = this.get("event");
-    if (!value || value.kind == ValueKind.NULL) {
-      return null;
-    } else {
-      return value.toString();
-    }
+    return value!.toString();
   }
 
-  set event(value: string | null) {
-    if (!value) {
-      this.unset("event");
-    } else {
-      this.set("event", Value.fromString(<string>value));
-    }
+  set event(value: string) {
+    this.set("event", Value.fromString(value));
   }
 
   get askingPrice(): BigInt | null {
@@ -487,14 +472,6 @@ export class Transfer extends Entity {
   constructor(id: string) {
     super();
     this.set("id", Value.fromString(id));
-
-    this.set("event", Value.fromString(""));
-    this.set("ticket", Value.fromString(""));
-    this.set("sender", Value.fromString(""));
-    this.set("senderBalance", Value.fromString(""));
-    this.set("receiver", Value.fromString(""));
-    this.set("receiverBalance", Value.fromString(""));
-    this.set("price", Value.fromBigInt(BigInt.zero()));
   }
 
   save(): void {
@@ -523,67 +500,123 @@ export class Transfer extends Entity {
     this.set("id", Value.fromString(value));
   }
 
-  get event(): string {
+  get event(): string | null {
     let value = this.get("event");
-    return value!.toString();
+    if (!value || value.kind == ValueKind.NULL) {
+      return null;
+    } else {
+      return value.toString();
+    }
   }
 
-  set event(value: string) {
-    this.set("event", Value.fromString(value));
+  set event(value: string | null) {
+    if (!value) {
+      this.unset("event");
+    } else {
+      this.set("event", Value.fromString(<string>value));
+    }
   }
 
-  get ticket(): string {
+  get ticket(): string | null {
     let value = this.get("ticket");
-    return value!.toString();
+    if (!value || value.kind == ValueKind.NULL) {
+      return null;
+    } else {
+      return value.toString();
+    }
   }
 
-  set ticket(value: string) {
-    this.set("ticket", Value.fromString(value));
+  set ticket(value: string | null) {
+    if (!value) {
+      this.unset("ticket");
+    } else {
+      this.set("ticket", Value.fromString(<string>value));
+    }
   }
 
-  get sender(): string {
+  get sender(): string | null {
     let value = this.get("sender");
-    return value!.toString();
+    if (!value || value.kind == ValueKind.NULL) {
+      return null;
+    } else {
+      return value.toString();
+    }
   }
 
-  set sender(value: string) {
-    this.set("sender", Value.fromString(value));
+  set sender(value: string | null) {
+    if (!value) {
+      this.unset("sender");
+    } else {
+      this.set("sender", Value.fromString(<string>value));
+    }
   }
 
-  get senderBalance(): string {
+  get senderBalance(): string | null {
     let value = this.get("senderBalance");
-    return value!.toString();
+    if (!value || value.kind == ValueKind.NULL) {
+      return null;
+    } else {
+      return value.toString();
+    }
   }
 
-  set senderBalance(value: string) {
-    this.set("senderBalance", Value.fromString(value));
+  set senderBalance(value: string | null) {
+    if (!value) {
+      this.unset("senderBalance");
+    } else {
+      this.set("senderBalance", Value.fromString(<string>value));
+    }
   }
 
-  get receiver(): string {
+  get receiver(): string | null {
     let value = this.get("receiver");
-    return value!.toString();
+    if (!value || value.kind == ValueKind.NULL) {
+      return null;
+    } else {
+      return value.toString();
+    }
   }
 
-  set receiver(value: string) {
-    this.set("receiver", Value.fromString(value));
+  set receiver(value: string | null) {
+    if (!value) {
+      this.unset("receiver");
+    } else {
+      this.set("receiver", Value.fromString(<string>value));
+    }
   }
 
-  get receiverBalance(): string {
+  get receiverBalance(): string | null {
     let value = this.get("receiverBalance");
-    return value!.toString();
+    if (!value || value.kind == ValueKind.NULL) {
+      return null;
+    } else {
+      return value.toString();
+    }
   }
 
-  set receiverBalance(value: string) {
-    this.set("receiverBalance", Value.fromString(value));
+  set receiverBalance(value: string | null) {
+    if (!value) {
+      this.unset("receiverBalance");
+    } else {
+      this.set("receiverBalance", Value.fromString(<string>value));
+    }
   }
 
-  get price(): BigInt {
+  get price(): BigInt | null {
     let value = this.get("price");
-    return value!.toBigInt();
+    if (!value || value.kind == ValueKind.NULL) {
+      return null;
+    } else {
+      return value.toBigInt();
+    }
   }
 
-  set price(value: BigInt) {
-    this.set("price", Value.fromBigInt(value));
+  set price(value: BigInt | null) {
+    if (!value) {
+      this.unset("price");
+    } else {
+      this.set("price", Value.fromBigInt(<BigInt>value));
+    }
   }
 
   get amount(): i32 {
@@ -602,5 +635,22 @@ export class Transfer extends Entity {
 
   set isSale(value: boolean) {
     this.set("isSale", Value.fromBoolean(value));
+  }
+
+  get createdAt(): BigInt | null {
+    let value = this.get("createdAt");
+    if (!value || value.kind == ValueKind.NULL) {
+      return null;
+    } else {
+      return value.toBigInt();
+    }
+  }
+
+  set createdAt(value: BigInt | null) {
+    if (!value) {
+      this.unset("createdAt");
+    } else {
+      this.set("createdAt", Value.fromBigInt(<BigInt>value));
+    }
   }
 }

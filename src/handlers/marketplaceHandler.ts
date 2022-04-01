@@ -54,7 +54,12 @@ export function handleTicketPublished(event: TicketPublished): void {
   
   ticket.save();
 
-  let ticketBalance = loadOrCreateTicketBalance(event.params.ticketId, event.params.organizer);
+  let ticketBalance = TicketBalance.load(getTicketBalanceId(event.params.ticketId, event.params.organizer));
+  if( ticketBalance !== null ){
+    log.error("handleTicketPublished: TicketBalance already existed, id : {}", [getTicketBalanceId(event.params.ticketId, event.params.organizer)]);
+    return;
+  }
+  ticketBalance = new TicketBalance(getTicketBalanceId(event.params.ticketId, event.params.organizer));
   ticketBalance.ticket = ticketId;
   ticketBalance.event = eventEntity.id;
   ticketBalance.askingPrice = event.params.price;
@@ -127,11 +132,11 @@ export function handleTicketBought(event: TicketBought): void {
     return;
   }
   if( !ticketHasNAmountOnSell(sellerTicketBalance, amount)  ){
-    log.error("sellerTicketBalance.amountOnSell not enough on internalTransferToken. balance amount: {}, transfer value: {}", [sellerTicketBalance.amountOnSell, amount.toHex()]);
+    log.error("sellerTicketBalance.amountOnSell not enough on internalTransferToken. balance amount: {}, transfer value: {}", [sellerTicketBalance.amountOnSell.toString(), amount.toString()]);
     return;
   }
-  if( ticketPriceMatches(event.params.price, sellerTicketBalance) ) {
-    log.error("sellerTicketBalance incongruent price on handleTicketBought. id : {}, tx price: {}, askingPrice: {}", [getTicketBalanceId(event.params.ticketId, event.params.seller), event.params.price.toHex(), sellerTicketBalance.askingPrice.toHex() ]);
+  if( !ticketPriceMatches(event.params.price, sellerTicketBalance) ) {
+    log.error("sellerTicketBalance incongruent price on handleTicketBought. id : {}, tx price: {}", [getTicketBalanceId(event.params.ticketId, event.params.seller), event.params.price.toHex()]);
     return;
   }
 
@@ -162,7 +167,7 @@ export function handleAskSetted(event: AskSetted): void {
 export function handleAskRemoved(event: AskRemoved): void {
   let ticketBalance = TicketBalance.load(getTicketBalanceId(event.params.ticketId, event.params.seller));
   if(ticketBalance != null ) {
-    ticketBalance.amountOnSell = null;
+    ticketBalance.amountOnSell = 0;
     ticketBalance.askingPrice = null;
     
     ticketBalance.save();
@@ -174,6 +179,7 @@ export function handleAskRemoved(event: AskRemoved): void {
 
 export function handleEventOwnershipTransferred(event: EventOwnershipTransferred): void {
   let eventEntity = Event.load(event.params.eventId.toHex());
+  
   if(eventEntity == null ) {
     log.error("Event not found on handleEventOwnershipTransferred. id : {}", [event.params.eventId.toHex()]);
     return;
@@ -184,16 +190,21 @@ export function handleEventOwnershipTransferred(event: EventOwnershipTransferred
 
   eventEntity.save();
 
-  eventEntity.ticketBalances.forEach( tb => {
+  for( let i = 0; i< eventEntity.ticketBalances.length ; i++ ){
+    let tb = eventEntity.ticketBalances[i]
     let ticketBalance = TicketBalance.load(tb);
     if(ticketBalance == null ) {
       log.error("TicketBalance not found on handleEventOwnershipTransferred. id : {}", [tb]);
       return;
     }
 
-    ticketBalance.isEventOwner = ticketBalance.owner == ownerUser.id;
+    if( ticketBalance.owner === ownerUser.id ) {
+      ticketBalance.isEventOwner = true;
+    } else {
+      ticketBalance.isEventOwner = false;
+    }
     ticketBalance.save();
-  });
+  }
 }
 
 export function handleCreatorRoyaltyModifiedOnEvent(event: CreatorRoyaltyModifiedOnEvent): void {
@@ -203,7 +214,8 @@ export function handleCreatorRoyaltyModifiedOnEvent(event: CreatorRoyaltyModifie
     return;
   }
 
-  eventEntity.tickets.forEach( t => {
+  for( let i = 0; i< eventEntity.tickets.length ; i++ ){
+    let t = eventEntity.tickets[i]
     let ticket = Ticket.load(t);
     if(ticket == null ) {
       log.error("Ticket not found on handleCreatorRoyaltyModifiedOnEvent. id : {}", [t]);
@@ -212,7 +224,7 @@ export function handleCreatorRoyaltyModifiedOnEvent(event: CreatorRoyaltyModifie
 
     ticket.creatorRoyalty = event.params.newRoyalty.toI32();
     ticket.save();
-  });
+  }
 }
 
 export function handleCreatorRoyaltyModifiedOnTicket(event: CreatorRoyaltyModifiedOnTicket): void {

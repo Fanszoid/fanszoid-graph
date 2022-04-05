@@ -29,7 +29,16 @@ import {
   ticketHasNAmountOnSell,
   ticketPriceMatches,
 } from "../modules/TicketBalance";
-import { store, log, BigInt } from "@graphprotocol/graph-ts";
+import { store, log, BigInt, ipfs, json, Value, JSONValue, Bytes, TypedMap, Entity, JSONValueKind, TypedMapEntry } from "@graphprotocol/graph-ts";
+import { parseMetadata } from "./utils"
+let eventAttrs: string[] = [
+  'title', 'description', 'type', 'category', 'dclX', 'dclY', 'city', 
+  'postalCode', 'socials', 'email', 'website', 'isAvailable', 'status', 
+  'inStock', 'createdAt', 'updatedAt', 'image', 'startDateUTC', 'endDateUTC'
+];
+let ticketAttrs: string[] = [
+  'name', 'description', 'image'
+];
 
 
 export function handleTicketPublished(event: TicketPublished): void {
@@ -51,6 +60,8 @@ export function handleTicketPublished(event: TicketPublished): void {
   ticket.isResellable = event.params.isResellable;
   ticket.metadata = event.params.uri;
   ticket.totalAmount = event.params.amount.toI32();
+  
+  parseMetadata(event.params.uri, ticket, ticketAttrs);
   
   ticket.save();
 
@@ -78,6 +89,8 @@ export function handleEventCreated(event: EventCreated): void {
   );
 
   eventEntity.metadata = event.params.uri;
+  parseMetadata(event.params.uri, eventEntity, eventAttrs);
+    
   eventEntity.organizer = organizerUser.address.toHex();
   eventEntity.save();
 }
@@ -221,7 +234,7 @@ export function handleCreatorRoyaltyModifiedOnEvent(event: CreatorRoyaltyModifie
       log.error("Ticket not found on handleCreatorRoyaltyModifiedOnEvent. id : {}", [t]);
       return;
     }
-
+    
     ticket.creatorRoyalty = event.params.newRoyalty.toI32();
     ticket.save();
   }

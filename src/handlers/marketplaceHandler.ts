@@ -8,29 +8,45 @@ import {
   TicketBought,
   EventOwnershipTransferred,
   CreatorRoyaltyModifiedOnEvent,
-  CreatorRoyaltyModifiedOnTicket
-} from "../generated/Marketplace/Marketplace";
-import { Event, Ticket, TicketBalance } from "../generated/schema";
+  CreatorRoyaltyModifiedOnTicket,
+  TicketEdited,
+  EventEdited
+} from "../../build/generated/Marketplace/Marketplace";
+import { Event, Ticket, TicketBalance } from "../../build/generated/schema";
 import { loadOrCreateUser } from "../modules/User";
 import { 
   loadOrCreateEvent,
-  getEventId
+  getEventId,
+  eventAttrs
 } from "../modules/Event";
 import {
-  getTicketId,
+  getTicketId, ticketAttrs,
 } from "../modules/Ticket";
 import {
   loadOrCreateTransfer,
 } from "../modules/Transfer";
 import { 
-  loadOrCreateTicketBalance,
   getTicketBalanceId,
   ticketHasNAmountAvailable,
   ticketHasNAmountOnSell,
   ticketPriceMatches,
 } from "../modules/TicketBalance";
-import { store, log, BigInt } from "@graphprotocol/graph-ts";
+import { store, log } from "@graphprotocol/graph-ts";
+import { parseMetadata } from "./utils"
 
+export function handleTicketUriModification(event: TicketEdited): void {
+  let ticketEntity = Ticket.load(event.params.ticketId.toString());
+  if (!ticketEntity) return;
+  parseMetadata(event.params.newUri, ticketEntity, ticketAttrs);
+  ticketEntity.save();
+}
+
+export function handleEventUriModification(event: EventEdited): void {
+  let eventEntity = Event.load(event.params.eventId.toString());
+  if (!eventEntity) return;
+  parseMetadata(event.params.newUri, eventEntity, eventAttrs);
+  eventEntity.save();
+}
 
 export function handleTicketPublished(event: TicketPublished): void {
   let eventEntity = loadOrCreateEvent(
@@ -51,6 +67,8 @@ export function handleTicketPublished(event: TicketPublished): void {
   ticket.isResellable = event.params.isResellable;
   ticket.metadata = event.params.uri;
   ticket.totalAmount = event.params.amount.toI32();
+  
+  parseMetadata(event.params.uri, ticket, ticketAttrs);
   
   ticket.save();
 
@@ -78,6 +96,8 @@ export function handleEventCreated(event: EventCreated): void {
   );
 
   eventEntity.metadata = event.params.uri;
+  parseMetadata(event.params.uri, eventEntity, eventAttrs);
+    
   eventEntity.organizer = organizerUser.address.toHex();
   eventEntity.save();
 }
@@ -221,7 +241,7 @@ export function handleCreatorRoyaltyModifiedOnEvent(event: CreatorRoyaltyModifie
       log.error("Ticket not found on handleCreatorRoyaltyModifiedOnEvent. id : {}", [t]);
       return;
     }
-
+    
     ticket.creatorRoyalty = event.params.newRoyalty.toI32();
     ticket.save();
   }

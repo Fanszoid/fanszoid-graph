@@ -1,5 +1,11 @@
 import { Address, BigInt } from "@graphprotocol/graph-ts";
-import { Event } from "../../generated/schema";
+import { Event } from "../../../build/generated/schema";
+
+export var eventAttrs: string[] = [
+  'title', 'description', 'type', 'category', 'dclX', 'dclY', 'city', 
+  'postalCode', 'socials', 'email', 'website', 'isAvailable', 'status', 
+  'inStock', 'createdAt', 'updatedAt', 'image', 'startDateUTC', 'endDateUTC'
+];
 
 export function getEventId(
   eventIdContract: BigInt

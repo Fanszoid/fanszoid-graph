@@ -1,26 +1,24 @@
 import {
+  SetUriCall,
   TransferBatch,
   TransferSingle,
-} from "../generated/Ticket/Ticket";
-import { Event, Ticket, TicketBalance } from "../generated/schema";
-import { getEventId } from "../modules/Event";
+} from "../../build/generated/Ticket/Ticket";
+import { Event, Ticket, TicketBalance } from "../../build/generated/schema";
 import {
   getTicketBalanceId,
-  loadOrCreateTicketBalance,
-  ticketHasNAmountAvailable,
-  ticketHasAmountAvailable
+  ticketHasNAmountAvailable
 } from "../modules/TicketBalance";
 import {
-  getTicketId,
+  getTicketId, ticketAttrs,
 } from "../modules/Ticket";
 import {
   loadOrCreateTransfer,
 } from "../modules/Transfer";
 import { loadOrCreateUser } from "../modules/User";
-import { User } from "../generated/schema";
 import { Address, log } from "@graphprotocol/graph-ts";
 import { BigInt } from "@graphprotocol/graph-ts/common/numbers";
-import { store } from "@graphprotocol/graph-ts";
+import { SetTicketUriCall } from "../../build/generated/Marketplace/Marketplace";
+import { parseMetadata } from "./utils";
 
 export function handleTransferSingle(event: TransferSingle): void {
   let to = event.params.to;
@@ -41,6 +39,10 @@ export function handleTransferBatch(event: TransferBatch): void {
     internalTransferToken(to, from, ids[i], values[i], event.transaction.hash.toHex(), event.block.timestamp);
   }
 }
+
+///////////////////////////////////////////////////////////////////
+/////                   INTERNAL                              /////
+///////////////////////////////////////////////////////////////////
 
 function internalTransferToken(
   to: Address,
@@ -111,3 +113,4 @@ function internalTransferToken(
     ]);
   }
 }
+

@@ -1,6 +1,9 @@
 specVersion: 0.0.4
 description: Fanszoid Tickets Marketplace
 repository: https://github.com/Fanszoid/fanszoid-graph
+features:
+  - ipfsOnEthereumContracts
+  - fullTextSearch
 schema:
   file: ./schema.graphql
 dataSources:
@@ -19,6 +22,7 @@ dataSources:
       apiVersion: 0.0.6
       language: wasm/assemblyscript
       entities:
+        - Event
         - Ticket
         - TicketBalance
         - User
@@ -76,4 +80,8 @@ dataSources:
           handler: handleCreatorRoyaltyModifiedOnEvent
         - event: CreatorRoyaltyModifiedOnTicket(uint256,uint256)
           handler: handleCreatorRoyaltyModifiedOnTicket
+        - event: TicketEdited(uint256,string)
+          handler: handleTicketUriModification
+        - event: EventEdited(uint256,string)
+          handler: handleEventUriModification
       file: ./src/handlers/marketplaceHandler.ts

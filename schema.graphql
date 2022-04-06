@@ -3,8 +3,28 @@ type Event @entity {
   tickets: [Ticket!]! @derivedFrom(field: "event")
   ticketBalances: [TicketBalance!]! @derivedFrom(field: "event")
   sentTickets: [Transfer!] @derivedFrom(field: "event")
-  metadata: String!
   organizer: User!
+  metadata: String
+  
+  title: String!
+  description: String
+  type: String!
+  category: String
+  dclX: String
+  dclY: String
+  city: String
+  postalCode: String
+  socials: String
+  email: String
+  website: String
+  isAvailable: String
+  status: String
+  inStock: String
+  createdAt: String
+  updatedAt: String
+  image: String
+  startDateUTC: String
+  endDateUTC: String
 }
 
 type Ticket @entity {
@@ -12,10 +32,14 @@ type Ticket @entity {
   event: Event
   creatorRoyalty: Int!
   isResellable: Boolean!
-  metadata: String!
   totalAmount: Int!
   ticketBalances: [TicketBalance!]! @derivedFrom(field: "ticket")
   sentTickets: [Transfer!] @derivedFrom(field: "ticket")
+  metadata: String
+
+  name: String
+  description: String
+  image: String
 }
 
 type TicketBalance @entity {

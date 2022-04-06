@@ -1,5 +1,5 @@
 import { Address, BigInt } from "@graphprotocol/graph-ts";
-import { Event } from "../../generated/schema";
+import { Event } from "../../../build/generated/schema";
 
 export var eventAttrs: string[] = [
   'title', 'description', 'type', 'category', 'dclX', 'dclY', 'city', 

@@ -1,5 +1,5 @@
 import { BigInt } from "@graphprotocol/graph-ts";
-import { Transfer } from "../../generated/schema";
+import { Transfer } from"../../../build/generated/schema";
 
 export function loadOrCreateTransfer(
   id: string

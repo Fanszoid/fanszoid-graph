@@ -24,9 +24,9 @@ const startBlockByNetwork: Record<Network, Record<string, number>> = {
       event:   25657919,  
     },
     [Network.MUMBAI]: {
-      marketplace: 25731086,
-      ticket: 25731084,
-      event: 25731084
+      marketplace: 25823969,
+      ticket: 25823969,
+      event: 25823969
     }
 }
 
@@ -37,9 +37,9 @@ const contractAddressByNetwork: Record<Network, Record<string, string>> = {
       event: "0x96338E94520977C0523599F6Ccf0e388c120d867"
     },
     [Network.MUMBAI]: {
-      marketplace: "0x67bf152A179b5710a323E0Dc6c9ac6D4c528CCf2",
-      ticket: "0xB592f4A053129593AAC9493661A1B8057fb659DF",
-      event: "0x287B9409468376924651AA2534BC051D48555020"
+      marketplace: "0x6d18f35Fac3E6a89DA24af4D54637672A91E253C",
+      ticket: "0xaDd515E7A64dFf18a7151FA2fa3CA06Af3c8d31B",
+      event: "0x0FaA6260fc9a4c599b8C62A044652aD96a5dFA9a"
     }
 }
 

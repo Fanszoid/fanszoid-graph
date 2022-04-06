@@ -1,8 +1,9 @@
 import {
+  SetUriCall,
   TransferBatch,
   TransferSingle,
-} from "../generated/Ticket/Ticket";
-import { Event, Ticket, TicketBalance } from "../generated/schema";
+} from "../../build/generated/Ticket/Ticket";
+import { Event, Ticket, TicketBalance } from "../../build/generated/schema";
 import {
   getTicketBalanceId,
   ticketHasNAmountAvailable
@@ -16,7 +17,7 @@ import {
 import { loadOrCreateUser } from "../modules/User";
 import { Address, log } from "@graphprotocol/graph-ts";
 import { BigInt } from "@graphprotocol/graph-ts/common/numbers";
-import { SetTicketUriCall } from "../generated/Marketplace/Marketplace";
+import { SetTicketUriCall } from "../../build/generated/Marketplace/Marketplace";
 import { parseMetadata } from "./utils";
 
 export function handleTransferSingle(event: TransferSingle): void {
@@ -39,9 +40,9 @@ export function handleTransferBatch(event: TransferBatch): void {
   }
 }
 
-export function handleSetTicketUri(call: SetTicketUriCall): void {
-  let ticketId = call.inputs.ticketId;
-  let uri = call.inputs.newUri;
+export function handleSetTicketUriModification(call: SetUriCall): void {
+  let ticketId = call.inputs.tokenId;
+  let uri = call.inputs.tokenURI;
 
   let ticket = Ticket.load(ticketId.toString());
   if (!ticket) return;

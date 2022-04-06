@@ -22,6 +22,7 @@ dataSources:
       apiVersion: 0.0.6
       language: wasm/assemblyscript
       entities:
+        - Event
         - Ticket
         - TicketBalance
         - User
@@ -34,33 +35,7 @@ dataSources:
           handler: handleTransferSingle
         - event: TransferBatch(indexed address,indexed address,indexed address,uint256[],uint256[])
           handler: handleTransferBatch
-      callHandlers:
-        - function: setUri(uint256,string)
-          handler: handleSetTicketUri
       file: ./src/handlers/ticketsHandler.ts
-  # ---------------------------------------------------------
-  # Events
-  # ---------------------------------------------------------
-  - kind: ethereum/contract
-    name: Event
-    network: {{network}}
-    source:
-      address: '{{address:event}}'
-      abi: Event
-      startBlock: {{startBlock:event}}
-    mapping:
-      kind: ethereum/events
-      apiVersion: 0.0.6
-      language: wasm/assemblyscript
-      entities:
-        - Event
-      abis:
-        - name: Event
-          file: ./abis/Event.json
-      callHandlers:
-        - function: setTokenURI(uint256,string)
-          handler: handleSetEventUri
-      file: ./src/handlers/eventsHandler.ts  
   # ---------------------------------------------------------
   # MARKETPLACE 
   # ---------------------------------------------------------
@@ -85,26 +60,28 @@ dataSources:
         - name: Marketplace
           file: ./abis/Marketplace.json
       eventHandlers:
-        - event: TicketPublished(uint256,address,uint256,uint256,uint256,uint256,uint256,bool,string)
+        - event: TicketPublished(indexed uint256,address,indexed uint256,uint256,uint256,uint256,uint256,bool,string)
           handler: handleTicketPublished
-        - event: EventCreated(uint256,address,string)
+        - event: EventCreated(indexed uint256,address,string)
           handler: handleEventCreated
-        - event: EventDeleted(uint256)
+        - event: EventDeleted(indexed uint256)
           handler: handleEventDeleted
-        - event: TicketDeleted(uint256,address,uint256[],uint256[])
+        - event: TicketDeleted(indexed uint256,address,uint256[],uint256[])
           handler: handleTicketDeleted
-        - event: TicketBought(uint256,address,address,uint256,uint256)
+        - event: TicketBought(indexed uint256,address,address,uint256,uint256)
           handler: handleTicketBought
-        - event: AskSetted(uint256,address,uint256,uint256)
+        - event: AskSetted(indexed uint256,indexed address,uint256,uint256)
           handler: handleAskSetted
-        - event: AskRemoved(address,uint256)
+        - event: AskRemoved(indexed address,indexed uint256)
           handler: handleAskRemoved
-        - event: EventOwnershipTransferred(uint256,address)
+        - event: EventOwnershipTransferred(indexed uint256,address)
           handler: handleEventOwnershipTransferred
-        - event: CreatorRoyaltyModifiedOnEvent(uint256,uint256)
+        - event: CreatorRoyaltyModifiedOnEvent(indexed uint256,uint256)
           handler: handleCreatorRoyaltyModifiedOnEvent
-        - event: CreatorRoyaltyModifiedOnTicket(uint256,uint256)
+        - event: CreatorRoyaltyModifiedOnTicket(indexed uint256,uint256)
           handler: handleCreatorRoyaltyModifiedOnTicket
-        - event: TicketEdited(uint256,string)
+        - event: TicketEdited(indexed uint256,string)
           handler: handleTicketUriModification
+        - event: EventEdited(indexed uint256,string)
+          handler: handleEventUriModification
       file: ./src/handlers/marketplaceHandler.ts

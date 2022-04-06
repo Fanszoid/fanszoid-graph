@@ -1,5 +1,5 @@
 import { Address, BigInt } from "@graphprotocol/graph-ts";
-import { TicketBalance } from "../../generated/schema";
+import { TicketBalance } from"../../../build/generated/schema";
 
 export function getTicketBalanceId(ticketIdContract: BigInt, user: Address): string {
   return "t" + ticketIdContract.toHex() + "-" + user.toHex();

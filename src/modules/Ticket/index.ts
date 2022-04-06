@@ -1,5 +1,5 @@
 import { Address, BigInt } from "@graphprotocol/graph-ts";
-import { Ticket } from "../../generated/schema";
+import { Ticket } from"../../../build/generated/schema";
 
 export var ticketAttrs: string[] = [
   'name', 'description', 'image'

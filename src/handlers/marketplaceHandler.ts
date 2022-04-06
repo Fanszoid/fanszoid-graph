@@ -9,9 +9,10 @@ import {
   EventOwnershipTransferred,
   CreatorRoyaltyModifiedOnEvent,
   CreatorRoyaltyModifiedOnTicket,
-  TicketEdited
-} from "../generated/Marketplace/Marketplace";
-import { Event, Ticket, TicketBalance } from "../generated/schema";
+  TicketEdited,
+  EventEdited
+} from "../../build/generated/Marketplace/Marketplace";
+import { Event, Ticket, TicketBalance } from "../../build/generated/schema";
 import { loadOrCreateUser } from "../modules/User";
 import { 
   loadOrCreateEvent,
@@ -38,6 +39,13 @@ export function handleTicketUriModification(event: TicketEdited): void {
   if (!ticketEntity) return;
   parseMetadata(event.params.newUri, ticketEntity, ticketAttrs);
   ticketEntity.save();
+}
+
+export function handleEventUriModification(event: EventEdited): void {
+  let eventEntity = Event.load(event.params.eventId.toString());
+  if (!eventEntity) return;
+  parseMetadata(event.params.newUri, eventEntity, eventAttrs);
+  eventEntity.save();
 }
 
 export function handleTicketPublished(event: TicketPublished): void {

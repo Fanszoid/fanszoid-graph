@@ -40,16 +40,6 @@ export function handleTransferBatch(event: TransferBatch): void {
   }
 }
 
-export function handleSetTicketUriModification(call: SetUriCall): void {
-  let ticketId = call.inputs.tokenId;
-  let uri = call.inputs.tokenURI;
-
-  let ticket = Ticket.load(ticketId.toString());
-  if (!ticket) return;
-  parseMetadata(uri, ticket, ticketAttrs)
-  ticket.save();
-}
-
 ///////////////////////////////////////////////////////////////////
 /////                   INTERNAL                              /////
 ///////////////////////////////////////////////////////////////////

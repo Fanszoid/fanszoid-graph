@@ -8,38 +8,37 @@ import {
   TicketBought,
   EventOwnershipTransferred,
   CreatorRoyaltyModifiedOnEvent,
-  CreatorRoyaltyModifiedOnTicket
+  CreatorRoyaltyModifiedOnTicket,
+  TicketEdited
 } from "../generated/Marketplace/Marketplace";
 import { Event, Ticket, TicketBalance } from "../generated/schema";
 import { loadOrCreateUser } from "../modules/User";
 import { 
   loadOrCreateEvent,
-  getEventId
+  getEventId,
+  eventAttrs
 } from "../modules/Event";
 import {
-  getTicketId,
+  getTicketId, ticketAttrs,
 } from "../modules/Ticket";
 import {
   loadOrCreateTransfer,
 } from "../modules/Transfer";
 import { 
-  loadOrCreateTicketBalance,
   getTicketBalanceId,
   ticketHasNAmountAvailable,
   ticketHasNAmountOnSell,
   ticketPriceMatches,
 } from "../modules/TicketBalance";
-import { store, log, BigInt, ipfs, json, Value, JSONValue, Bytes, TypedMap, Entity, JSONValueKind, TypedMapEntry } from "@graphprotocol/graph-ts";
+import { store, log } from "@graphprotocol/graph-ts";
 import { parseMetadata } from "./utils"
-let eventAttrs: string[] = [
-  'title', 'description', 'type', 'category', 'dclX', 'dclY', 'city', 
-  'postalCode', 'socials', 'email', 'website', 'isAvailable', 'status', 
-  'inStock', 'createdAt', 'updatedAt', 'image', 'startDateUTC', 'endDateUTC'
-];
-let ticketAttrs: string[] = [
-  'name', 'description', 'image'
-];
 
+export function handleTicketUriModification(event: TicketEdited): void {
+  let ticketEntity = Ticket.load(event.params.ticketId.toString());
+  if (!ticketEntity) return;
+  parseMetadata(event.params.newUri, ticketEntity, ticketAttrs);
+  ticketEntity.save();
+}
 
 export function handleTicketPublished(event: TicketPublished): void {
   let eventEntity = loadOrCreateEvent(

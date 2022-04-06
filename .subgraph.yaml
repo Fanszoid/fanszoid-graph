@@ -1,6 +1,9 @@
 specVersion: 0.0.4
 description: Fanszoid Tickets Marketplace
 repository: https://github.com/Fanszoid/fanszoid-graph
+features:
+  - ipfsOnEthereumContracts
+  - fullTextSearch
 schema:
   file: ./schema.graphql
 dataSources:
@@ -31,7 +34,33 @@ dataSources:
           handler: handleTransferSingle
         - event: TransferBatch(indexed address,indexed address,indexed address,uint256[],uint256[])
           handler: handleTransferBatch
+      callHandlers:
+        - function: setUri(uint256,string)
+          handler: handleSetTicketUri
       file: ./src/handlers/ticketsHandler.ts
+  # ---------------------------------------------------------
+  # Events
+  # ---------------------------------------------------------
+  - kind: ethereum/contract
+    name: Event
+    network: {{network}}
+    source:
+      address: '{{address:event}}'
+      abi: Event
+      startBlock: {{startBlock:event}}
+    mapping:
+      kind: ethereum/events
+      apiVersion: 0.0.6
+      language: wasm/assemblyscript
+      entities:
+        - Event
+      abis:
+        - name: Event
+          file: ./abis/Event.json
+      callHandlers:
+        - function: setTokenURI(uint256,string)
+          handler: handleSetEventUri
+      file: ./src/handlers/eventsHandler.ts  
   # ---------------------------------------------------------
   # MARKETPLACE 
   # ---------------------------------------------------------
@@ -76,4 +105,6 @@ dataSources:
           handler: handleCreatorRoyaltyModifiedOnEvent
         - event: CreatorRoyaltyModifiedOnTicket(uint256,uint256)
           handler: handleCreatorRoyaltyModifiedOnTicket
+        - event: TicketEdited(uint256,string)
+          handler: handleTicketUriModification
       file: ./src/handlers/marketplaceHandler.ts

@@ -60,28 +60,28 @@ dataSources:
         - name: Marketplace
           file: ./abis/Marketplace.json
       eventHandlers:
-        - event: TicketPublished(indexed uint256,address,indexed uint256,uint256,uint256,uint256,uint256,bool,string)
+        - event: TicketPublished(uint256,address,uint256,uint256,uint256,uint256,uint256,bool,string)
           handler: handleTicketPublished
-        - event: EventCreated(indexed uint256,address,string)
+        - event: EventCreated(uint256,address,string)
           handler: handleEventCreated
-        - event: EventDeleted(indexed uint256)
+        - event: EventDeleted(uint256)
           handler: handleEventDeleted
-        - event: TicketDeleted(indexed uint256,address,uint256[],uint256[])
+        - event: TicketDeleted(uint256,address,uint256[],uint256[])
           handler: handleTicketDeleted
-        - event: TicketBought(indexed uint256,address,address,uint256,uint256)
+        - event: TicketBought(uint256,address,address,uint256,uint256)
           handler: handleTicketBought
-        - event: AskSetted(indexed uint256,indexed address,uint256,uint256)
+        - event: AskSetted(uint256,address,uint256,uint256)
           handler: handleAskSetted
-        - event: AskRemoved(indexed address,indexed uint256)
+        - event: AskRemoved(address,uint256)
           handler: handleAskRemoved
-        - event: EventOwnershipTransferred(indexed uint256,address)
+        - event: EventOwnershipTransferred(uint256,address)
           handler: handleEventOwnershipTransferred
-        - event: CreatorRoyaltyModifiedOnEvent(indexed uint256,uint256)
+        - event: CreatorRoyaltyModifiedOnEvent(uint256,uint256)
           handler: handleCreatorRoyaltyModifiedOnEvent
-        - event: CreatorRoyaltyModifiedOnTicket(indexed uint256,uint256)
+        - event: CreatorRoyaltyModifiedOnTicket(uint256,uint256)
           handler: handleCreatorRoyaltyModifiedOnTicket
-        - event: TicketEdited(indexed uint256,string)
+        - event: TicketEdited(uint256,string)
           handler: handleTicketUriModification
-        - event: EventEdited(indexed uint256,string)
+        - event: EventEdited(uint256,string)
           handler: handleEventUriModification
       file: ./src/handlers/marketplaceHandler.ts

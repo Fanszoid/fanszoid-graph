@@ -5,6 +5,7 @@ type Event @entity {
   sentTickets: [Transfer!] @derivedFrom(field: "event")
   organizer: User!
   metadata: String
+  attendees: BigInt!
   
   title: String!
   description: String

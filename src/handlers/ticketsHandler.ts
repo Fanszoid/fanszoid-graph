@@ -94,19 +94,6 @@ function internalTransferToken(
       toTicketBalance.amountOwned = toTicketBalance.amountOwned + value.toI32();
     }
 
-    if(fromTicketBalance.amountOwned == 0) {
-      store.remove(
-        "TicketBalance",
-        fromTicketBalance.id
-      );
-      if (fromTicketBalance.owner != eventEntity.organizer) {
-        eventEntity.attendees = eventEntity.attendees.minus(BigInt.fromI32(1));
-      }
-    } else {
-      fromTicketBalance.save()
-    }
-    toTicketBalance.save();
-
     let transfer = loadOrCreateTransfer(txHash);
 
     // the isSale field on transfer is only setted on the ticketBought handler
@@ -119,6 +106,19 @@ function internalTransferToken(
     transfer.amount = value.toI32();
     transfer.createdAt = txTimestamp;
     transfer.save()
+
+    if(fromTicketBalance.amountOwned == 0) {
+      if (fromTicketBalance.owner != eventEntity.organizer) {
+        eventEntity.attendees = eventEntity.attendees.minus(BigInt.fromI32(1));
+      }
+      store.remove(
+        "TicketBalance",
+        fromTicketBalance.id
+      );
+    } else {
+      fromTicketBalance.save()
+    }
+    toTicketBalance.save();
   } else {
     log.info("Transfer single, to: {}, from: {}. Nothing done...", [
       to.toHex(),

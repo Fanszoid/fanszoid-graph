@@ -15,7 +15,7 @@ import {
   loadOrCreateTransfer,
 } from "../modules/Transfer";
 import { loadOrCreateUser } from "../modules/User";
-import { Address, log } from "@graphprotocol/graph-ts";
+import { Address, log, store } from "@graphprotocol/graph-ts";
 import { BigInt } from "@graphprotocol/graph-ts/common/numbers";
 import { SetTicketUriCall } from "../../build/generated/Marketplace/Marketplace";
 import { parseMetadata } from "./utils";
@@ -87,11 +87,24 @@ function internalTransferToken(
       toTicketBalance.isEventOwner = to.toHex() == eventEntity.organizer;
       toTicketBalance.amountOwned = value.toI32();
       toTicketBalance.amountOnSell = 0;
+      if (toTicketBalance.owner != eventEntity.organizer) {
+        eventEntity.attendees = eventEntity.attendees.plus(BigInt.fromI32(1));
+      }
     } else {
       toTicketBalance.amountOwned = toTicketBalance.amountOwned + value.toI32();
     }
 
-    fromTicketBalance.save();
+    if(fromTicketBalance.amountOwned == 0) {
+      store.remove(
+        "TicketBalance",
+        fromTicketBalance.id
+      );
+      if (fromTicketBalance.owner != eventEntity.organizer) {
+        eventEntity.attendees = eventEntity.attendees.minus(BigInt.fromI32(1));
+      }
+    } else {
+      fromTicketBalance.save()
+    }
     toTicketBalance.save();
 
     let transfer = loadOrCreateTransfer(txHash);

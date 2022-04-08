@@ -119,6 +119,7 @@ function internalTransferToken(
       fromTicketBalance.save()
     }
     toTicketBalance.save();
+    eventEntity.save();
   } else {
     log.info("Transfer single, to: {}, from: {}. Nothing done...", [
       to.toHex(),

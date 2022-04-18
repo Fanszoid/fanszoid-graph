@@ -49,7 +49,7 @@ export function parseJSONValueToString(value: JSONValue): string{
           .map<string>( (entry: TypedMapEntry<string, JSONValue>) => (entry.key + ":" + parseJSONValueToString(entry.value) + ","))
           .join(',');  
       case JSONValueKind.ARRAY:
-        return value.toArray().toString();
+        return value.toArray().map<string>( (item: JSONValue) => parseJSONValueToString(item)).toString();
       default:
         return "";
     }

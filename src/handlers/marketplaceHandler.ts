@@ -38,6 +38,7 @@ export function handleTicketUriModification(event: TicketEdited): void {
   let ticketEntity = Ticket.load(event.params.ticketId.toString());
   if (!ticketEntity) return;
   parseMetadata(event.params.newUri, ticketEntity, ticketAttrs);
+  ticketEntity.metadata = event.params.newUri;
   ticketEntity.save();
 }
 
@@ -45,6 +46,7 @@ export function handleEventUriModification(event: EventEdited): void {
   let eventEntity = Event.load(event.params.eventId.toString());
   if (!eventEntity) return;
   parseMetadata(event.params.newUri, eventEntity, eventAttrs);
+  eventEntity.metadata = event.params.newUri;
   eventEntity.save();
 }
 

@@ -24,8 +24,8 @@ type Event @entity {
   createdAt: String
   updatedAt: String
   image: String
-  startDateUTC: String
-  endDateUTC: String
+  startDateUTC: BigInt
+  endDateUTC: BigInt
 }
 
 type Ticket @entity {

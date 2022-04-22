@@ -1,4 +1,5 @@
-import { log, ipfs, json, JSONValue, TypedMap, Entity, JSONValueKind, TypedMapEntry } from "@graphprotocol/graph-ts";
+import { log, ipfs, json, JSONValue, TypedMap, Entity, JSONValueKind, TypedMapEntry, BigInt } from "@graphprotocol/graph-ts";
+import { bigIntEventAttrs } from "../modules/Event";
 
 export function parseMetadata(uri: string, entity: Entity, attrs: string[]): void {
     let uriParts = uri.split("/");
@@ -26,7 +27,11 @@ export function parseMetadata(uri: string, entity: Entity, attrs: string[]): voi
       for (let i = 0; i < attrs.length; i++) {
         let aux = value.get(attrs[i]);
         if (aux) {
-          entity.setString(attrs[i], parseJSONValueToString(aux));
+          if( bigIntEventAttrs.indexOf(attrs[i]) >= 0 ) {
+            entity.setBigInt(attrs[i], BigInt.fromString(parseJSONValueToString(aux)))
+          } else {
+            entity.setString(attrs[i], parseJSONValueToString(aux));
+          }
         } else {
           log.error("parseMetadata: aux is null", []);
         }

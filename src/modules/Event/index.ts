@@ -7,6 +7,10 @@ export var eventAttrs: string[] = [
   'inStock', 'createdAt', 'updatedAt', 'image', 'startDateUTC', 'endDateUTC'
 ];
 
+export var bigIntEventAttrs: string[] = [
+  'startDateUTC', 'endDateUTC'
+];
+
 export function getEventId(
   eventIdContract: BigInt
 ): string {

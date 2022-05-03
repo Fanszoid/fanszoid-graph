@@ -1,33 +1,88 @@
 type Event @entity {
   id: ID!
-  ticketTypes: [TicketType!]! @derivedFrom(field: "event")
-  metadata: String!
+  tickets: [Ticket!]! @derivedFrom(field: "event")
+  ticketBalances: [TicketBalance!]! @derivedFrom(field: "event")
+  sentTickets: [Transfer!] @derivedFrom(field: "event")
   organizer: User!
+  metadata: String
+  attendees: BigInt!
+  
+  title: String!
+  description: String
+  type: String!
+  category: String
+  dclX: String
+  dclY: String
+  city: String
+  postalCode: String
+  socials: [SocialNetwork!] @derivedFrom(field: "event")
+  email: String
+  website: String
+  isAvailable: String
+  status: String
+  inStock: String
+  createdAt: String
+  updatedAt: String
+  image: String
+  startDateUTC: BigInt
+  endDateUTC: BigInt
 }
 
-type TicketType @entity {
+type Ticket @entity {
   id: ID!
-  event: Event!
+  event: Event
   creatorRoyalty: Int!
-  metadata: String!
-  primaryAskingPrice: BigInt
-  primarySupply: Int!
-  initialAmount: Int!
-  soldTickets: [Ticket!]! @derivedFrom(field: "ticketType")
+  isResellable: Boolean!
+  totalAmount: Int!
+  ticketBalances: [TicketBalance!]! @derivedFrom(field: "ticket")
+  sentTickets: [Transfer!] @derivedFrom(field: "ticket")
+  metadata: String
+
+  name: String
+  description: String
+  image: String
+}
+
+type TicketBalance @entity {
+  id: ID!
+  ticket: Ticket!
+  event: Event!
+  askingPrice: BigInt
+  amountOnSell: Int!
+  amountOwned: Int!
+  owner: User!
+  isEventOwner: Boolean!
+  sentTickets: [Transfer!] @derivedFrom(field: "senderBalance")
+  receivedTickets: [Transfer!] @derivedFrom(field: "receiverBalance")
 }
 
 type User @entity {
   id: ID! # ETH addr
   address: Bytes!
   events: [Event!] @derivedFrom(field: "organizer")
-  tickets: [Ticket!] @derivedFrom(field: "owner")
+  ticketBalances: [TicketBalance!] @derivedFrom(field: "owner")
+  sentTickets: [Transfer!] @derivedFrom(field: "sender")
+  receivedTickets: [Transfer!] @derivedFrom(field: "receiver")
 }
 
-type Ticket @entity {
+# Fields are optional to make easier the entity setting/updating.
+type Transfer @entity {
   id: ID!
-  ticketType: TicketType!
+  event: Event
+  ticket: Ticket
+  sender: User
+  senderBalance: TicketBalance
+  receiver: User
+  receiverBalance: TicketBalance
+  price: BigInt
+  amount: Int
+  isSale: Boolean
+  createdAt: BigInt
+}
+
+type SocialNetwork @entity {
+  id: ID!
+  name: String!
+  url: String
   event: Event!
-  askingPrice: BigInt
-  amount: Int!
-  owner: User!
 }

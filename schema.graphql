@@ -15,7 +15,7 @@ type Event @entity {
   dclY: String
   city: String
   postalCode: String
-  socials: String
+  socials: [SocialNetwork!] @derivedFrom(field: "event")
   email: String
   website: String
   isAvailable: String
@@ -80,3 +80,9 @@ type Transfer @entity {
   createdAt: BigInt
 }
 
+type SocialNetwork @entity {
+  id: ID!
+  name: String!
+  url: String
+  event: Event!
+}

@@ -19,9 +19,9 @@ enum ContractName {
 
 const startBlockByNetwork: Record<Network, Record<string, number>> = {
   [Network.MATIC]: {
-    marketplace: 25657775,
-    ticket: 	25657919,
-    event:   25657919,  
+    marketplace: 26621371,
+    ticket: 	26621365,
+    event:   26621368,  
   },
   [Network.MUMBAI]: {
     marketplace: 25731086,

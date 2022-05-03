@@ -1,5 +1,6 @@
 import { log, ipfs, json, JSONValue, TypedMap, Entity, JSONValueKind, TypedMapEntry, BigInt } from "@graphprotocol/graph-ts";
 import { bigIntEventAttrs } from "../modules/Event";
+import { SocialNetwork } from "../../build/generated/schema";
 
 export function parseMetadata(uri: string, entity: Entity, attrs: string[]): void {
     let uriParts = uri.split("/");
@@ -29,7 +30,41 @@ export function parseMetadata(uri: string, entity: Entity, attrs: string[]): voi
         if (aux) {
           if( bigIntEventAttrs.indexOf(attrs[i]) >= 0 ) {
             entity.setBigInt(attrs[i], BigInt.fromString(parseJSONValueToString(aux)))
-          } else {
+          } 
+          // especial parsing for socials
+          else if( attrs[i] == "socials") {
+            if( aux.kind === JSONValueKind.ARRAY ) {
+              let socials = aux.toArray();
+
+            for( let i=0; i< socials.length ; i++) {
+              let social = socials[i];
+
+              let name: string;
+              let url: string;
+
+              let socialValues = social.toObject().entries;
+              for( let i=0; i< socialValues.length ; i++) {
+                let socialValue = socialValues[i];
+                if( socialValue.key.toString() == "name" ){
+                  name = socialValue.value.toString();
+                } else if ( socialValue.key.toString() == "url" ){
+                  url = socialValue.value.toString();
+                }
+              }
+
+              
+              log.info("Socials reached, name: {}, url: {}", [ name, url]);
+                
+                let socialNetwork = new SocialNetwork(entity.getString("id") + '-' + name);
+                socialNetwork.name = name;
+                socialNetwork.url = url;
+                socialNetwork.event = entity.getString("id");
+
+                socialNetwork.save();
+              }
+            }
+          } 
+          else {
             entity.setString(attrs[i], parseJSONValueToString(aux));
           }
         } else {

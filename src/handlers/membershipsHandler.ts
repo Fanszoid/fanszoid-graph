@@ -1,15 +1,15 @@
 import {
   TransferBatch,
   TransferSingle,
-} from "../../build/generated/Ticket/Ticket";
+} from "../../build/generated/Membership/Membership";
 import { Event, Balance } from "../../build/generated/schema";
 import {
   getBalanceId,
   balanceHasNAmountAvailable
 } from "../modules/Balance";
 import {
-  getTicketId,
-} from "../modules/Ticket";
+  getMembershipId,
+} from "../modules/Membership";
 import {
   loadOrCreateTransfer,
 } from "../modules/Transfer";
@@ -56,9 +56,9 @@ function internalTransferToken(
     loadOrCreateUser(from);
     loadOrCreateUser(to);
 
-    let fromBalance = Balance.load(getBalanceId(id, from, false));
+    let fromBalance = Balance.load(getBalanceId(id, from, true));
     if( fromBalance == null ){
-      log.error("fromBalance not found on internalTransferToken. ticket id : {}, address: {}", [ id.toHex(),from.toHex()]);
+      log.error("fromBalance not found on internalTransferToken. membership id : {}, address: {}", [ id.toHex(),from.toHex()]);
       return;
     }
     if( !balanceHasNAmountAvailable(fromBalance, value.toI32()) ){
@@ -74,11 +74,11 @@ function internalTransferToken(
 
     fromBalance.amountOwned = fromBalance.amountOwned - value.toI32();
 
-    let toBalanceId = getBalanceId(id, to, false)
+    let toBalanceId = getBalanceId(id, to, true)
     let toBalance = Balance.load(toBalanceId);
     if( toBalance == null ){
       toBalance = new Balance(toBalanceId);
-      toBalance.ticket = getTicketId(id);
+      toBalance.membership = getMembershipId(id);
       toBalance.event = fromBalance.event;
       toBalance.owner = to.toHex();
       toBalance.isEventOwner = to.toHex() == eventEntity.organizer;
@@ -93,9 +93,9 @@ function internalTransferToken(
 
     let transfer = loadOrCreateTransfer(txHash);
 
-    // the isSale field on transfer is only setted on the ticketBought handler
+    // the isSale field on transfer is only setted on the membershipBought handler
     transfer.event = fromBalance.event;
-    transfer.ticket = fromBalance.ticket;
+    transfer.membership = fromBalance.membership;
     transfer.sender = from.toHex();
     transfer.senderBalance = fromBalance.id;
     transfer.receiver = to.toHex();

@@ -6,8 +6,8 @@
   "scripts": {
     "codegen": "graph codegen --debug --output-dir build/generated/",
     "build-data": "ts-node ./scripts/completeSubgraph.ts --network mumbai",
-    "deploy:mumbai": "ts-node ./scripts/completeSubgraph.ts --network mumbai && graph deploy --product hosted-service fanszoid/fanszoid-tickets-mumbai",
-    "deploy:matic": "ts-node ./scripts/completeSubgraph.ts --network matic && graph deploy --product hosted-service fanszoid/fanszoid-tickets-matic"
+    "deploy:mumbai": "ts-node ./scripts/completeSubgraph.ts --network mumbai && graph deploy --product hosted-service fanszoid/fanszoid-tickets-mumbai  --ipfs http://ipfs.fanszoid.com/",
+    "deploy:matic": "ts-node ./scripts/completeSubgraph.ts --network matic && graph deploy --product hosted-service fanszoid/fanszoid-tickets-matic  --ipfs http://ipfs.fanszoid.com/"
   },
   "repository": {
     "type": "git",

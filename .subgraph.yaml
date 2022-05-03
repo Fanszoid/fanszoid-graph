@@ -7,9 +7,6 @@ features:
 schema:
   file: ./schema.graphql
 dataSources:
-  # ---------------------------------------------------------
-  # Tickets
-  # ---------------------------------------------------------
   - kind: ethereum/contract
     name: Ticket
     network: {{network}}
@@ -24,7 +21,7 @@ dataSources:
       entities:
         - Event
         - Ticket
-        - TicketBalance
+        - Balance
         - User
         - Transfer
       abis:
@@ -36,16 +33,39 @@ dataSources:
         - event: TransferBatch(indexed address,indexed address,indexed address,uint256[],uint256[])
           handler: handleTransferBatch
       file: ./src/handlers/ticketsHandler.ts
-  # ---------------------------------------------------------
-  # MARKETPLACE 
-  # ---------------------------------------------------------
   - kind: ethereum/contract
-    name: Marketplace
+    name: Membership
     network: {{network}}
     source:
-      address: '{{address:marketplace}}'
-      abi: Marketplace
-      startBlock: {{startBlock:marketplace}}
+      address: '{{address:membership}}'
+      abi: Membership
+      startBlock: {{startBlock:membership}}
+    mapping:
+      kind: ethereum/events
+      apiVersion: 0.0.6
+      language: wasm/assemblyscript
+      entities:
+        - Event
+        - Membership
+        - Balance
+        - User
+        - Transfer
+      abis:
+        - name: Membership
+          file: ./abis/Membership.json
+      eventHandlers:
+        - event: TransferSingle(indexed address,indexed address,indexed address,uint256,uint256)
+          handler: handleTransferSingle
+        - event: TransferBatch(indexed address,indexed address,indexed address,uint256[],uint256[])
+          handler: handleTransferBatch
+      file: ./src/handlers/membershipsHandler.ts
+  - kind: ethereum/contract
+    name: TicketsMarketplace
+    network: {{network}}
+    source:
+      address: '{{address:ticketsMarketplace}}'
+      abi: TicketsMarketplace
+      startBlock: {{startBlock:ticketsMarketplace}}
     mapping:
       kind: ethereum/events
       apiVersion: 0.0.6
@@ -53,35 +73,93 @@ dataSources:
       entities:
         - Event
         - Ticket
-        - TicketBalance
+        - Balance
         - User
         - Transfer
       abis:
-        - name: Marketplace
-          file: ./abis/Marketplace.json
+        - name: TicketsMarketplace
+          file: ./abis/TicketsMarketplace.json
       eventHandlers:
-        - event: TicketPublished(uint256,address,uint256,uint256,uint256,uint256,uint256,bool,string)
+        - event: TicketPublished(indexed uint256,address,indexed uint256,uint256,uint256,uint256,uint256,bool,string)
           handler: handleTicketPublished
-        - event: EventCreated(uint256,address,string)
-          handler: handleEventCreated
-        - event: EventDeleted(uint256)
-          handler: handleEventDeleted
-        - event: TicketDeleted(uint256,address,uint256[],uint256[])
-          handler: handleTicketDeleted
-        - event: TicketBought(uint256,address,address,uint256,uint256)
-          handler: handleTicketBought
-        - event: AskSetted(uint256,address,uint256,uint256)
-          handler: handleAskSetted
-        - event: AskRemoved(address,uint256)
-          handler: handleAskRemoved
-        - event: EventOwnershipTransferred(uint256,address)
-          handler: handleEventOwnershipTransferred
-        - event: CreatorRoyaltyModifiedOnEvent(uint256,uint256)
-          handler: handleCreatorRoyaltyModifiedOnEvent
-        - event: CreatorRoyaltyModifiedOnTicket(uint256,uint256)
-          handler: handleCreatorRoyaltyModifiedOnTicket
-        - event: TicketEdited(uint256,string)
+        - event: TicketEdited(indexed uint256,string)
           handler: handleTicketUriModification
-        - event: EventEdited(uint256,string)
+        - event: TicketBought(indexed uint256,address,address,uint256,uint256)
+          handler: handleTicketBought
+        - event: TicketDeleted(indexed uint256,address,uint256[],uint256[])
+          handler: handleTicketDeleted
+        - event: AskSetted(indexed uint256,indexed address,uint256,uint256)
+          handler: handleAskSetted
+        - event: AskRemoved(indexed address,indexed uint256)
+          handler: handleAskRemoved
+        - event: CreatorRoyaltyModifiedOnTicket(indexed uint256,uint256)
+          handler: handleCreatorRoyaltyModifiedOnTicket
+      file: ./src/handlers/ticketsMarketplaceHandler.ts
+  - kind: ethereum/contract
+    name: MembershipsMarketplace
+    network: {{network}}
+    source:
+      address: '{{address:membershipsMarketplace}}'
+      abi: MembershipsMarketplace
+      startBlock: {{startBlock:membershipsMarketplace}}
+    mapping:
+      kind: ethereum/events
+      apiVersion: 0.0.6
+      language: wasm/assemblyscript
+      entities:
+        - Event
+        - Membership
+        - Balance
+        - User
+        - Transfer
+      abis:
+        - name: MembershipsMarketplace
+          file: ./abis/MembershipsMarketplace.json
+      eventHandlers:
+        - event: MembershipPublished(address,indexed uint256,uint256,uint256,uint256,uint256,bool,string)
+          handler: handleMembershipPublished
+        - event: MembershipEdited(indexed uint256,string)
+          handler: handleMembershipUriModification
+        - event: MembershipBought(indexed uint256,address,address,uint256,uint256)
+          handler: handleMembershipBought
+        - event: MembershipDeleted(indexed uint256,address,uint256[],uint256[])
+          handler: handleMembershipDeleted
+        - event: AskSetted(indexed uint256,indexed address,uint256,uint256)
+          handler: handleAskSetted
+        - event: AskRemoved(indexed address,indexed uint256)
+          handler: handleAskRemoved
+        - event: CreatorRoyaltyModifiedOnMembership(indexed uint256,uint256)
+          handler: handleCreatorRoyaltyModifiedOnMembership
+      file: ./src/handlers/membershipsMarketplaceHandler.ts
+  - kind: ethereum/contract
+    name: Admin
+    network: {{network}}
+    source:
+      address: '{{address:admin}}'
+      abi: Admin
+      startBlock: {{startBlock:admin}}
+    mapping:
+      kind: ethereum/events
+      apiVersion: 0.0.6
+      language: wasm/assemblyscript
+      entities:
+        - Event
+        - Ticket
+        - Balance
+        - User
+        - Transfer
+      abis:
+        - name: Admin
+          file: ./abis/Admin.json
+      eventHandlers:
+        - event: EventCreated(indexed uint256,address,string)
+          handler: handleEventCreated
+        - event: EventDeleted(indexed uint256)
+          handler: handleEventDeleted
+        - event: EventOwnershipTransferred(indexed uint256,address)
+          handler: handleEventOwnershipTransferred
+        - event: CreatorRoyaltyModifiedOnEvent(indexed uint256,uint256)
+          handler: handleCreatorRoyaltyModifiedOnEvent
+        - event: EventEdited(indexed uint256,string)
           handler: handleEventUriModification
-      file: ./src/handlers/marketplaceHandler.ts
+      file: ./src/handlers/adminHandler.ts

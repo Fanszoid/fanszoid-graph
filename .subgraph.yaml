@@ -162,4 +162,11 @@ dataSources:
           handler: handleCreatorRoyaltyModifiedOnEvent
         - event: EventEdited(indexed uint256,string)
           handler: handleEventUriModification
+        - event: MembershipAssignedToTicket(indexed uint256,address,uint256[])
+          handler: handleMembershipsAssigned
+        - event: MembershipRemovedFromTicket(indexed uint256,address)
+          handler: handleDisallowMembership
+        - event: MembershipTokenIdRemovedFromTicket(indexed uint256,address,uint256)
+          handler: handleDisallowMembershipTokenId
+
       file: ./src/handlers/adminHandler.ts

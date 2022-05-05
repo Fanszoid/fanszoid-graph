@@ -1,3 +1,47 @@
+"======================================================== FULLTEXT SEARCH ======================================================" 
+
+type _Schema_
+  @fulltext(
+    name: "ticketSearch"
+    language: en
+    algorithm: rank
+    include: [{ 
+      entity: "Ticket", 
+      fields: [
+        { name: "name" }, 
+        { name: "description" }, 
+      ] 
+    }]
+  )
+
+  @fulltext(
+    name: "membershipSearch"
+    language: en
+    algorithm: rank
+    include: [{ 
+      entity: "Membership", 
+      fields: [
+        { name: "name" }, 
+        { name: "description" }, 
+      ] 
+    }]
+  )
+
+@fulltext(
+  name: "eventSearch"
+  language: en
+  algorithm: rank
+  include: [{ 
+    entity: "Event", 
+    fields: [
+      { name: "title" }, 
+      { name: "description" }, 
+    ] 
+  }]
+)
+
+"============================================================ ENTITIES ===========================================================" 
+
 type Event @entity {
   id: ID!
   tickets: [Ticket!]! @derivedFrom(field: "event")
@@ -37,6 +81,7 @@ type Ticket @entity {
   ticketBalances: [Balance!]! @derivedFrom(field: "ticket")
   sentTickets: [Transfer!] @derivedFrom(field: "ticket")
   metadata: String
+  allowedMemberships: [AllowedMembership!]
 
   name: String
   description: String
@@ -45,7 +90,7 @@ type Ticket @entity {
 
 type Membership @entity {
   id: ID!
-  organizer: User!
+  organizer: Bytes!
   creatorRoyalty: Int!
   isResellable: Boolean!
   totalAmount: Int!
@@ -103,4 +148,11 @@ type SocialNetwork @entity {
   name: String!
   url: String
   event: Event!
+}
+
+type AllowedMembership @entity {
+  id: ID!
+  address: Bytes!
+  tokenIds: [BigInt!]
+  allowedIds: BigInt!
 }

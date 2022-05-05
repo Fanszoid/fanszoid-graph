@@ -3,17 +3,24 @@ import {
   EventDeleted,
   EventOwnershipTransferred,
   CreatorRoyaltyModifiedOnEvent,
-  EventEdited
+  EventEdited,
+  MembershipAssignedToTicket,
+  MembershipTokenIdRemovedFromTicket,
+  MembershipRemovedFromTicket
 } from "../../build/generated/Admin/Admin";
-import { Event, Ticket, Balance } from "../../build/generated/schema";
+import { Event, Ticket, Balance, AllowedMembership } from "../../build/generated/schema";
+import {
+  getMembershipId, membershipAttrs,
+} from "../modules/Membership";
 import { loadOrCreateUser } from "../modules/User";
 import { 
   loadOrCreateEvent,
   getEventId,
   eventAttrs
 } from "../modules/Event";
-import { store, log } from "@graphprotocol/graph-ts";
+import { store, log, BigInt } from "@graphprotocol/graph-ts";
 import { parseMetadata } from "./utils"
+import { getTicketId } from "../modules/Ticket";
 
 export function handleEventUriModification(event: EventEdited): void {
   let eventEntity = Event.load(event.params.eventId.toString());
@@ -41,6 +48,70 @@ export function handleEventDeleted(event: EventDeleted): void {
     "Event",
     getEventId(event.params.eventId)
   );
+}
+
+export function handleMembershipsAssigned(event: MembershipAssignedToTicket): void {
+
+  let ticketEntity = Ticket.load(getTicketId(event.params.ticketId));
+  if(ticketEntity == null ) {
+    log.error("Ticket Not Found. id : {}", [event.params.ticketId.toString()]);
+    return;
+  }
+  let allowedMembership = new AllowedMembership(ticketEntity.getString("id") + '-' + event.params.contractAddress.toHex());
+  allowedMembership.address = event.params.contractAddress;
+  allowedMembership.tokenIds = event.params.ids;
+  allowedMembership.save();
+  if (ticketEntity.allowedMemberships == null) {
+    ticketEntity.allowedMemberships = new Array<string>();
+  }
+  (ticketEntity.allowedMemberships as Array<string>).push(allowedMembership.id);
+  ticketEntity.save();
+}
+
+export function handleDisallowMembership(event: MembershipRemovedFromTicket): void {
+  let ticketEntity = Ticket.load(getTicketId(event.params.ticketId));
+  if(ticketEntity == null ) {
+    log.error("Ticket Not Found. id : {}", [event.params.ticketId.toString()]);
+    return;
+  }
+  if (ticketEntity.allowedMemberships == null) {
+    ticketEntity.allowedMemberships = new Array<string>();
+  }
+  let finalAllowedMemberships: Array<string> = new Array<string>();
+  for (let i = 0 ; i <  (ticketEntity.allowedMemberships as Array<string>).length ; i++) {
+    let membership = (ticketEntity.allowedMemberships as Array<string>)[i];
+    let allowedMembership = AllowedMembership.load(getMembershipId(BigInt.fromString(membership)));
+    if (allowedMembership != null && allowedMembership.address != event.params.contractAddress) {
+      finalAllowedMemberships.push(membership);
+    }
+  }
+  ticketEntity.allowedMemberships = finalAllowedMemberships;
+  ticketEntity.save();
+}
+
+export function handleDisallowMembershipTokenId(event: MembershipTokenIdRemovedFromTicket): void {
+  let ticketEntity = Ticket.load(getTicketId(event.params.ticketId));
+  if(ticketEntity == null ) {
+    log.error("Ticket Not Found. id : {}", [event.params.ticketId.toString()]);
+    return;
+  };
+  for (let i = 0 ; i <  (ticketEntity.allowedMemberships as Array<string>).length ; i++) {
+    let membership = (ticketEntity.allowedMemberships as Array<string>)[i];
+    let allowedMembership = AllowedMembership.load(getMembershipId(BigInt.fromString(membership)));
+    if (allowedMembership != null && allowedMembership.address == event.params.contractAddress) {
+      let currentIds: Array<BigInt> = allowedMembership == null? new Array<BigInt>() : (allowedMembership.tokenIds as Array<BigInt>);
+      let finalIds: Array<BigInt> = new Array<BigInt>();
+      for (let j = 0 ; j < currentIds.length ; j++) {
+        let id = currentIds[j];
+        if (id != event.params.tokenId) {
+          finalIds.push(id);
+        }
+      }
+      allowedMembership.tokenIds = finalIds;
+      allowedMembership.save();
+    }
+  }
+  ticketEntity.save();
 }
 
 export function handleEventOwnershipTransferred(event: EventOwnershipTransferred): void {

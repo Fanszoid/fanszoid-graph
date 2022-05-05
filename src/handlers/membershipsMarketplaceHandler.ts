@@ -25,6 +25,7 @@ import {
 } from "../modules/Balance";
 import { store, log } from "@graphprotocol/graph-ts";
 import { parseMetadata } from "./utils"
+import { loadOrCreateUser } from "../modules/User";
 
 export function handleMembershipUriModification(event: MembershipEdited): void {
   let membershipEntity = Membership.load(event.params.membershipId.toString());
@@ -35,6 +36,9 @@ export function handleMembershipUriModification(event: MembershipEdited): void {
 }
 
 export function handleMembershipPublished(event: MembershipPublished): void {
+  let userEntity = loadOrCreateUser(
+    event.params.organizer
+  );
 
   let membershipId = getMembershipId(event.params.membershipId);
   let membership = Membership.load(membershipId);
@@ -45,6 +49,7 @@ export function handleMembershipPublished(event: MembershipPublished): void {
 
   membership = new Membership(membershipId);
 
+  membership.organizer = userEntity.address;
   membership.creatorRoyalty = event.params.creatorRoyalty.toI32();
   membership.isResellable = event.params.isResellable;
   membership.metadata = event.params.uri;

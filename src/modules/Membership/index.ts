@@ -7,3 +7,7 @@ export var membershipAttrs: string[] = [
 export function getMembershipId(membershipIdContract: BigInt): string {
   return "mem" + membershipIdContract.toHex();
 }
+
+export function getAllowedMembershipId(ticketId: string, contract: string): string {
+  return ticketId.toString() + "-" + contract;
+}

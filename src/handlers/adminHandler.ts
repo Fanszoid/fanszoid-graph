@@ -10,7 +10,7 @@ import {
 } from "../../build/generated/Admin/Admin";
 import { Event, Ticket, Balance, AllowedMembership } from "../../build/generated/schema";
 import {
-  getMembershipId, membershipAttrs,
+  getAllowedMembershipId, membershipAttrs,
 } from "../modules/Membership";
 import { loadOrCreateUser } from "../modules/User";
 import { 
@@ -51,20 +51,15 @@ export function handleEventDeleted(event: EventDeleted): void {
 }
 
 export function handleMembershipsAssigned(event: MembershipAssignedToTicket): void {
-
   let ticketEntity = Ticket.load(getTicketId(event.params.ticketId));
   if(ticketEntity == null ) {
-    log.error("Ticket Not Found. id : {}", [event.params.ticketId.toString()]);
-    return;
+    ticketEntity = new Ticket(getTicketId(event.params.ticketId));
   }
-  let allowedMembership = new AllowedMembership(ticketEntity.getString("id") + '-' + event.params.contractAddress.toHex());
+  let allowedMembership = new AllowedMembership(getAllowedMembershipId(ticketEntity.getString("id"), event.params.contractAddress.toHex()));
   allowedMembership.address = event.params.contractAddress;
   allowedMembership.tokenIds = event.params.ids;
+  ticketEntity.allowedMemberships = ticketEntity.allowedMemberships.concat([allowedMembership.id]);
   allowedMembership.save();
-  if (ticketEntity.allowedMemberships == null) {
-    ticketEntity.allowedMemberships = new Array<string>();
-  }
-  (ticketEntity.allowedMemberships as Array<string>).push(allowedMembership.id);
   ticketEntity.save();
 }
 
@@ -74,13 +69,10 @@ export function handleDisallowMembership(event: MembershipRemovedFromTicket): vo
     log.error("Ticket Not Found. id : {}", [event.params.ticketId.toString()]);
     return;
   }
-  if (ticketEntity.allowedMemberships == null) {
-    ticketEntity.allowedMemberships = new Array<string>();
-  }
-  let finalAllowedMemberships: Array<string> = new Array<string>();
-  for (let i = 0 ; i <  (ticketEntity.allowedMemberships as Array<string>).length ; i++) {
-    let membership = (ticketEntity.allowedMemberships as Array<string>)[i];
-    let allowedMembership = AllowedMembership.load(getMembershipId(BigInt.fromString(membership)));
+  let finalAllowedMemberships: string[] = [];
+  for (let i = 0 ; i <  (ticketEntity.allowedMemberships as string[]).length ; i++) {
+    let membership = (ticketEntity.allowedMemberships as string[])[i];
+    let allowedMembership = AllowedMembership.load(membership);
     if (allowedMembership != null && allowedMembership.address != event.params.contractAddress) {
       finalAllowedMemberships.push(membership);
     }
@@ -95,11 +87,11 @@ export function handleDisallowMembershipTokenId(event: MembershipTokenIdRemovedF
     log.error("Ticket Not Found. id : {}", [event.params.ticketId.toString()]);
     return;
   };
-  for (let i = 0 ; i <  (ticketEntity.allowedMemberships as Array<string>).length ; i++) {
-    let membership = (ticketEntity.allowedMemberships as Array<string>)[i];
-    let allowedMembership = AllowedMembership.load(getMembershipId(BigInt.fromString(membership)));
+  for (let i = 0 ; i <  (ticketEntity.allowedMemberships as string[]).length ; i++) {
+    let membership = (ticketEntity.allowedMemberships as string[])[i];
+    let allowedMembership = AllowedMembership.load(membership);
     if (allowedMembership != null && allowedMembership.address == event.params.contractAddress) {
-      let currentIds: Array<BigInt> = allowedMembership == null? new Array<BigInt>() : (allowedMembership.tokenIds as Array<BigInt>);
+      let currentIds: Array<BigInt> = allowedMembership == null? new Array<BigInt>() : (allowedMembership.tokenIds as BigInt[]);
       let finalIds: Array<BigInt> = new Array<BigInt>();
       for (let j = 0 ; j < currentIds.length ; j++) {
         let id = currentIds[j];

@@ -41,13 +41,10 @@ export function handleTicketPublished(event: TicketPublished): void {
 
   let ticketId = getTicketId(event.params.ticketId);
   let ticket = Ticket.load(ticketId);
-  if (ticket != null) {
-    log.error("handleTicketPublished: TicketType already existed, id : {}", [ticketId]);
-    return;
+  if (ticket == null) {
+    ticket = new Ticket(ticketId);
   }
-
-  ticket = new Ticket(ticketId);
-
+  
   ticket.event = eventEntity.id;
   ticket.creatorRoyalty = event.params.creatorRoyalty.toI32();
   ticket.isResellable = event.params.isResellable;

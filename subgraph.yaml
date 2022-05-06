@@ -12,11 +12,11 @@ dataSources:
   # ---------------------------------------------------------
   - kind: ethereum/contract
     name: Ticket
-    network: matic
+    network: mumbai
     source:
-      address: '0xAec844771035Bee7e174D5c382703FF0cDE53B9d'
+      address: '0xB592f4A053129593AAC9493661A1B8057fb659DF'
       abi: Ticket
-      startBlock: 26621365
+      startBlock: 25731084
     mapping:
       kind: ethereum/events
       apiVersion: 0.0.6
@@ -41,11 +41,11 @@ dataSources:
   # ---------------------------------------------------------
   - kind: ethereum/contract
     name: Marketplace
-    network: matic
+    network: mumbai
     source:
-      address: '0xB47c1BE646F7C5f180424f6198E038a4071B9c46'
+      address: '0x67bf152A179b5710a323E0Dc6c9ac6D4c528CCf2'
       abi: Marketplace
-      startBlock: 26621371
+      startBlock: 25731086
     mapping:
       kind: ethereum/events
       apiVersion: 0.0.6

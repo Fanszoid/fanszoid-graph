@@ -13,6 +13,7 @@ type Event @entity {
   category: String
   dclX: String
   dclY: String
+  location: String
   city: String
   postalCode: String
   socials: [SocialNetwork!] @derivedFrom(field: "event")

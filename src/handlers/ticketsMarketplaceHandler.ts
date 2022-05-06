@@ -61,6 +61,7 @@ export function handleTicketPublished(event: TicketPublished): void {
     return;
   }
   ticketBalance = new Balance(getBalanceId(event.params.ticketId, event.params.organizer, false));
+  ticketBalance.type = 'Ticket';
   ticketBalance.ticket = ticketId;
   ticketBalance.event = eventEntity.id;
   ticketBalance.askingPrice = event.params.price;

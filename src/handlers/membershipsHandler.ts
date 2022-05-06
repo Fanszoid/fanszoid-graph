@@ -66,27 +66,17 @@ function internalTransferToken(
       return;
     }
 
-    let eventEntity = Event.load(fromBalance.event);
-    if(eventEntity == null ) {
-      log.error("Event not found on internalTransferToken. id : {}", [fromBalance.event]);
-      return;
-    }
-
     fromBalance.amountOwned = fromBalance.amountOwned - value.toI32();
 
     let toBalanceId = getBalanceId(id, to, true)
     let toBalance = Balance.load(toBalanceId);
     if( toBalance == null ){
       toBalance = new Balance(toBalanceId);
+      toBalance.type = fromBalance.type;
       toBalance.membership = getMembershipId(id);
-      toBalance.event = fromBalance.event;
       toBalance.owner = to.toHex();
-      toBalance.isEventOwner = to.toHex() == eventEntity.organizer;
       toBalance.amountOwned = value.toI32();
       toBalance.amountOnSell = 0;
-      if (toBalance.owner != eventEntity.organizer) {
-        eventEntity.attendees = eventEntity.attendees.plus(BigInt.fromI32(1));
-      }
     } else {
       toBalance.amountOwned = toBalance.amountOwned + value.toI32();
     }
@@ -94,7 +84,6 @@ function internalTransferToken(
     let transfer = loadOrCreateTransfer(txHash);
 
     // the isSale field on transfer is only setted on the membershipBought handler
-    transfer.event = fromBalance.event;
     transfer.membership = fromBalance.membership;
     transfer.sender = from.toHex();
     transfer.senderBalance = fromBalance.id;
@@ -105,9 +94,6 @@ function internalTransferToken(
     transfer.save()
 
     if(fromBalance.amountOwned == 0) {
-      if (fromBalance.owner != eventEntity.organizer) {
-        eventEntity.attendees = eventEntity.attendees.minus(BigInt.fromI32(1));
-      }
       store.remove(
         "Balance",
         fromBalance.id
@@ -116,7 +102,6 @@ function internalTransferToken(
       fromBalance.save()
     }
     toBalance.save();
-    eventEntity.save();
   } else {
     log.info("Transfer single, to: {}, from: {}. Nothing done...", [
       to.toHex(),

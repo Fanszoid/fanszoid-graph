@@ -66,9 +66,14 @@ function internalTransferToken(
       return;
     }
 
-    let eventEntity = Event.load(fromBalance.event);
+    if (fromBalance.type == 'Ticket' && fromBalance.event == null) {
+      log.error("Event not found on ticket balance. id : {}", [fromBalance.id]);
+      return;
+    }
+
+    let eventEntity = Event.load((fromBalance.event as string));
     if(eventEntity == null ) {
-      log.error("Event not found on internalTransferToken. id : {}", [fromBalance.event]);
+      log.error("Event not found on internalTransferToken. id : {}", [(fromBalance.event as string)]);
       return;
     }
 
@@ -79,6 +84,7 @@ function internalTransferToken(
     if( toBalance == null ){
       toBalance = new Balance(toBalanceId);
       toBalance.ticket = getTicketId(id);
+      toBalance.type = fromBalance.type;
       toBalance.event = fromBalance.event;
       toBalance.owner = to.toHex();
       toBalance.isEventOwner = to.toHex() == eventEntity.organizer;

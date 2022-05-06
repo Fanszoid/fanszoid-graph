@@ -103,11 +103,17 @@ type Membership @entity {
   image: String
 }
 
+enum BalanceType {
+  Membership
+  Ticket
+}
+
 type Balance @entity {
   id: ID!
   ticket: Ticket
   membership: Membership
-  event: Event!
+  type: BalanceType!
+  event: Event
   askingPrice: BigInt
   amountOnSell: Int!
   amountOwned: Int!

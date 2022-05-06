@@ -7,7 +7,7 @@ import {
   CreatorRoyaltyModifiedOnMembership,
   MembershipEdited
 } from "../../build/generated/MembershipsMarketplace/MembershipsMarketplace";
-import { Membership, Balance } from "../../build/generated/schema";
+import { Membership, Balance,  } from "../../build/generated/schema";
 import { 
   loadOrCreateEvent,
 } from "../modules/Event";
@@ -66,6 +66,7 @@ export function handleMembershipPublished(event: MembershipPublished): void {
   }
   membershipBalance = new Balance(getBalanceId(event.params.membershipId, event.params.organizer, true));
   membershipBalance.membership = membershipId;
+  membershipBalance.type = 'Membership';
   membershipBalance.askingPrice = event.params.price;
   membershipBalance.amountOnSell = event.params.amountToSell.toI32();
   membershipBalance.amountOwned = event.params.amount.toI32();

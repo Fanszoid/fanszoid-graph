@@ -23,8 +23,11 @@ import { parseMetadata } from "./utils"
 import { getTicketId } from "../modules/Ticket";
 
 export function handleEventUriModification(event: EventEdited): void {
-  let eventEntity = Event.load(event.params.eventId.toString());
-  if (!eventEntity) return;
+  let eventEntity = Event.load(getEventId(event.params.eventId));
+  if (!eventEntity) {
+    log.error("Event Not Found on handleEventUriModification. id : {}", [event.params.eventId.toString()]);
+    return;
+  }
   parseMetadata(event.params.newUri, eventEntity, eventAttrs);
   eventEntity.metadata = event.params.newUri;
   eventEntity.save();
@@ -53,61 +56,54 @@ export function handleEventDeleted(event: EventDeleted): void {
 export function handleMembershipsAssigned(event: MembershipAssignedToTicket): void {
   let ticketEntity = Ticket.load(getTicketId(event.params.ticketId));
   if(ticketEntity == null ) {
-    ticketEntity = new Ticket(getTicketId(event.params.ticketId));
+    log.error("Ticket Not Found on handleMembershipsAssigned. id : {}", [event.params.ticketId.toHex()]);
+    return;
   }
-  let allowedMembership = new AllowedMembership(getAllowedMembershipId(ticketEntity.getString("id"), event.params.contractAddress.toHex()));
+  let allowedMembership = new AllowedMembership(getAllowedMembershipId(ticketEntity.id, event.params.contractAddress.toHex()));
   allowedMembership.address = event.params.contractAddress;
   allowedMembership.tokenIds = event.params.ids;
-  ticketEntity.allowedMemberships = ticketEntity.allowedMemberships.concat([allowedMembership.id]);
+  allowedMembership.ticket = ticketEntity.id
   allowedMembership.save();
-  ticketEntity.save();
 }
 
 export function handleDisallowMembership(event: MembershipRemovedFromTicket): void {
   let ticketEntity = Ticket.load(getTicketId(event.params.ticketId));
   if(ticketEntity == null ) {
-    log.error("Ticket Not Found. id : {}", [event.params.ticketId.toString()]);
+    log.error("Ticket Not Found on handleDisallowMembership. id : {}", [event.params.ticketId.toHex()]);
     return;
   }
-  let finalAllowedMemberships: string[] = [];
-  for (let i = 0 ; i <  (ticketEntity.allowedMemberships as string[]).length ; i++) {
-    let membership = (ticketEntity.allowedMemberships as string[])[i];
-    let allowedMembership = AllowedMembership.load(membership);
-    if (allowedMembership != null && allowedMembership.address != event.params.contractAddress) {
-      finalAllowedMemberships.push(membership);
-    }
-  }
-  ticketEntity.allowedMemberships = finalAllowedMemberships;
-  ticketEntity.save();
+  store.remove(
+    "AllowedMembership",
+    getAllowedMembershipId(ticketEntity.id, event.params.contractAddress.toHex())
+  );
 }
 
 export function handleDisallowMembershipTokenId(event: MembershipTokenIdRemovedFromTicket): void {
   let ticketEntity = Ticket.load(getTicketId(event.params.ticketId));
   if(ticketEntity == null ) {
-    log.error("Ticket Not Found. id : {}", [event.params.ticketId.toString()]);
+    log.error("Ticket Not Found on handleDisallowMembershipTokenId. id : {}", [event.params.ticketId.toString()]);
     return;
   };
-  for (let i = 0 ; i <  (ticketEntity.allowedMemberships as string[]).length ; i++) {
-    let membership = (ticketEntity.allowedMemberships as string[])[i];
-    let allowedMembership = AllowedMembership.load(membership);
-    if (allowedMembership != null && allowedMembership.address == event.params.contractAddress) {
-      let currentIds: Array<BigInt> = allowedMembership == null? new Array<BigInt>() : (allowedMembership.tokenIds as BigInt[]);
-      let finalIds: Array<BigInt> = new Array<BigInt>();
-      for (let j = 0 ; j < currentIds.length ; j++) {
-        let id = currentIds[j];
-        if (id != event.params.tokenId) {
-          finalIds.push(id);
-        }
-      }
-      allowedMembership.tokenIds = finalIds;
-      allowedMembership.save();
+  let allowedMembershipId = getAllowedMembershipId(ticketEntity.id, event.params.contractAddress.toHex())
+  let allowedMembership = AllowedMembership.load(allowedMembershipId);
+  if(allowedMembership == null ) {
+    log.error("AllowedMembership Not Found on handleDisallowMembershipTokenId. id : {}", [allowedMembershipId]);
+    return;
+  };
+  let currentIds = allowedMembership.tokenIds as BigInt[];
+  let finalIds: Array<BigInt> = new Array<BigInt>();
+  for (let j = 0 ; j < currentIds.length ; j++) {
+    let id = currentIds[j];
+    if (id != event.params.tokenId) {
+      finalIds.push(id);
     }
   }
-  ticketEntity.save();
+  allowedMembership.tokenIds = finalIds;
+  allowedMembership.save();
 }
 
 export function handleEventOwnershipTransferred(event: EventOwnershipTransferred): void {
-  let eventEntity = Event.load(event.params.eventId.toHex());
+  let eventEntity = Event.load(getEventId(event.params.eventId));
   
   if(eventEntity == null ) {
     log.error("Event not found on handleEventOwnershipTransferred. id : {}", [event.params.eventId.toHex()]);
@@ -137,7 +133,7 @@ export function handleEventOwnershipTransferred(event: EventOwnershipTransferred
 }
 
 export function handleCreatorRoyaltyModifiedOnEvent(event: CreatorRoyaltyModifiedOnEvent): void {
-  let eventEntity = Event.load(event.params.eventId.toHex());
+  let eventEntity = Event.load(getEventId(event.params.eventId));
   if(eventEntity == null ) {
     log.error("Event not found on handleEventOwnershipTransferred. id : {}", [event.params.eventId.toHex()]);
     return;

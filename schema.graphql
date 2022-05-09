@@ -81,7 +81,7 @@ type Ticket @entity {
   ticketBalances: [Balance!]! @derivedFrom(field: "ticket")
   sentTickets: [Transfer!] @derivedFrom(field: "ticket")
   metadata: String
-  allowedMemberships: [AllowedMembership!]!
+  allowedMemberships: [AllowedMembership!]  @derivedFrom(field: "ticket")
 
   name: String
   description: String
@@ -160,4 +160,5 @@ type AllowedMembership @entity {
   id: ID!
   address: Bytes!
   tokenIds: [BigInt!]
+  ticket: Ticket!
 }

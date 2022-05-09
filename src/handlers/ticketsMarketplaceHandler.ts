@@ -27,8 +27,11 @@ import { store, log } from "@graphprotocol/graph-ts";
 import { parseMetadata } from "./utils";
 
 export function handleTicketUriModification(event: TicketEdited): void {
-  let ticketEntity = Ticket.load(event.params.ticketId.toString());
-  if (!ticketEntity) return;
+  let ticketEntity = Ticket.load(getTicketId(event.params.ticketId));
+  if (!ticketEntity) {
+    log.error("Ticket Not Found on handleTicketUriModification. id : {}", [event.params.ticketId.toString()]);
+    return;
+  }
   parseMetadata(event.params.newUri, ticketEntity, ticketAttrs);
   ticketEntity.metadata = event.params.newUri;
   ticketEntity.save();
@@ -43,6 +46,8 @@ export function handleTicketPublished(event: TicketPublished): void {
   let ticket = Ticket.load(ticketId);
   if (ticket == null) {
     ticket = new Ticket(ticketId);
+  } else {
+    log.error("Warning: ticket already existed on handleTicketPublished. id : {}", [event.params.ticketId.toString()]);
   }
   
   ticket.event = eventEntity.id;
@@ -162,7 +167,7 @@ export function handleAskRemoved(event: AskRemoved): void {
 }
 
 export function handleCreatorRoyaltyModifiedOnTicket(event: CreatorRoyaltyModifiedOnTicket): void {
-  let ticket = Ticket.load(event.params.ticketId.toHex());
+  let ticket = Ticket.load(getTicketId(event.params.ticketId));
   if(ticket == null ) {
     log.error("Ticket not found on handleCreatorRoyaltyModifiedOnTicket. id : {}", [event.params.ticketId.toHex()]);
     return;

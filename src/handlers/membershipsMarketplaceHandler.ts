@@ -28,8 +28,11 @@ import { parseMetadata } from "./utils"
 import { loadOrCreateUser } from "../modules/User";
 
 export function handleMembershipUriModification(event: MembershipEdited): void {
-  let membershipEntity = Membership.load(event.params.membershipId.toString());
-  if (!membershipEntity) return;
+  let membershipEntity = Membership.load(getMembershipId(event.params.membershipId));
+  if (!membershipEntity) {
+    log.error("Membership Not Found on handleMembershipUriModification. id : {}", [event.params.membershipId.toString()]);
+    return;
+  }
   parseMetadata(event.params.newUri, membershipEntity, membershipAttrs);
   membershipEntity.metadata = event.params.newUri;
   membershipEntity.save();
@@ -165,7 +168,7 @@ export function handleAskRemoved(event: AskRemoved): void {
 }
 
 export function handleCreatorRoyaltyModifiedOnMembership(event: CreatorRoyaltyModifiedOnMembership): void {
-  let membership = Membership.load(event.params.membershipId.toHex());
+  let membership = Membership.load(getMembershipId(event.params.membershipId));
   if(membership == null ) {
     log.error("Membership not found on handleCreatorRoyaltyModifiedOnMembership. id : {}", [event.params.membershipId.toHex()]);
     return;

@@ -1,7 +1,51 @@
+"======================================================== FULLTEXT SEARCH ======================================================" 
+
+type _Schema_
+  @fulltext(
+    name: "ticketSearch"
+    language: en
+    algorithm: rank
+    include: [{ 
+      entity: "Ticket", 
+      fields: [
+        { name: "name" }, 
+        { name: "description" }, 
+      ] 
+    }]
+  )
+
+  @fulltext(
+    name: "membershipSearch"
+    language: en
+    algorithm: rank
+    include: [{ 
+      entity: "Membership", 
+      fields: [
+        { name: "name" }, 
+        { name: "description" }, 
+      ] 
+    }]
+  )
+
+@fulltext(
+  name: "eventSearch"
+  language: en
+  algorithm: rank
+  include: [{ 
+    entity: "Event", 
+    fields: [
+      { name: "title" }, 
+      { name: "description" }, 
+    ] 
+  }]
+)
+
+"============================================================ ENTITIES ===========================================================" 
+
 type Event @entity {
   id: ID!
   tickets: [Ticket!]! @derivedFrom(field: "event")
-  ticketBalances: [TicketBalance!]! @derivedFrom(field: "event")
+  ticketBalances: [Balance!]! @derivedFrom(field: "event")
   sentTickets: [Transfer!] @derivedFrom(field: "event")
   organizer: User!
   metadata: String
@@ -34,8 +78,24 @@ type Ticket @entity {
   creatorRoyalty: Int!
   isResellable: Boolean!
   totalAmount: Int!
-  ticketBalances: [TicketBalance!]! @derivedFrom(field: "ticket")
+  ticketBalances: [Balance!]! @derivedFrom(field: "ticket")
   sentTickets: [Transfer!] @derivedFrom(field: "ticket")
+  metadata: String
+  allowedMemberships: [AllowedMembership!]  @derivedFrom(field: "ticket")
+
+  name: String
+  description: String
+  image: String
+}
+
+type Membership @entity {
+  id: ID!
+  organizer: Bytes!
+  creatorRoyalty: Int!
+  isResellable: Boolean!
+  totalAmount: Int!
+  membershipBalances: [Balance!]! @derivedFrom(field: "membership")
+  sentTickets: [Transfer!] @derivedFrom(field: "membership")
   metadata: String
 
   name: String
@@ -43,24 +103,32 @@ type Ticket @entity {
   image: String
 }
 
-type TicketBalance @entity {
+enum BalanceType {
+  Membership
+  Ticket
+}
+
+type Balance @entity {
   id: ID!
-  ticket: Ticket!
-  event: Event!
+  ticket: Ticket
+  membership: Membership
+  type: BalanceType!
+  event: Event
   askingPrice: BigInt
   amountOnSell: Int!
   amountOwned: Int!
   owner: User!
   isEventOwner: Boolean!
-  sentTickets: [Transfer!] @derivedFrom(field: "senderBalance")
-  receivedTickets: [Transfer!] @derivedFrom(field: "receiverBalance")
+  sent: [Transfer!] @derivedFrom(field: "senderBalance")
+  received: [Transfer!] @derivedFrom(field: "receiverBalance")
 }
 
 type User @entity {
   id: ID! # ETH addr
   address: Bytes!
   events: [Event!] @derivedFrom(field: "organizer")
-  ticketBalances: [TicketBalance!] @derivedFrom(field: "owner")
+  ticketBalances: [Balance!] @derivedFrom(field: "owner")
+  membershipBalances: [Balance!] @derivedFrom(field: "owner")
   sentTickets: [Transfer!] @derivedFrom(field: "sender")
   receivedTickets: [Transfer!] @derivedFrom(field: "receiver")
 }
@@ -70,10 +138,11 @@ type Transfer @entity {
   id: ID!
   event: Event
   ticket: Ticket
+  membership: Membership
   sender: User
-  senderBalance: TicketBalance
+  senderBalance: Balance
   receiver: User
-  receiverBalance: TicketBalance
+  receiverBalance: Balance
   price: BigInt
   amount: Int
   isSale: Boolean
@@ -85,4 +154,11 @@ type SocialNetwork @entity {
   name: String!
   url: String
   event: Event!
+}
+
+type AllowedMembership @entity {
+  id: ID!
+  address: Bytes!
+  tokenIds: [BigInt!]
+  ticket: Ticket!
 }

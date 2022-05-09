@@ -1,6 +1,4 @@
 
-import * as https from 'https'
-import * as url from 'url'
 import * as fs from 'fs'
 import * as path from 'path'
 
@@ -11,35 +9,33 @@ enum Network {
     MUMBAI = 'mumbai'
 }
 
-enum ContractName {
-    marketplace = 'marketplace',
-    ticket = 'ticket',
-    event = 'event',
-}
-
 const startBlockByNetwork: Record<Network, Record<string, number>> = {
   [Network.MATIC]: {
-    marketplace: 26621371,
-    ticket: 	26621365,
-    event:   26621368,  
+    default: 26621371,  
+    // Can define contract specific also.
   },
   [Network.MUMBAI]: {
-    marketplace: 25731086,
-    ticket: 25731084,
-    event: 25731085
+    default: 26203727,
+    // Can define contract specific also.
   }
 }
 
 const contractAddressByNetwork: Record<Network, Record<string, string>> = {
-  [Network.MATIC]: {
-    marketplace: "0xB47c1BE646F7C5f180424f6198E038a4071B9c46",
-    ticket: 	"0xAec844771035Bee7e174D5c382703FF0cDE53B9d",
-    event: "0x96338E94520977C0523599F6Ccf0e388c120d867"
+  [Network.MATIC]: {  // TODO: Set prod addresss here
+    admin: "0xf88f80F84Acd24c60f63f58d437338aaB93775BF", 
+    event: "0x38db04D98DB9Da644c7bc94C0be52c27a56F0cEE",
+    ticket: 	"0x3666Df2e874C33f8a2355f043A14Cc07f67f6c9A",
+    ticketsMarketplace: "0xB53FeA7CE72e3c09F44229022ACEB9ae50f21cD9",
+    membership: 	"0x3FC9F6b164643eC56788234D3d873799563581e5",
+    membershipsMarketplace: "0x9003Aa6b9cA061133A8952faE3b4BCd0C83Beefe",
   },
   [Network.MUMBAI]: {
-    marketplace: "0x67bf152A179b5710a323E0Dc6c9ac6D4c528CCf2",
-    ticket: "0xB592f4A053129593AAC9493661A1B8057fb659DF",
-    event: "0x287B9409468376924651AA2534BC051D48555020"
+    admin: "0xf88f80F84Acd24c60f63f58d437338aaB93775BF",
+    event: "0x38db04D98DB9Da644c7bc94C0be52c27a56F0cEE",
+    ticket: 	"0x3666Df2e874C33f8a2355f043A14Cc07f67f6c9A",
+    ticketsMarketplace: "0xB53FeA7CE72e3c09F44229022ACEB9ae50f21cD9",
+    membership: 	"0x3FC9F6b164643eC56788234D3d873799563581e5",
+    membershipsMarketplace: "0x9003Aa6b9cA061133A8952faE3b4BCd0C83Beefe",
   }
 }
 
@@ -93,7 +89,7 @@ class Ethereum {
   
     getStartBlock(contractName: string) {
       return (
-        this.startBlocks[contractName]
+        this.startBlocks['default'] || this.startBlocks[contractName]
       )
     }
   

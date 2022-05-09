@@ -1,15 +1,15 @@
 import {
   TransferBatch,
   TransferSingle,
-} from "../../build/generated/Ticket/Ticket";
+} from "../../build/generated/Membership/Membership";
 import { Event, Balance } from "../../build/generated/schema";
 import {
   getBalanceId,
   balanceHasNAmountAvailable
 } from "../modules/Balance";
 import {
-  getTicketId,
-} from "../modules/Ticket";
+  getMembershipId,
+} from "../modules/Membership";
 import {
   loadOrCreateTransfer,
 } from "../modules/Transfer";
@@ -56,9 +56,9 @@ function internalTransferToken(
     loadOrCreateUser(from);
     loadOrCreateUser(to);
 
-    let fromBalance = Balance.load(getBalanceId(id, from, false));
+    let fromBalance = Balance.load(getBalanceId(id, from, true));
     if( fromBalance == null ){
-      log.error("fromBalance not found on internalTransferToken. ticket id : {}, address: {}", [ id.toHex(),from.toHex()]);
+      log.error("fromBalance not found on internalTransferToken. membership id : {}, address: {}", [ id.toHex(),from.toHex()]);
       return;
     }
     if( !balanceHasNAmountAvailable(fromBalance, value.toI32()) ){
@@ -66,42 +66,25 @@ function internalTransferToken(
       return;
     }
 
-    if (fromBalance.type == 'Ticket' && fromBalance.event == null) {
-      log.error("Event not found on ticket balance. id : {}", [fromBalance.id]);
-      return;
-    }
-
-    let eventEntity = Event.load((fromBalance.event as string));
-    if(eventEntity == null ) {
-      log.error("Event not found on internalTransferToken. id : {}", [(fromBalance.event as string)]);
-      return;
-    }
-
     fromBalance.amountOwned = fromBalance.amountOwned - value.toI32();
 
-    let toBalanceId = getBalanceId(id, to, false)
+    let toBalanceId = getBalanceId(id, to, true)
     let toBalance = Balance.load(toBalanceId);
     if( toBalance == null ){
       toBalance = new Balance(toBalanceId);
-      toBalance.ticket = getTicketId(id);
       toBalance.type = fromBalance.type;
-      toBalance.event = fromBalance.event;
+      toBalance.membership = getMembershipId(id);
       toBalance.owner = to.toHex();
-      toBalance.isEventOwner = to.toHex() == eventEntity.organizer;
       toBalance.amountOwned = value.toI32();
       toBalance.amountOnSell = 0;
-      if (toBalance.owner != eventEntity.organizer) {
-        eventEntity.attendees = eventEntity.attendees.plus(BigInt.fromI32(1));
-      }
     } else {
       toBalance.amountOwned = toBalance.amountOwned + value.toI32();
     }
 
     let transfer = loadOrCreateTransfer(txHash);
 
-    // the isSale field on transfer is only setted on the ticketBought handler
-    transfer.event = fromBalance.event;
-    transfer.ticket = fromBalance.ticket;
+    // the isSale field on transfer is only setted on the membershipBought handler
+    transfer.membership = fromBalance.membership;
     transfer.sender = from.toHex();
     transfer.senderBalance = fromBalance.id;
     transfer.receiver = to.toHex();
@@ -111,9 +94,6 @@ function internalTransferToken(
     transfer.save()
 
     if(fromBalance.amountOwned == 0) {
-      if (fromBalance.owner != eventEntity.organizer) {
-        eventEntity.attendees = eventEntity.attendees.minus(BigInt.fromI32(1));
-      }
       store.remove(
         "Balance",
         fromBalance.id
@@ -122,7 +102,6 @@ function internalTransferToken(
       fromBalance.save()
     }
     toBalance.save();
-    eventEntity.save();
   } else {
     log.info("Transfer single, to: {}, from: {}. Nothing done...", [
       to.toHex(),

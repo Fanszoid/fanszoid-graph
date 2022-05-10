@@ -62,6 +62,7 @@ type Event @entity {
   socials: [SocialNetwork!] @derivedFrom(field: "event")
   email: String
   website: String
+  location: String
   isAvailable: String
   status: String
   inStock: String

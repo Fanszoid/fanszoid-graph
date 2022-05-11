@@ -22,20 +22,20 @@ const startBlockByNetwork: Record<Network, Record<string, number>> = {
 
 const contractAddressByNetwork: Record<Network, Record<string, string>> = {
   [Network.MATIC]: {  // TODO: Set prod addresss here
-    admin: "0xf88f80F84Acd24c60f63f58d437338aaB93775BF", 
-    event: "0x38db04D98DB9Da644c7bc94C0be52c27a56F0cEE",
-    ticket: 	"0x3666Df2e874C33f8a2355f043A14Cc07f67f6c9A",
-    ticketsMarketplace: "0xB53FeA7CE72e3c09F44229022ACEB9ae50f21cD9",
-    membership: 	"0x3FC9F6b164643eC56788234D3d873799563581e5",
-    membershipsMarketplace: "0x9003Aa6b9cA061133A8952faE3b4BCd0C83Beefe",
+    admin: "0x2bae69cfb272518254335AbceAD612a09CFa9D99",
+    event: "0x05f113930E8e571D899AB6aa4484f10c92Dd5a7F",
+    ticket: 	"0xA9720bF99CB770fBadEc586b1f8D90738a268Bed",
+    ticketsMarketplace: "0x00dFE99c400dbd785dD90e94Ce426508d22c982d",
+    membership: 	"0x8Ca7a5912207a772Eb0b27A1d6df5f0B136e2e9f",
+    membershipsMarketplace: "0xEFfe806CAD8Aa7dBD3cA8554F37D4d87f148E022",
   },
   [Network.MUMBAI]: {
-    admin: "0xf88f80F84Acd24c60f63f58d437338aaB93775BF",
-    event: "0x38db04D98DB9Da644c7bc94C0be52c27a56F0cEE",
-    ticket: 	"0x3666Df2e874C33f8a2355f043A14Cc07f67f6c9A",
-    ticketsMarketplace: "0xB53FeA7CE72e3c09F44229022ACEB9ae50f21cD9",
-    membership: 	"0x3FC9F6b164643eC56788234D3d873799563581e5",
-    membershipsMarketplace: "0x9003Aa6b9cA061133A8952faE3b4BCd0C83Beefe",
+    admin: "0x2bae69cfb272518254335AbceAD612a09CFa9D99",
+    event: "0x05f113930E8e571D899AB6aa4484f10c92Dd5a7F",
+    ticket: 	"0xA9720bF99CB770fBadEc586b1f8D90738a268Bed",
+    ticketsMarketplace: "0x00dFE99c400dbd785dD90e94Ce426508d22c982d",
+    membership: 	"0x8Ca7a5912207a772Eb0b27A1d6df5f0B136e2e9f",
+    membershipsMarketplace: "0xEFfe806CAD8Aa7dBD3cA8554F37D4d87f148E022",
   }
 }
 

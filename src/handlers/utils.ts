@@ -5,7 +5,12 @@ import { SocialNetwork } from "../../build/generated/schema";
 export function parseMetadata(uri: string, entity: Entity, attrs: string[]): void {
     let uriParts = uri.split("/");
     let hash = uriParts[uriParts.length - 1];
-    let data = ipfs.cat(hash);
+    let retries = 3;
+    let data = undefined;
+    while(!data && retries > 0) {
+      data = ipfs.cat(hash);
+      retries--;
+    }
     if (!data) return;
   
     let jsonParsed = json.fromBytes(data);

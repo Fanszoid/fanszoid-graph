@@ -2,7 +2,7 @@ import {
   TransferBatch,
   TransferSingle,
 } from "../../build/generated/Membership/Membership";
-import { Event, Balance } from "../../build/generated/schema";
+import { Event, Balance, Membership } from "../../build/generated/schema";
 import {
   getBalanceId,
   balanceHasNAmountAvailable
@@ -66,6 +66,12 @@ function internalTransferToken(
       return;
     }
 
+    let membership = Membership.load((fromBalance.membership as string));
+    if(membership == null ) {
+      log.error("membership not found on internalTransferToken. id : {}", [(fromBalance.membership as string)]);
+      return;
+    }
+
     fromBalance.amountOwned = fromBalance.amountOwned - value.toI32();
 
     let toBalanceId = getBalanceId(id, to, true)
@@ -77,6 +83,8 @@ function internalTransferToken(
       toBalance.owner = to.toHex();
       toBalance.amountOwned = value.toI32();
       toBalance.amountOnSell = 0;
+      
+      toBalance.isEventOwner = to.toHex() == membership.organizer.toHex();
     } else {
       toBalance.amountOwned = toBalance.amountOwned + value.toI32();
     }
@@ -93,7 +101,7 @@ function internalTransferToken(
     transfer.createdAt = txTimestamp;
     transfer.save()
 
-    if(fromBalance.amountOwned == 0) {
+    if(fromBalance.amountOwned == 0 && !fromBalance.isEventOwner) {
       store.remove(
         "Balance",
         fromBalance.id

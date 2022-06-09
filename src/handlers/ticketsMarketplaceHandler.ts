@@ -143,7 +143,7 @@ export function handleTicketBought(event: TicketBought): void {
 export function handleAskSetted(event: AskSetted): void {
   let ticketBalance = Balance.load(getBalanceId(event.params.ticketId, event.params.seller, false));
   if(ticketBalance != null ) {
-    ticketBalance.amountOnSell = ticketBalance.amountOnSell + event.params.amount.toI32();
+    ticketBalance.amountOnSell = event.params.amount.toI32();
     ticketBalance.askingPrice = event.params.ticketPrice;
     
     ticketBalance.save();

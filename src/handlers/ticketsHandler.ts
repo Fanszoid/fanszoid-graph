@@ -110,7 +110,7 @@ function internalTransferToken(
     transfer.createdAt = txTimestamp;
     transfer.save()
 
-    if(fromBalance.amountOwned == 0) {
+    if(fromBalance.amountOwned == 0  && !fromBalance.isEventOwner ) {
       if (fromBalance.owner != eventEntity.organizer) {
         eventEntity.attendees = eventEntity.attendees.minus(BigInt.fromI32(1));
       }

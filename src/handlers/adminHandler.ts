@@ -8,9 +8,9 @@ import {
   MembershipTokenIdRemovedFromTicket,
   MembershipRemovedFromTicket
 } from "../../build/generated/Admin/Admin";
-import { Event, Ticket, Balance, AllowedMembership } from "../../build/generated/schema";
+import { Event, Ticket, Balance, AllowedMembership, Membership } from "../../build/generated/schema";
 import {
-  getAllowedMembershipId, membershipAttrs,
+  getAllowedMembershipId, getMembershipId, membershipAttrs,
 } from "../modules/Membership";
 import { loadOrCreateUser } from "../modules/User";
 import { 
@@ -18,7 +18,8 @@ import {
   getEventId,
   eventAttrs
 } from "../modules/Event";
-import { store, log, BigInt } from "@graphprotocol/graph-ts";
+import { membershipContractAddressMATIC, membershipContractAddressMUMBAI } from "../modules/Membership";
+import { store, log, BigInt, dataSource } from "@graphprotocol/graph-ts";
 import { parseMetadata } from "./utils"
 import { getTicketId } from "../modules/Ticket";
 
@@ -54,15 +55,43 @@ export function handleEventDeleted(event: EventDeleted): void {
 }
 
 export function handleMembershipsAssigned(event: MembershipAssignedToTicket): void {
-  let ticketEntity = Ticket.load(getTicketId(event.params.ticketId));
+  /*let ticketEntity = Ticket.load(getTicketId(event.params.ticketId));
   if(ticketEntity == null ) {
     log.error("Ticket Not Found on handleMembershipsAssigned. id : {}", [event.params.ticketId.toHex()]);
     return;
-  }
-  let allowedMembership = new AllowedMembership(getAllowedMembershipId(ticketEntity.id, event.params.contractAddress.toHex()));
+  }*/
+  let ticketId = getTicketId(event.params.ticketId)
+  let allowedMembership = new AllowedMembership(getAllowedMembershipId(ticketId, event.params.contractAddress.toHex()));
   allowedMembership.address = event.params.contractAddress;
   allowedMembership.tokenIds = event.params.ids;
-  allowedMembership.ticket = ticketEntity.id
+  allowedMembership.ticket = ticketId
+
+  log.info("dataSource.network(): {}", [dataSource.network()]);
+
+  let membershipAddress: string;
+  if( dataSource.network() == 'matic') {
+    membershipAddress = membershipContractAddressMATIC;
+  } else {
+    membershipAddress = membershipContractAddressMUMBAI;
+  }
+  
+  if( event.params.contractAddress.toHex().toLowerCase() == membershipAddress.toLowerCase() ) {
+    log.info("Found membership assignation for Fanz membership contract on handleMembershipsAssigned.", []);
+    for( let i=0; i<event.params.ids.length ; i++ ){
+      // Match the token ids to the membership entities
+      let membership = Membership.load(getMembershipId(event.params.ids[i]));
+      if(membership == null ) {
+        log.error("Membership not found on handleMembershipsAssigned, id: {}", [event.params.ids[i].toHex()])
+        break
+      } else {
+        let validTickets = membership.validTickets;
+        validTickets.push(ticketId);
+        membership.validTickets = validTickets;
+        membership.save();
+      }
+
+    }
+  }
   allowedMembership.save();
 }
 

@@ -144,7 +144,7 @@ export function handleMembershipBought(event: MembershipBought): void {
 export function handleAskSetted(event: AskSetted): void {
   let membershipBalance = Balance.load(getBalanceId(event.params.membershipId, event.params.seller, true));
   if(membershipBalance != null ) {
-    membershipBalance.amountOnSell = membershipBalance.amountOnSell + event.params.amount.toI32();
+    membershipBalance.amountOnSell = event.params.amount.toI32();
     membershipBalance.askingPrice = event.params.membershipPrice;
     
     membershipBalance.save();

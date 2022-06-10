@@ -1,6 +1,6 @@
 import { log, ipfs, json, JSONValue, TypedMap, Entity, JSONValueKind, TypedMapEntry, BigInt } from "@graphprotocol/graph-ts";
 import { bigIntEventAttrs } from "../modules/Event";
-import { SocialNetwork } from "../../build/generated/schema";
+import { Allowance, SocialNetwork } from "../../build/generated/schema";
 
 export function parseMetadata(uri: string, entity: Entity, attrs: string[]): void {
     let uriParts = uri.split("/");

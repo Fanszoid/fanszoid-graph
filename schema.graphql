@@ -87,6 +87,7 @@ type Ticket @entity {
   metadata: String
   allowedMemberships: [AllowedMembership!]  @derivedFrom(field: "ticket")
   isPrivate: Boolean!
+  allowances: [Allowance!]! @derivedFrom(field: "ticket")
 
   memberships: [Membership!]! @derivedFrom(field: "validTickets")
 
@@ -106,6 +107,7 @@ type Membership @entity {
   validTickets: [Ticket!]!
   metadata: String
   isPrivate: Boolean!
+  allowances: [Allowance!]! @derivedFrom(field: "membership")
 
   name: String
   description: String
@@ -116,6 +118,9 @@ type Allowance @entity {
   id: ID!
   amount: Int!
   allowedAddresses: [Bytes!]!
+
+  ticket: Ticket
+  membership: Membership
 }
 
 enum BalanceType {

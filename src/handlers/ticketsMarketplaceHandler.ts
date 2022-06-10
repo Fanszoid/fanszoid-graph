@@ -5,9 +5,12 @@ import {
   AskRemoved,
   TicketBought,
   CreatorRoyaltyModifiedOnTicket,
-  TicketEdited
+  TicketEdited,
+  AllowanceAdded,
+  AllowanceConsumed,
+  AllowanceRemoved
 } from "../../build/generated/TicketsMarketplace/TicketsMarketplace";
-import { Ticket, Balance } from "../../build/generated/schema";
+import { Ticket, Balance, Allowance } from "../../build/generated/schema";
 import { 
   loadOrCreateEvent,
 } from "../modules/Event";
@@ -25,6 +28,47 @@ import {
 } from "../modules/Balance";
 import { store, log } from "@graphprotocol/graph-ts";
 import { parseMetadata } from "./utils";
+
+export function handleAllowanceAdded(event: AllowanceAdded): void {
+  let ticketEntity = Ticket.load(getTicketId(event.params.ticketId));
+  if (!ticketEntity) {
+    log.error("Ticket Not Found on handleAllowanceAdded. id : {}", [event.params.ticketId.toString()]);
+    return;
+  }
+  let allowance = new Allowance(event.params.allowanceId.toString());
+  allowance.amount = event.params.allowance.amount;
+  allowance.allowedAddresses = event.params.allowance.allowedAddresses;
+  allowance.save();
+
+  ticketEntity.allowances.push(allowance.id);
+  ticketEntity.save();
+}
+
+export function handleAllowanceConsumed(event: AllowanceConsumed): void {
+  let allowance = Allowance.load(event.params.allowanceId.toString());
+  if (!allowance) {
+    log.error("Allowance Not Found on handleAllowanceConsumed. id : {}", [event.params.allowanceId.toString()]);
+    return;
+  }
+  allowance.amount--;
+  allowance.save();
+}
+
+export function handleAllowanceRemoved(event: AllowanceRemoved): void {
+  let ticketEntity = Ticket.load(getTicketId(event.params.ticketId));
+  if (!ticketEntity) {
+    log.error("Ticket Not Found on handleAllowanceAdded. id : {}", [event.params.ticketId.toString()]);
+    return;
+  }
+  let allowanceLoaded = Allowance.load(event.params.allowanceId.toString());
+  if (!allowanceLoaded) {
+    log.error("Allowance Not Found on handleAllowanceConsumed. id : {}", [event.params.allowanceId.toString()]);
+    return;
+  }
+
+  ticketEntity.allowances = ticketEntity.allowances.filter(allowance => allowance != allowanceLoaded.id);
+  ticketEntity.save();
+}
 
 export function handleTicketUriModification(event: TicketEdited): void {
   let ticketEntity = Ticket.load(getTicketId(event.params.ticketId));

@@ -5,9 +5,12 @@ import {
   AskRemoved,
   MembershipBought,
   CreatorRoyaltyModifiedOnMembership,
-  MembershipEdited
+  MembershipEdited,
+  AllowanceAdded,
+  AllowanceRemoved,
+  AllowanceConsumed
 } from "../../build/generated/MembershipsMarketplace/MembershipsMarketplace";
-import { Membership, Balance,  } from "../../build/generated/schema";
+import { Membership, Balance, Allowance,  } from "../../build/generated/schema";
 import { 
   loadOrCreateEvent,
 } from "../modules/Event";
@@ -26,6 +29,47 @@ import {
 import { store, log } from "@graphprotocol/graph-ts";
 import { parseMetadata } from "./utils"
 import { loadOrCreateUser } from "../modules/User";
+
+export function handleAllowanceAdded(event: AllowanceAdded): void {
+  let membershipEntity = Membership.load(getMembershipId(event.params.membershipId));
+  if (!membershipEntity) {
+    log.error("Membership Not Found on handleAllowanceAdded. id : {}", [event.params.membershipId.toString()]);
+    return;
+  }
+  let allowance = new Allowance(event.params.allowanceId.toString());
+  allowance.amount = event.params.allowance.amount;
+  allowance.allowedAddresses = event.params.allowance.allowedAddresses;
+  allowance.save();
+
+  membershipEntity.allowances.push(allowance.id);
+  membershipEntity.save();
+}
+
+export function handleAllowanceConsumed(event: AllowanceConsumed): void {
+  let allowance = Allowance.load(event.params.allowanceId.toString());
+  if (!allowance) {
+    log.error("Allowance Not Found on handleAllowanceConsumed. id : {}", [event.params.allowanceId.toString()]);
+    return;
+  }
+  allowance.amount--;
+  allowance.save();
+}
+
+export function handleAllowanceRemoved(event: AllowanceRemoved): void {
+  let membershipEntity = Membership.load(getMembershipId(event.params.membershipId));
+  if (!membershipEntity) {
+    log.error("Membership Not Found on handleAllowanceAdded. id : {}", [event.params.membershipId.toString()]);
+    return;
+  }
+  let allowanceLoaded = Allowance.load(event.params.allowanceId.toString());
+  if (!allowanceLoaded) {
+    log.error("Allowance Not Found on handleAllowanceConsumed. id : {}", [event.params.allowanceId.toString()]);
+    return;
+  }
+
+  membershipEntity.allowances = membershipEntity.allowances.filter(allowance => allowance != allowanceLoaded.id);
+  membershipEntity.save();
+}
 
 export function handleMembershipUriModification(event: MembershipEdited): void {
   let membershipEntity = Membership.load(getMembershipId(event.params.membershipId));

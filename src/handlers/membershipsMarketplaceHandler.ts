@@ -26,7 +26,7 @@ import {
   balanceHasNAmountOnSell,
   balancePriceMatches,
 } from "../modules/Balance";
-import { store, log } from "@graphprotocol/graph-ts";
+import { store, log, Address } from "@graphprotocol/graph-ts";
 import { parseMetadata } from "./utils"
 import { loadOrCreateUser } from "../modules/User";
 
@@ -37,8 +37,8 @@ export function handleAllowanceAdded(event: AllowanceAdded): void {
     return;
   }
   let allowance = new Allowance(event.params.allowanceId.toString());
-  allowance.amount = event.params.allowance.amount;
-  allowance.allowedAddresses = event.params.allowance.allowedAddresses;
+  allowance.amount = event.params.allowance.amount.toI32();
+  allowance.allowedAddresses = event.params.allowance.allowedAddresses.map<string>( (add:Address) => add.toHex());
   allowance.save();
 
   membershipEntity.allowances.push(allowance.id);
@@ -66,8 +66,12 @@ export function handleAllowanceRemoved(event: AllowanceRemoved): void {
     log.error("Allowance Not Found on handleAllowanceConsumed. id : {}", [event.params.allowanceId.toString()]);
     return;
   }
-
-  membershipEntity.allowances = membershipEntity.allowances.filter(allowance => allowance != allowanceLoaded.id);
+  let index = membershipEntity.allowances.indexOf(allowanceLoaded.id);
+  if (index == -1) {
+    log.error("Allowance Not Found on saved. id : {}", [allowanceLoaded.id.toString()]);
+    return;
+  }
+  membershipEntity.allowances.splice(index, 1);
   membershipEntity.save();
 }
 

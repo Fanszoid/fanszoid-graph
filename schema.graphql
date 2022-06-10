@@ -51,7 +51,7 @@ type Event @entity {
   metadata: String
   attendees: BigInt!
   paused: Boolean!
-  collaborators: [User!]!
+  collaborators: [User!]! @derivedFrom(field: "eventsCollaborating")
   
   title: String!
   description: String
@@ -98,7 +98,7 @@ type Ticket @entity {
 
 type Membership @entity {
   id: ID!
-  organizer: Bytes!
+  organizer: String!
   creatorRoyalty: Int!
   isResellable: Boolean!
   totalAmount: Int!
@@ -117,7 +117,7 @@ type Membership @entity {
 type Allowance @entity {
   id: ID!
   amount: Int!
-  allowedAddresses: [Bytes!]!
+  allowedAddresses: [String!]!
 
   ticket: Ticket
   membership: Membership
@@ -145,8 +145,9 @@ type Balance @entity {
 
 type User @entity {
   id: ID! # ETH addr
-  address: Bytes!
+  address: String!
   events: [Event!] @derivedFrom(field: "organizer")
+  eventsCollaborating: [Event!] @derivedFrom(field: "collaborators")
   ticketBalances: [Balance!] @derivedFrom(field: "owner")
   membershipBalances: [Balance!] @derivedFrom(field: "owner")
   sentTickets: [Transfer!] @derivedFrom(field: "sender")
@@ -178,7 +179,7 @@ type SocialNetwork @entity {
 
 type AllowedMembership @entity {
   id: ID!
-  address: Bytes!
+  address: String!
   tokenIds: [BigInt!]
   ticket: Ticket!
 }

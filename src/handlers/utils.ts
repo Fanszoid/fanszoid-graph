@@ -1,4 +1,4 @@
-import { log, ipfs, json, JSONValue, TypedMap, Entity, JSONValueKind, TypedMapEntry, BigInt } from "@graphprotocol/graph-ts";
+import { log, ipfs, json, JSONValue, TypedMap, Entity, JSONValueKind, TypedMapEntry, BigInt, Bytes } from "@graphprotocol/graph-ts";
 import { bigIntEventAttrs } from "../modules/Event";
 import { Allowance, SocialNetwork } from "../../build/generated/schema";
 
@@ -6,7 +6,7 @@ export function parseMetadata(uri: string, entity: Entity, attrs: string[]): voi
     let uriParts = uri.split("/");
     let hash = uriParts[uriParts.length - 1];
     let retries = 3;
-    let data = undefined;
+    let data: Bytes | null = null;
     while(!data && retries > 0) {
       data = ipfs.cat(hash);
       retries--;

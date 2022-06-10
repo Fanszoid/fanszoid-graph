@@ -4,3 +4,4 @@
 .vscode
 subgraph.yaml
 yarn.lock
+package-lock.json

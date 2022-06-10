@@ -53,7 +53,8 @@ export function handleCollaboratorAdded(event: CollaboratorAdded): void {
     log.error("handleCollaboratorAdded: Event not found : {}", [event.params.eventId.toString()]);
     return;
   } 
-  eventEntity.collaborators.push[loadOrCreateUser(event.params.collaborator).id];
+  let collab = loadOrCreateUser(event.params.collaborator);
+  eventEntity.collaborators = eventEntity.collaborators.concat([collab.id]);
   eventEntity.save();
 }
 
@@ -68,7 +69,12 @@ export function handleCollaboratorRemoved(event: CollaboratorRemoved): void {
     log.error("handleCollaboratorRemoved: User not found : {}", [event.params.collaborator.toString()]);
     return;
   }
-  eventEntity.collaborators = eventEntity.collaborators.filter(collab => collab != user.id);
+  let index = eventEntity.collaborators.indexOf(user.id);
+  if (index == -1) {
+    log.error("handleCollaboratorRemoved: User not found : {}", [event.params.collaborator.toString()]);
+    return;
+  }
+  eventEntity.collaborators.splice(index, 1);
   eventEntity.save();
 }
 
@@ -92,7 +98,7 @@ export function handleEventCreated(event: EventCreated): void {
   eventEntity.metadata = event.params.uri;
   parseMetadata(event.params.uri, eventEntity, eventAttrs);
     
-  eventEntity.organizer = organizerUser.address.toHex();
+  eventEntity.organizer = organizerUser.address;
   eventEntity.save();
 }
 
@@ -111,7 +117,7 @@ export function handleMembershipsAssigned(event: MembershipAssignedToTicket): vo
   }*/
   let ticketId = getTicketId(event.params.ticketId)
   let allowedMembership = new AllowedMembership(getAllowedMembershipId(ticketId, event.params.contractAddress.toHex()));
-  allowedMembership.address = event.params.contractAddress;
+  allowedMembership.address = event.params.contractAddress.toHex();
   allowedMembership.tokenIds = event.params.ids;
   allowedMembership.ticket = ticketId
 

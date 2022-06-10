@@ -50,6 +50,8 @@ type Event @entity {
   organizer: User!
   metadata: String
   attendees: BigInt!
+  paused: Boolean!
+  collaborators: [User!]!
   
   title: String!
   description: String
@@ -84,6 +86,7 @@ type Ticket @entity {
   sentTickets: [Transfer!] @derivedFrom(field: "ticket")
   metadata: String
   allowedMemberships: [AllowedMembership!]  @derivedFrom(field: "ticket")
+  isPrivate: Boolean!
 
   memberships: [Membership!]! @derivedFrom(field: "validTickets")
 
@@ -102,10 +105,17 @@ type Membership @entity {
   sentTickets: [Transfer!] @derivedFrom(field: "membership")
   validTickets: [Ticket!]!
   metadata: String
+  isPrivate: Boolean!
 
   name: String
   description: String
   image: String
+}
+
+type Allowance @entity {
+  id: ID!
+  amount: Int!
+  allowedAddresses: [Bytes!]!
 }
 
 enum BalanceType {

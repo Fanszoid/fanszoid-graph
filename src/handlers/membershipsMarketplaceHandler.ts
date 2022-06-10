@@ -1,6 +1,6 @@
 import {
   MembershipPublished,
-  MembershipDeleted,
+  MembershipsDeleted,
   AskSetted,
   AskRemoved,
   MembershipBought,
@@ -53,10 +53,11 @@ export function handleMembershipPublished(event: MembershipPublished): void {
   membership = new Membership(membershipId);
 
   membership.organizer = userEntity.address;
-  membership.creatorRoyalty = event.params.creatorRoyalty.toI32();
-  membership.isResellable = event.params.isResellable;
+  membership.creatorRoyalty = event.params.saleInfo.royalty.toI32();
+  membership.isResellable = event.params.saleInfo.isResellable;
   membership.metadata = event.params.uri;
   membership.totalAmount = event.params.amount.toI32();
+  membership.isPrivate = event.params.saleInfo.isPrivate;
   
   parseMetadata(event.params.uri, membership, membershipAttrs);
   
@@ -70,8 +71,8 @@ export function handleMembershipPublished(event: MembershipPublished): void {
   membershipBalance = new Balance(getBalanceId(event.params.membershipId, event.params.organizer, true));
   membershipBalance.membership = membershipId;
   membershipBalance.type = 'Membership';
-  membershipBalance.askingPrice = event.params.price;
-  membershipBalance.amountOnSell = event.params.amountToSell.toI32();
+  membershipBalance.askingPrice = event.params.saleInfo.price;
+  membershipBalance.amountOnSell = event.params.saleInfo.amountToSell.toI32();
   membershipBalance.amountOwned = event.params.amount.toI32();
   membershipBalance.owner = event.params.organizer.toHex();
   membershipBalance.isEventOwner = true;
@@ -79,7 +80,7 @@ export function handleMembershipPublished(event: MembershipPublished): void {
   membershipBalance.save();
 }
 
-export function handleMembershipDeleted(event: MembershipDeleted): void {
+export function handleMembershipDeleted(event: MembershipsDeleted): void {
   for (let i = 0; i < event.params.ids.length; i++) {
     let id = event.params.ids[i];
     let amount = event.params.amounts[i].toI32();

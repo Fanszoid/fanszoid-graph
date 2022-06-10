@@ -6,9 +6,13 @@ import {
   EventEdited,
   MembershipAssignedToTicket,
   MembershipTokenIdRemovedFromTicket,
-  MembershipRemovedFromTicket
+  MembershipRemovedFromTicket,
+  EventPaused,
+  EventUnpaused,
+  CollaboratorAdded,
+  CollaboratorRemoved
 } from "../../build/generated/Admin/Admin";
-import { Event, Ticket, Balance, AllowedMembership, Membership } from "../../build/generated/schema";
+import { Event, Ticket, Balance, AllowedMembership, Membership, User } from "../../build/generated/schema";
 import {
   getAllowedMembershipId, getMembershipId, membershipAttrs,
 } from "../modules/Membership";
@@ -21,7 +25,52 @@ import {
 import { membershipContractAddressMATIC, membershipContractAddressMUMBAI } from "../modules/Membership";
 import { store, log, BigInt, dataSource } from "@graphprotocol/graph-ts";
 import { parseMetadata } from "./utils"
-import { getTicketId } from "../modules/Ticket";
+import { getTicketId } from "../modules/Ticket"
+
+export function handleEventPaused(event: EventPaused): void {
+  let eventEntity = Event.load(event.params.eventId.toString());
+  if (!eventEntity) {
+    log.error("handleEventPaused: Event not found : {}", [event.params.eventId.toString()]);
+    return;
+  } 
+  eventEntity.paused = true;
+  eventEntity.save();
+}
+
+export function handleEventUnpaused(event: EventUnpaused): void {
+  let eventEntity = Event.load(event.params.eventId.toString());
+  if (!eventEntity) {
+    log.error("handleEventUnpaused: Event not found : {}", [event.params.eventId.toString()]);
+    return;
+  } 
+  eventEntity.paused = false;
+  eventEntity.save();
+}
+
+export function handleCollaboratorAdded(event: CollaboratorAdded): void {
+  let eventEntity = Event.load(event.params.eventId.toString());
+  if (!eventEntity) {
+    log.error("handleCollaboratorAdded: Event not found : {}", [event.params.eventId.toString()]);
+    return;
+  } 
+  eventEntity.collaborators.push[loadOrCreateUser(event.params.collaborator).id];
+  eventEntity.save();
+}
+
+export function handleCollaboratorRemoved(event: CollaboratorRemoved): void {
+  let eventEntity = Event.load(event.params.eventId.toString());
+  if (!eventEntity) {
+    log.error("handleEventPaused: Event not found : {}", [event.params.eventId.toString()]);
+    return;
+  } 
+  let user = User.load(event.params.collaborator.toHex());
+  if (!user) {
+    log.error("handleCollaboratorRemoved: User not found : {}", [event.params.collaborator.toString()]);
+    return;
+  }
+  eventEntity.collaborators = eventEntity.collaborators.filter(collab => collab != user.id);
+  eventEntity.save();
+}
 
 export function handleEventUriModification(event: EventEdited): void {
   let eventEntity = Event.load(getEventId(event.params.eventId));

@@ -1,6 +1,6 @@
 import {
   TicketPublished,
-  TicketDeleted,
+  TicketsDeleted,
   AskSetted,
   AskRemoved,
   TicketBought,
@@ -51,10 +51,11 @@ export function handleTicketPublished(event: TicketPublished): void {
   }
   
   ticket.event = eventEntity.id;
-  ticket.creatorRoyalty = event.params.creatorRoyalty.toI32();
-  ticket.isResellable = event.params.isResellable;
+  ticket.creatorRoyalty = event.params.saleInfo.royalty.toI32();
+  ticket.isResellable = event.params.saleInfo.isResellable;
   ticket.metadata = event.params.uri;
   ticket.totalAmount = event.params.amount.toI32();
+  ticket.isPrivate = event.params.saleInfo.isPrivate;
   
   parseMetadata(event.params.uri, ticket, ticketAttrs);
   
@@ -69,8 +70,8 @@ export function handleTicketPublished(event: TicketPublished): void {
   ticketBalance.type = 'Ticket';
   ticketBalance.ticket = ticketId;
   ticketBalance.event = eventEntity.id;
-  ticketBalance.askingPrice = event.params.price;
-  ticketBalance.amountOnSell = event.params.amountToSell.toI32();
+  ticketBalance.askingPrice = event.params.saleInfo.price;
+  ticketBalance.amountOnSell = event.params.saleInfo.amountToSell.toI32();
   ticketBalance.amountOwned = event.params.amount.toI32();
   ticketBalance.owner = event.params.organizer.toHex();
   ticketBalance.isEventOwner = true;
@@ -78,7 +79,7 @@ export function handleTicketPublished(event: TicketPublished): void {
   ticketBalance.save();
 }
 
-export function handleTicketDeleted(event: TicketDeleted): void {
+export function handleTicketDeleted(event: TicketsDeleted): void {
   for (let i = 0; i < event.params.ids.length; i++) {
     let id = event.params.ids[i];
     let amount = event.params.amounts[i].toI32();

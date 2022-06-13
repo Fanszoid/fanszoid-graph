@@ -28,7 +28,7 @@ import { parseMetadata } from "./utils"
 import { getTicketId } from "../modules/Ticket"
 
 export function handleEventPaused(event: EventPaused): void {
-  let eventEntity = Event.load(event.params.eventId.toString());
+  let eventEntity = Event.load(getEventId(event.params.eventId));
   if (!eventEntity) {
     log.error("handleEventPaused: Event not found : {}", [event.params.eventId.toString()]);
     return;
@@ -38,7 +38,7 @@ export function handleEventPaused(event: EventPaused): void {
 }
 
 export function handleEventUnpaused(event: EventUnpaused): void {
-  let eventEntity = Event.load(event.params.eventId.toString());
+  let eventEntity = Event.load(getEventId(event.params.eventId));
   if (!eventEntity) {
     log.error("handleEventUnpaused: Event not found : {}", [event.params.eventId.toString()]);
     return;
@@ -48,7 +48,7 @@ export function handleEventUnpaused(event: EventUnpaused): void {
 }
 
 export function handleCollaboratorAdded(event: CollaboratorAdded): void {
-  let eventEntity = Event.load(event.params.eventId.toString());
+  let eventEntity = Event.load(getEventId(event.params.eventId));
   if (!eventEntity) {
     log.error("handleCollaboratorAdded: Event not found : {}", [event.params.eventId.toString()]);
     return;
@@ -59,7 +59,7 @@ export function handleCollaboratorAdded(event: CollaboratorAdded): void {
 }
 
 export function handleCollaboratorRemoved(event: CollaboratorRemoved): void {
-  let eventEntity = Event.load(event.params.eventId.toString());
+  let eventEntity = Event.load(getEventId(event.params.eventId));
   if (!eventEntity) {
     log.error("handleEventPaused: Event not found : {}", [event.params.eventId.toString()]);
     return;
@@ -190,7 +190,7 @@ export function handleEventOwnershipTransferred(event: EventOwnershipTransferred
   let eventEntity = Event.load(getEventId(event.params.eventId));
   
   if(eventEntity == null ) {
-    log.error("Event not found on handleEventOwnershipTransferred. id : {}", [event.params.eventId.toHex()]);
+    log.error("Event not found on handleEventOwnershipTransferred. id : {}", [getEventId(event.params.eventId)]);
     return;
   }
 
@@ -219,7 +219,7 @@ export function handleEventOwnershipTransferred(event: EventOwnershipTransferred
 export function handleCreatorRoyaltyModifiedOnEvent(event: CreatorRoyaltyModifiedOnEvent): void {
   let eventEntity = Event.load(getEventId(event.params.eventId));
   if(eventEntity == null ) {
-    log.error("Event not found on handleEventOwnershipTransferred. id : {}", [event.params.eventId.toHex()]);
+    log.error("Event not found on handleEventOwnershipTransferred. id : {}", [getEventId(event.params.eventId)]);
     return;
   }
 

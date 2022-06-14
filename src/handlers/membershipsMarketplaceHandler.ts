@@ -15,7 +15,7 @@ import {
   loadOrCreateEvent,
 } from "../modules/Event";
 import {
-  getMembershipId, membershipAttrs,
+  getMembershipId, loadOrCreateMembership, membershipAttrs,
 } from "../modules/Membership";
 import {
   loadOrCreateTransfer,
@@ -31,7 +31,7 @@ import { parseMetadata } from "./utils"
 import { loadOrCreateUser } from "../modules/User";
 
 export function handleAllowanceAdded(event: AllowanceAdded): void {
-  let membershipEntity = Membership.load(getMembershipId(event.params.membershipId));
+  let membershipEntity = loadOrCreateMembership(event.params.membershipId);
   if (!membershipEntity) {
     log.error("Membership Not Found on handleAllowanceAdded. id : {}", [event.params.membershipId.toString()]);
     return;
@@ -91,15 +91,7 @@ export function handleMembershipPublished(event: MembershipPublished): void {
     event.params.organizer
   );
 
-  let membershipId = getMembershipId(event.params.membershipId);
-  let membership = Membership.load(membershipId);
-  if (membership != null) {
-    log.error("handleMembershipPublished: MembershipType already existed, id : {}", [membershipId]);
-    return;
-  }
-
-  membership = new Membership(membershipId);
-
+  let membership = loadOrCreateMembership(event.params.membershipId);
   membership.organizer = userEntity.address;
   membership.creatorRoyalty = event.params.saleInfo.royalty.toI32();
   membership.isResellable = event.params.saleInfo.isResellable;
@@ -117,7 +109,7 @@ export function handleMembershipPublished(event: MembershipPublished): void {
     return;
   }
   membershipBalance = new Balance(getBalanceId(event.params.membershipId, event.params.organizer, true));
-  membershipBalance.membership = membershipId;
+  membershipBalance.membership = membership.id;
   membershipBalance.type = 'Membership';
   membershipBalance.askingPrice = event.params.saleInfo.price;
   membershipBalance.amountOnSell = event.params.saleInfo.amountToSell.toI32();

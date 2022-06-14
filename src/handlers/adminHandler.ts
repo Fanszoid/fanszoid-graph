@@ -54,6 +54,9 @@ export function handleCollaboratorAdded(event: CollaboratorAdded): void {
     return;
   } 
   let collab = loadOrCreateUser(event.params.collaborator);
+  if(eventEntity.collaborators == null){
+    eventEntity.collaborators = [];
+  }
   eventEntity.collaborators = eventEntity.collaborators.concat([collab.id]);
   eventEntity.save();
 }
@@ -66,6 +69,10 @@ export function handleCollaboratorRemoved(event: CollaboratorRemoved): void {
   } 
   let user = User.load(event.params.collaborator.toHex());
   if (!user) {
+    log.error("handleCollaboratorRemoved: User not found : {}", [event.params.collaborator.toString()]);
+    return;
+  }
+  if(eventEntity.collaborators == null) {
     log.error("handleCollaboratorRemoved: User not found : {}", [event.params.collaborator.toString()]);
     return;
   }

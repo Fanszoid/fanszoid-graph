@@ -15,7 +15,7 @@ import {
   loadOrCreateEvent,
 } from "../modules/Event";
 import {
-  getTicketId, ticketAttrs,
+  getTicketId, loadOrCreateTicket, ticketAttrs,
 } from "../modules/Ticket";
 import {
   loadOrCreateTransfer,
@@ -30,7 +30,7 @@ import { store, log, Address } from "@graphprotocol/graph-ts";
 import { parseMetadata } from "./utils";
 
 export function handleAllowanceAdded(event: AllowanceAdded): void {
-  let ticketEntity = Ticket.load(getTicketId(event.params.ticketId));
+  let ticketEntity = loadOrCreateTicket(event.params.ticketId);
   if (!ticketEntity) {
     log.error("Ticket Not Found on handleAllowanceAdded. id : {}", [event.params.ticketId.toString()]);
     return;
@@ -91,14 +91,7 @@ export function handleTicketPublished(event: TicketPublished): void {
     event.params.eventId
   );
 
-  let ticketId = getTicketId(event.params.ticketId);
-  let ticket = Ticket.load(ticketId);
-  if (ticket == null) {
-    ticket = new Ticket(ticketId);
-  } else {
-    log.error("Warning: ticket already existed on handleTicketPublished. id : {}", [event.params.ticketId.toString()]);
-  }
-  
+  let ticket = loadOrCreateTicket(event.params.ticketId);  
   ticket.event = eventEntity.id;
   ticket.creatorRoyalty = event.params.saleInfo.royalty.toI32();
   ticket.isResellable = event.params.saleInfo.isResellable;
@@ -117,7 +110,7 @@ export function handleTicketPublished(event: TicketPublished): void {
   }
   ticketBalance = new Balance(getBalanceId(event.params.ticketId, event.params.organizer, false));
   ticketBalance.type = 'Ticket';
-  ticketBalance.ticket = ticketId;
+  ticketBalance.ticket = ticket.id;
   ticketBalance.event = eventEntity.id;
   ticketBalance.askingPrice = event.params.saleInfo.price;
   ticketBalance.amountOnSell = event.params.saleInfo.amountToSell.toI32();

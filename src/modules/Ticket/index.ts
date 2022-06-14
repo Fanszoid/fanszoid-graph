@@ -8,3 +8,14 @@ export var ticketAttrs: string[] = [
 export function getTicketId(ticketIdContract: BigInt): string {
   return "tt" + ticketIdContract.toHex();
 }
+
+export function loadOrCreateTicket(
+  ticketIdContract: BigInt
+): Ticket {
+  let ticketId = getTicketId(ticketIdContract);
+  let ticketEntity = Ticket.load(ticketId);
+  if (ticketEntity == null) {
+    ticketEntity = new Ticket(ticketId);
+  }
+  return ticketEntity;
+}

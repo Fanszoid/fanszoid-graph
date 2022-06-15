@@ -1,12 +1,8 @@
 import { Address, BigInt } from "@graphprotocol/graph-ts";
 import { Membership } from "../../../build/generated/schema";
 
-export var fanzMembershipContractAddress: string[] = [
-  '0x64bC7bB5A73563657bE31e832aB1937617cEAA1D', '0x8Ca7a5912207a772Eb0b27A1d6df5f0B136e2e9f'
-]
-
 export var membershipContractAddressMATIC = '0x64bC7bB5A73563657bE31e832aB1937617cEAA1D'
-export var membershipContractAddressMUMBAI = '0x8Ca7a5912207a772Eb0b27A1d6df5f0B136e2e9f'
+export var membershipContractAddressMUMBAI = '0xF94F58EBA614a78118Cba0667F22268f478c88B8'
 
 // 1 for Mumbai, 0 for Matic
 export var env = 0

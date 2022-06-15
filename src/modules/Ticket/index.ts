@@ -17,5 +17,6 @@ export function loadOrCreateTicket(
   if (ticketEntity == null) {
     ticketEntity = new Ticket(ticketId);
   }
+  ticketEntity.allowances = [];
   return ticketEntity;
 }

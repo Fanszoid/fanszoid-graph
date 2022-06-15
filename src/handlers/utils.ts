@@ -73,7 +73,7 @@ export function parseMetadata(uri: string, entity: Entity, attrs: string[]): voi
             entity.setString(attrs[i], parseJSONValueToString(aux));
           }
         } else {
-          log.error("parseMetadata: aux is null", []);
+          log.error("Could not parse metadata value: " + value, []);
         }
       }
     } else {

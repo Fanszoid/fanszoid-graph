@@ -31,5 +31,6 @@ export function loadOrCreateMembership(
   if (membershipEntity == null) {
     membershipEntity = new Membership(membershipId);
   }
+  membershipEntity.allowances = [];
   return membershipEntity;
 }

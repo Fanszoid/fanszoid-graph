@@ -25,5 +25,6 @@ export function loadOrCreateEvent(
   if (eventEntity == null) {
     eventEntity = new Event(eventId);
   }
+  eventEntity.collaborators = [];
   return eventEntity;
 }

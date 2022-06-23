@@ -206,20 +206,22 @@ export function handleEventOwnershipTransferred(event: EventOwnershipTransferred
 
   eventEntity.save();
 
-  for( let i = 0; i< eventEntity.ticketBalances.length ; i++ ){
-    let tb = eventEntity.ticketBalances[i]
-    let ticketBalance = Balance.load(tb);
-    if(ticketBalance == null ) {
-      log.error("Balance not found on handleEventOwnershipTransferred. id : {}", [tb]);
-      return;
+  if(eventEntity.ticketBalances) {
+    for( let i = 0; i< (eventEntity.ticketBalances as string[]).length ; i++ ){
+      let tb = (eventEntity.ticketBalances as string[])[i]
+      let ticketBalance = Balance.load(tb);
+      if(ticketBalance == null ) {
+        log.error("Balance not found on handleEventOwnershipTransferred. id : {}", [tb]);
+        return;
+      }
+  
+      if( ticketBalance.owner === ownerUser.id ) {
+        ticketBalance.isEventOwner = true;
+      } else {
+        ticketBalance.isEventOwner = false;
+      }
+      ticketBalance.save();
     }
-
-    if( ticketBalance.owner === ownerUser.id ) {
-      ticketBalance.isEventOwner = true;
-    } else {
-      ticketBalance.isEventOwner = false;
-    }
-    ticketBalance.save();
   }
 }
 

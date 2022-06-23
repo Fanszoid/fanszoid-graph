@@ -23,10 +23,12 @@ export function parseMetadata(uri: string, entity: Entity, attrs: string[]): voi
         value = jsonObject.toObject();
       } else {
         log.error("parseMetadata: Invalid metadata obj kind {}", [jsonObject.kind.toString()]);
+        return;
       }
   
     } else {
       log.error("parseMetadata: Invalid metadata kind {}", [jsonParsed.kind.toString()]);
+      return;
     }
   
     if (value) {
@@ -44,8 +46,8 @@ export function parseMetadata(uri: string, entity: Entity, attrs: string[]): voi
             for( let i=0; i< socials.length ; i++) {
               let social = socials[i];
 
-              let name: string;
-              let url: string;
+              let name: string = '';
+              let url: string = '';
 
               let socialValues = social.toObject().entries;
               for( let i=0; i< socialValues.length ; i++) {
@@ -73,7 +75,7 @@ export function parseMetadata(uri: string, entity: Entity, attrs: string[]): voi
             entity.setString(attrs[i], parseJSONValueToString(aux));
           }
         } else {
-          log.error("Could not parse metadata value: " + value, []);
+          log.debug("Could not get attr: " + attrs[i].toString() + " " + value.entries.map<string>((entry: TypedMapEntry<string, JSONValue>) => "[" + entry.key + ',' + parseJSONValueToString(entry.value) + "]").toString(), []);
         }
       }
     } else {

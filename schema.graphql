@@ -45,7 +45,7 @@ type _Schema_
 type Event @entity {
   id: ID!
   tickets: [Ticket!]! @derivedFrom(field: "event")
-  ticketBalances: [Balance!]! @derivedFrom(field: "event")
+  ticketBalances: [Balance!] @derivedFrom(field: "event")
   sentTickets: [Transfer!] @derivedFrom(field: "event")
   organizer: User!
   metadata: String

@@ -80,12 +80,16 @@ dataSources:
         - name: TicketsMarketplace
           file: ./abis/TicketsMarketplace.json
       eventHandlers:
+        - event: TicketPublished(indexed uint256,address,indexed uint256,uint256,uint256,uint256,uint256,bool,string)
+          handler: handleTicketPublishedLegacy
         - event: TicketPublished(indexed uint256,address,indexed uint256,uint256,(uint256,uint256,uint256,uint256,bool,string,bool,(uint256,address[])[]),string)
           handler: handleTicketPublished
         - event: TicketEdited(indexed uint256,string)
           handler: handleTicketUriModification
         - event: TicketBought(indexed uint256,address,address,uint256,uint256)
           handler: handleTicketBought
+        - event: TicketDeleted(indexed uint256,address,uint256[],uint256[])
+          handler: handleTicketDeletedLegacy
         - event: TicketsDeleted(uint256[],address,uint256[])
           handler: handleTicketDeleted
         - event: AskSetted(indexed uint256,indexed address,uint256,uint256)
@@ -122,12 +126,16 @@ dataSources:
         - name: MembershipsMarketplace
           file: ./abis/MembershipsMarketplace.json
       eventHandlers:
+        - event: MembershipPublished(address,indexed uint256,uint256,uint256,uint256,uint256,bool,string)
+          handler: handleMembershipPublishedLegacy
         - event: MembershipPublished(address,indexed uint256,uint256,(uint256,uint256,uint256,uint256,bool,string,bool,(uint256,address[])[]),string)
           handler: handleMembershipPublished
         - event: MembershipEdited(indexed uint256,string)
           handler: handleMembershipUriModification
         - event: MembershipBought(indexed uint256,address,address,uint256,uint256)
           handler: handleMembershipBought
+        - event: MembershipDeleted(indexed uint256,address,uint256[],uint256[])
+          handler: handleMembershipDeletedLegacy
         - event: MembershipsDeleted(uint256[],address,uint256[])
           handler: handleMembershipDeleted
         - event: AskSetted(indexed uint256,indexed address,uint256,uint256)

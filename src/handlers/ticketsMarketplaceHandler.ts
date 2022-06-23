@@ -8,7 +8,9 @@ import {
   TicketEdited,
   AllowanceAdded,
   AllowanceConsumed,
-  AllowanceRemoved
+  AllowanceRemoved,
+  TicketDeleted,
+  TicketPublished1
 } from "../../build/generated/TicketsMarketplace/TicketsMarketplace";
 import { Ticket, Balance, Allowance } from "../../build/generated/schema";
 import { 
@@ -86,7 +88,7 @@ export function handleTicketUriModification(event: TicketEdited): void {
   ticketEntity.save();
 }
 
-export function handleTicketPublished(event: TicketPublished): void {
+export function handleTicketPublished(event: TicketPublished1): void {
   let eventEntity = loadOrCreateEvent(
     event.params.eventId
   );
@@ -218,4 +220,75 @@ export function handleCreatorRoyaltyModifiedOnTicket(event: CreatorRoyaltyModifi
 
   ticket.creatorRoyalty = event.params.newRoyalty.toI32();
   ticket.save();
+}
+
+
+
+
+/////////   Legacy    /////////////
+
+export function handleTicketDeletedLegacy(event: TicketDeleted): void {
+  for (let i = 0; i < event.params.ids.length; i++) {
+    let id = event.params.ids[i];
+    let amount = event.params.amounts[i].toI32();
+    let ticketBalanceId = getBalanceId(id, event.params.owner, false)
+    let ticketBalance = Balance.load(ticketBalanceId);
+    if(ticketBalance == null ){
+      log.error("ticketBalance not found, id : {}", [ticketBalanceId]);
+      return;
+    }
+    if( !balanceHasNAmountAvailable(ticketBalance, amount) ) {
+      log.error("Not enough amount owned on ticketBalance, id : {}", [ticketBalanceId]);
+      return;
+    }
+    ticketBalance.amountOwned = ticketBalance.amountOwned - amount;
+    if( ticketBalance.amountOwned == 0 ) {
+      store.remove(
+        "Balance",
+        ticketBalanceId
+      );
+    } else {
+      ticketBalance.save()
+    }
+  }
+}
+
+export function handleTicketPublishedLegacy(event: TicketPublished): void {
+  let eventEntity = loadOrCreateEvent(
+    event.params.eventId
+  );
+
+  let ticketId = getTicketId(event.params.ticketId);
+  let ticket = Ticket.load(ticketId);
+  if (ticket == null) {
+    ticket = new Ticket(ticketId);
+  } else {
+    log.error("Warning: ticket already existed on handleTicketPublished. id : {}", [event.params.ticketId.toString()]);
+  }
+
+  ticket.event = eventEntity.id;
+  ticket.creatorRoyalty = event.params.creatorRoyalty.toI32();
+  ticket.isResellable = event.params.isResellable;
+  ticket.metadata = event.params.uri;
+  ticket.totalAmount = event.params.amount.toI32();
+
+  parseMetadata(event.params.uri, ticket, ticketAttrs);
+
+  ticket.save();
+  let ticketBalance = Balance.load(getBalanceId(event.params.ticketId, event.params.organizer, false));
+  if( ticketBalance !== null ){
+    log.error("handleTicketPublished: Balance already existed, id : {}", [getBalanceId(event.params.ticketId, event.params.organizer, false)]);
+    return;
+  }
+  ticketBalance = new Balance(getBalanceId(event.params.ticketId, event.params.organizer, false));
+  ticketBalance.type = 'Ticket';
+  ticketBalance.ticket = ticketId;
+  ticketBalance.event = eventEntity.id;
+  ticketBalance.askingPrice = event.params.price;
+  ticketBalance.amountOnSell = event.params.amountToSell.toI32();
+  ticketBalance.amountOwned = event.params.amount.toI32();
+  ticketBalance.owner = event.params.organizer.toHex();
+  ticketBalance.isEventOwner = true;
+
+  ticketBalance.save();
 }

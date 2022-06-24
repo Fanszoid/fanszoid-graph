@@ -11,7 +11,7 @@ enum Network {
 
 const startBlockByNetwork: Record<Network, Record<string, number>> = {
   [Network.MATIC]: {
-    default: 26285118,  
+    default: 28390685,  
     // Can define contract specific also.
   },
   [Network.MUMBAI]: {

@@ -45,11 +45,13 @@ type _Schema_
 type Event @entity {
   id: ID!
   tickets: [Ticket!]! @derivedFrom(field: "event")
-  ticketBalances: [Balance!]! @derivedFrom(field: "event")
+  ticketBalances: [Balance!] @derivedFrom(field: "event")
   sentTickets: [Transfer!] @derivedFrom(field: "event")
   organizer: User!
   metadata: String
   attendees: BigInt!
+  paused: Boolean!
+  collaborators: [User!]! 
   
   title: String!
   description: String
@@ -84,6 +86,8 @@ type Ticket @entity {
   sentTickets: [Transfer!] @derivedFrom(field: "ticket")
   metadata: String
   allowedMemberships: [AllowedMembership!]  @derivedFrom(field: "ticket")
+  isPrivate: Boolean!
+  allowances: [Allowance!]!
 
   memberships: [Membership!]! @derivedFrom(field: "validTickets")
 
@@ -94,7 +98,7 @@ type Ticket @entity {
 
 type Membership @entity {
   id: ID!
-  organizer: Bytes!
+  organizer: String!
   creatorRoyalty: Int!
   isResellable: Boolean!
   totalAmount: Int!
@@ -102,10 +106,18 @@ type Membership @entity {
   sentTickets: [Transfer!] @derivedFrom(field: "membership")
   validTickets: [Ticket!]!
   metadata: String
+  isPrivate: Boolean!
+  allowances: [Allowance!]!
 
   name: String
   description: String
   image: String
+}
+
+type Allowance @entity {
+  id: ID!
+  amount: Int!
+  allowedAddresses: [String!]!
 }
 
 enum BalanceType {
@@ -130,7 +142,7 @@ type Balance @entity {
 
 type User @entity {
   id: ID! # ETH addr
-  address: Bytes!
+  address: String!
   events: [Event!] @derivedFrom(field: "organizer")
   ticketBalances: [Balance!] @derivedFrom(field: "owner")
   membershipBalances: [Balance!] @derivedFrom(field: "owner")
@@ -163,7 +175,7 @@ type SocialNetwork @entity {
 
 type AllowedMembership @entity {
   id: ID!
-  address: Bytes!
+  address: String!
   tokenIds: [BigInt!]
   ticket: Ticket!
 }

@@ -81,12 +81,16 @@ dataSources:
           file: ./abis/TicketsMarketplace.json
       eventHandlers:
         - event: TicketPublished(indexed uint256,address,indexed uint256,uint256,uint256,uint256,uint256,bool,string)
+          handler: handleTicketPublishedLegacy
+        - event: TicketPublished(indexed uint256,address,indexed uint256,uint256,(uint256,uint256,uint256,uint256,bool,string,bool,(uint256,address[])[]),string)
           handler: handleTicketPublished
         - event: TicketEdited(indexed uint256,string)
           handler: handleTicketUriModification
         - event: TicketBought(indexed uint256,address,address,uint256,uint256)
           handler: handleTicketBought
         - event: TicketDeleted(indexed uint256,address,uint256[],uint256[])
+          handler: handleTicketDeletedLegacy
+        - event: TicketsDeleted(uint256[],address,uint256[])
           handler: handleTicketDeleted
         - event: AskSetted(indexed uint256,indexed address,uint256,uint256)
           handler: handleAskSetted
@@ -94,6 +98,12 @@ dataSources:
           handler: handleAskRemoved
         - event: CreatorRoyaltyModifiedOnTicket(indexed uint256,uint256)
           handler: handleCreatorRoyaltyModifiedOnTicket
+        - event: AllowanceAdded(indexed uint256,indexed uint256,(uint256,address[]))
+          handler: handleAllowanceAdded
+        - event: AllowanceConsumed(indexed uint256)
+          handler: handleAllowanceConsumed
+        - event: AllowanceRemoved(indexed uint256,indexed uint256)
+          handler: handleAllowanceRemoved
       file: ./src/handlers/ticketsMarketplaceHandler.ts
   - kind: ethereum/contract
     name: MembershipsMarketplace
@@ -117,12 +127,16 @@ dataSources:
           file: ./abis/MembershipsMarketplace.json
       eventHandlers:
         - event: MembershipPublished(address,indexed uint256,uint256,uint256,uint256,uint256,bool,string)
+          handler: handleMembershipPublishedLegacy
+        - event: MembershipPublished(address,indexed uint256,uint256,(uint256,uint256,uint256,uint256,bool,string,bool,(uint256,address[])[]),string)
           handler: handleMembershipPublished
         - event: MembershipEdited(indexed uint256,string)
           handler: handleMembershipUriModification
         - event: MembershipBought(indexed uint256,address,address,uint256,uint256)
           handler: handleMembershipBought
         - event: MembershipDeleted(indexed uint256,address,uint256[],uint256[])
+          handler: handleMembershipDeletedLegacy
+        - event: MembershipsDeleted(uint256[],address,uint256[])
           handler: handleMembershipDeleted
         - event: AskSetted(indexed uint256,indexed address,uint256,uint256)
           handler: handleAskSetted
@@ -130,6 +144,12 @@ dataSources:
           handler: handleAskRemoved
         - event: CreatorRoyaltyModifiedOnMembership(indexed uint256,uint256)
           handler: handleCreatorRoyaltyModifiedOnMembership
+        - event: AllowanceAdded(indexed uint256,indexed uint256,(uint256,address[]))
+          handler: handleAllowanceAdded
+        - event: AllowanceConsumed(indexed uint256)
+          handler: handleAllowanceConsumed
+        - event: AllowanceRemoved(indexed uint256,indexed uint256)
+          handler: handleAllowanceRemoved
       file: ./src/handlers/membershipsMarketplaceHandler.ts
   - kind: ethereum/contract
     name: Admin
@@ -168,5 +188,13 @@ dataSources:
           handler: handleDisallowMembership
         - event: MembershipTokenIdRemovedFromTicket(indexed uint256,address,uint256)
           handler: handleDisallowMembershipTokenId
+        - event: EventPaused(indexed uint256)
+          handler: handleEventPaused
+        - event: EventUnpaused(indexed uint256)
+          handler: handleEventUnpaused
+        - event: CollaboratorAdded(indexed uint256,indexed address)
+          handler: handleCollaboratorAdded
+        - event: CollaboratorRemoved(indexed uint256,indexed address)
+          handler: handleCollaboratorRemoved
 
       file: ./src/handlers/adminHandler.ts

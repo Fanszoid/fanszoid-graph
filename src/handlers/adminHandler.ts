@@ -6,9 +6,13 @@ import {
   EventEdited,
   MembershipAssignedToTicket,
   MembershipTokenIdRemovedFromTicket,
-  MembershipRemovedFromTicket
+  MembershipRemovedFromTicket,
+  EventPaused,
+  EventUnpaused,
+  CollaboratorAdded,
+  CollaboratorRemoved
 } from "../../build/generated/Admin/Admin";
-import { Event, Ticket, Balance, AllowedMembership, Membership } from "../../build/generated/schema";
+import { Event, Ticket, Balance, AllowedMembership, Membership, User } from "../../build/generated/schema";
 import {
   getAllowedMembershipId, getMembershipId, membershipAttrs,
 } from "../modules/Membership";
@@ -21,7 +25,65 @@ import {
 import { membershipContractAddressMATIC, membershipContractAddressMUMBAI } from "../modules/Membership";
 import { store, log, BigInt, dataSource } from "@graphprotocol/graph-ts";
 import { parseMetadata } from "./utils"
-import { getTicketId } from "../modules/Ticket";
+import { getTicketId } from "../modules/Ticket"
+
+export function handleEventPaused(event: EventPaused): void {
+  let eventEntity = Event.load(getEventId(event.params.eventId));
+  if (!eventEntity) {
+    log.error("handleEventPaused: Event not found : {}", [event.params.eventId.toString()]);
+    return;
+  } 
+  eventEntity.paused = true;
+  eventEntity.save();
+}
+
+export function handleEventUnpaused(event: EventUnpaused): void {
+  let eventEntity = Event.load(getEventId(event.params.eventId));
+  if (!eventEntity) {
+    log.error("handleEventUnpaused: Event not found : {}", [event.params.eventId.toString()]);
+    return;
+  } 
+  eventEntity.paused = false;
+  eventEntity.save();
+}
+
+export function handleCollaboratorAdded(event: CollaboratorAdded): void {
+  let eventEntity = Event.load(getEventId(event.params.eventId));
+  if (!eventEntity) {
+    log.error("handleCollaboratorAdded: Event not found : {}", [event.params.eventId.toString()]);
+    return;
+  } 
+  let collab = loadOrCreateUser(event.params.collaborator);
+  if(eventEntity.collaborators == null){
+    eventEntity.collaborators = [];
+  }
+  eventEntity.collaborators = eventEntity.collaborators.concat([collab.id]);
+  eventEntity.save();
+}
+
+export function handleCollaboratorRemoved(event: CollaboratorRemoved): void {
+  let eventEntity = Event.load(getEventId(event.params.eventId));
+  if (!eventEntity) {
+    log.error("handleEventPaused: Event not found : {}", [event.params.eventId.toString()]);
+    return;
+  } 
+  let user = User.load(event.params.collaborator.toHex());
+  if (!user) {
+    log.error("handleCollaboratorRemoved: User not found : {}", [event.params.collaborator.toString()]);
+    return;
+  }
+  if(eventEntity.collaborators == null) {
+    log.error("handleCollaboratorRemoved: User not found : {}", [event.params.collaborator.toString()]);
+    return;
+  }
+  let index = eventEntity.collaborators.indexOf(user.id);
+  if (index == -1) {
+    log.error("handleCollaboratorRemoved: User not found : {}", [event.params.collaborator.toString()]);
+    return;
+  }
+  eventEntity.collaborators.splice(index, 1);
+  eventEntity.save();
+}
 
 export function handleEventUriModification(event: EventEdited): void {
   let eventEntity = Event.load(getEventId(event.params.eventId));
@@ -43,7 +105,7 @@ export function handleEventCreated(event: EventCreated): void {
   eventEntity.metadata = event.params.uri;
   parseMetadata(event.params.uri, eventEntity, eventAttrs);
     
-  eventEntity.organizer = organizerUser.address.toHex();
+  eventEntity.organizer = organizerUser.address;
   eventEntity.save();
 }
 
@@ -62,7 +124,7 @@ export function handleMembershipsAssigned(event: MembershipAssignedToTicket): vo
   }*/
   let ticketId = getTicketId(event.params.ticketId)
   let allowedMembership = new AllowedMembership(getAllowedMembershipId(ticketId, event.params.contractAddress.toHex()));
-  allowedMembership.address = event.params.contractAddress;
+  allowedMembership.address = event.params.contractAddress.toHex();
   allowedMembership.tokenIds = event.params.ids;
   allowedMembership.ticket = ticketId
 
@@ -135,7 +197,7 @@ export function handleEventOwnershipTransferred(event: EventOwnershipTransferred
   let eventEntity = Event.load(getEventId(event.params.eventId));
   
   if(eventEntity == null ) {
-    log.error("Event not found on handleEventOwnershipTransferred. id : {}", [event.params.eventId.toHex()]);
+    log.error("Event not found on handleEventOwnershipTransferred. id : {}", [getEventId(event.params.eventId)]);
     return;
   }
 
@@ -144,27 +206,29 @@ export function handleEventOwnershipTransferred(event: EventOwnershipTransferred
 
   eventEntity.save();
 
-  for( let i = 0; i< eventEntity.ticketBalances.length ; i++ ){
-    let tb = eventEntity.ticketBalances[i]
-    let ticketBalance = Balance.load(tb);
-    if(ticketBalance == null ) {
-      log.error("Balance not found on handleEventOwnershipTransferred. id : {}", [tb]);
-      return;
+  if(eventEntity.ticketBalances) {
+    for( let i = 0; i< (eventEntity.ticketBalances as string[]).length ; i++ ){
+      let tb = (eventEntity.ticketBalances as string[])[i]
+      let ticketBalance = Balance.load(tb);
+      if(ticketBalance == null ) {
+        log.error("Balance not found on handleEventOwnershipTransferred. id : {}", [tb]);
+        return;
+      }
+  
+      if( ticketBalance.owner === ownerUser.id ) {
+        ticketBalance.isEventOwner = true;
+      } else {
+        ticketBalance.isEventOwner = false;
+      }
+      ticketBalance.save();
     }
-
-    if( ticketBalance.owner === ownerUser.id ) {
-      ticketBalance.isEventOwner = true;
-    } else {
-      ticketBalance.isEventOwner = false;
-    }
-    ticketBalance.save();
   }
 }
 
 export function handleCreatorRoyaltyModifiedOnEvent(event: CreatorRoyaltyModifiedOnEvent): void {
   let eventEntity = Event.load(getEventId(event.params.eventId));
   if(eventEntity == null ) {
-    log.error("Event not found on handleEventOwnershipTransferred. id : {}", [event.params.eventId.toHex()]);
+    log.error("Event not found on handleEventOwnershipTransferred. id : {}", [getEventId(event.params.eventId)]);
     return;
   }
 

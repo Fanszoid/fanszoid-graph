@@ -1,12 +1,12 @@
-import { log, ipfs, json, JSONValue, TypedMap, Entity, JSONValueKind, TypedMapEntry, BigInt } from "@graphprotocol/graph-ts";
+import { log, ipfs, json, JSONValue, TypedMap, Entity, JSONValueKind, TypedMapEntry, BigInt, Bytes } from "@graphprotocol/graph-ts";
 import { bigIntEventAttrs } from "../modules/Event";
-import { SocialNetwork } from "../../build/generated/schema";
+import { Allowance, SocialNetwork } from "../../build/generated/schema";
 
 export function parseMetadata(uri: string, entity: Entity, attrs: string[]): void {
     let uriParts = uri.split("/");
     let hash = uriParts[uriParts.length - 1];
     let retries = 3;
-    let data = undefined;
+    let data: Bytes | null = null;
     while(!data && retries > 0) {
       data = ipfs.cat(hash);
       retries--;
@@ -23,10 +23,12 @@ export function parseMetadata(uri: string, entity: Entity, attrs: string[]): voi
         value = jsonObject.toObject();
       } else {
         log.error("parseMetadata: Invalid metadata obj kind {}", [jsonObject.kind.toString()]);
+        return;
       }
   
     } else {
       log.error("parseMetadata: Invalid metadata kind {}", [jsonParsed.kind.toString()]);
+      return;
     }
   
     if (value) {
@@ -44,8 +46,8 @@ export function parseMetadata(uri: string, entity: Entity, attrs: string[]): voi
             for( let i=0; i< socials.length ; i++) {
               let social = socials[i];
 
-              let name: string;
-              let url: string;
+              let name: string = '';
+              let url: string = '';
 
               let socialValues = social.toObject().entries;
               for( let i=0; i< socialValues.length ; i++) {
@@ -73,7 +75,7 @@ export function parseMetadata(uri: string, entity: Entity, attrs: string[]): voi
             entity.setString(attrs[i], parseJSONValueToString(aux));
           }
         } else {
-          log.error("parseMetadata: aux is null", []);
+          log.debug("Could not get attr: " + attrs[i].toString() + " " + value.entries.map<string>((entry: TypedMapEntry<string, JSONValue>) => "[" + entry.key + ',' + parseJSONValueToString(entry.value) + "]").toString(), []);
         }
       }
     } else {

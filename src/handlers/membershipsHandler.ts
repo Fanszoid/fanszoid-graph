@@ -84,7 +84,7 @@ function internalTransferToken(
       toBalance.amountOwned = value.toI32();
       toBalance.amountOnSell = 0;
       
-      toBalance.isEventOwner = to.toHex() == membership.organizer.toHex();
+      toBalance.isEventOwner = to.toHex() == membership.organizer;
     } else {
       toBalance.amountOwned = toBalance.amountOwned + value.toI32();
     }

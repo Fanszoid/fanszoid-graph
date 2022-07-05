@@ -24,6 +24,7 @@ export function loadOrCreateEvent(
   let eventEntity = Event.load(eventId);
   if (eventEntity == null) {
     eventEntity = new Event(eventId);
+    eventEntity.collaborators = [];
   }
   return eventEntity;
 }

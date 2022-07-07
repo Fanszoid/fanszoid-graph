@@ -78,7 +78,7 @@ function internalTransferToken(
     }
 
     fromBalance.amountOwned = fromBalance.amountOwned - value.toI32();
-
+    
     let toBalanceId = getBalanceId(id, to, false)
     let toBalance = Balance.load(toBalanceId);
     if( toBalance == null ){

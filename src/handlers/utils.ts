@@ -58,9 +58,6 @@ export function parseMetadata(uri: string, entity: Entity, attrs: string[]): voi
                   url = socialValue.value.toString();
                 }
               }
-
-              
-              log.info("Socials reached, name: {}, url: {}", [ name, url]);
                 
                 let socialNetwork = new SocialNetwork(entity.getString("id") + '-' + name);
                 socialNetwork.name = name;
@@ -75,7 +72,7 @@ export function parseMetadata(uri: string, entity: Entity, attrs: string[]): voi
             entity.setString(attrs[i], parseJSONValueToString(aux));
           }
         } else {
-          log.debug("Could not get attr: " + attrs[i].toString() + " " + value.entries.map<string>((entry: TypedMapEntry<string, JSONValue>) => "[" + entry.key + ',' + parseJSONValueToString(entry.value) + "]").toString(), []);
+          log.debug("Could not get attr: " + attrs[i].toString(), []);
         }
       }
     } else {

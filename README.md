@@ -9,6 +9,10 @@ https://thegraph.com/hosted-service/subgraph/fanszoid/fanszoid-tickets-mumbai (Q
 2. Build: `npm run codegen` && `npm run build-data` 
 3. Deploy: `npm run deploy:[matic|mumbai]`
 
+## Test
+Please run `graph test`
+May need postgresql previously installed.
+
 ## Queries
 Please refer to https://thegraph.com/docs/en/developer/graphql-api/
 

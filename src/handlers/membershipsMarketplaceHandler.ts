@@ -27,6 +27,7 @@ import {
   balanceHasNAmountAvailable,
   balanceHasNAmountOnSell,
   balancePriceMatches,
+  getAllowanceId,
 } from "../modules/Balance";
 import { store, log, Address } from "@graphprotocol/graph-ts";
 import { parseMetadata } from "./utils"
@@ -38,7 +39,7 @@ export function handleAllowanceAdded(event: AllowanceAdded): void {
     log.error("Membership Not Found on handleAllowanceAdded. id : {}", [event.params.membershipId.toString()]);
     return;
   }
-  let allowance = new Allowance(event.params.allowanceId.toString());
+  let allowance = new Allowance(getAllowanceId(event.params.allowanceId, true));
   allowance.amount = event.params.allowance.amount.toI32();
   allowance.allowedAddresses = event.params.allowance.allowedAddresses.map<string>( (add:Address) => add.toHex());
   allowance.save();
@@ -48,7 +49,7 @@ export function handleAllowanceAdded(event: AllowanceAdded): void {
 }
 
 export function handleAllowanceConsumed(event: AllowanceConsumed): void {
-  let allowance = Allowance.load(event.params.allowanceId.toString());
+  let allowance = Allowance.load(getAllowanceId(event.params.allowanceId, true));
   if (!allowance) {
     log.error("Allowance Not Found on handleAllowanceConsumed. id : {}", [event.params.allowanceId.toString()]);
     return;
@@ -63,7 +64,7 @@ export function handleAllowanceRemoved(event: AllowanceRemoved): void {
     log.error("Membership Not Found on handleAllowanceAdded. id : {}", [event.params.membershipId.toString()]);
     return;
   }
-  let allowanceLoaded = Allowance.load(event.params.allowanceId.toString());
+  let allowanceLoaded = Allowance.load(getAllowanceId(event.params.allowanceId, true));
   if (!allowanceLoaded) {
     log.error("Allowance Not Found on handleAllowanceConsumed. id : {}", [event.params.allowanceId.toString()]);
     return;
@@ -75,6 +76,10 @@ export function handleAllowanceRemoved(event: AllowanceRemoved): void {
   }
   membershipEntity.allowances.splice(index, 1);
   membershipEntity.save();
+  store.remove(
+    'Allowance',
+    getAllowanceId(event.params.allowanceId, true)
+  )
 }
 
 export function handleMembershipUriModification(event: MembershipEdited): void {

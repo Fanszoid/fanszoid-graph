@@ -1,8 +1,12 @@
 import { Address, BigInt } from "@graphprotocol/graph-ts";
-import { Balance } from"../../../build/generated/schema";
+import { Allowance, Balance } from"../../../build/generated/schema";
 
 export function getBalanceId(balanceIdContract: BigInt, user: Address, isMembership: boolean): string {
   return (isMembership? "m":"t") + balanceIdContract.toHex() + "-" + user.toHex();
+}
+
+export function getAllowanceId(allowanceIdContract: BigInt, isMembership: boolean): string {
+  return (isMembership? "ma":"ta") + '-' +  allowanceIdContract.toHex();
 }
 
 export function balancePriceMatches(price: BigInt, balance: Balance): boolean {
@@ -30,6 +34,16 @@ export function loadOrCreateBalance(balanceIdContract: BigInt, userAddr: Address
     let tb = Balance.load(id);
     if (tb == null) {
       tb = new Balance(id);
+      tb.save();
+    }
+    return tb;
+  }
+
+  export function loadOrCreateAllowances(allowanceIdContract: BigInt, isMembership: boolean): Allowance {
+    let id = getAllowanceId(allowanceIdContract, isMembership);
+    let tb = Allowance.load(id);
+    if (tb == null) {
+      tb = new Allowance(id);
       tb.save();
     }
     return tb;

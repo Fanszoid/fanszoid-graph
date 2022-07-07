@@ -81,7 +81,9 @@ export function handleCollaboratorRemoved(event: CollaboratorRemoved): void {
     log.error("handleCollaboratorRemoved: User not found : {}", [event.params.collaborator.toString()]);
     return;
   }
-  eventEntity.collaborators.splice(index, 1);
+  let aux = eventEntity.collaborators;
+  aux.splice(index, 1);
+  eventEntity.collaborators = aux;
   eventEntity.save();
 }
 

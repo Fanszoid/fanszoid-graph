@@ -1,6 +1,7 @@
 /node_modules
 /build
 **/.DS_Store
+tests/.bin
 .vscode
 subgraph.yaml
 yarn.lock

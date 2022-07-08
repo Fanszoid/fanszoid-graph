@@ -37,7 +37,6 @@ describe("Memberships", () => {
 
       let user2 = new User(address2);
       user2.save();
-      log.info('Loaded', [])
   });
   
   test("Single Transfer", () => {

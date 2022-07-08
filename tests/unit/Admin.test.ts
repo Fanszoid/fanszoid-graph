@@ -1,11 +1,12 @@
 import { Address, BigInt, ethereum } from "@graphprotocol/graph-ts";
 import { assert, beforeAll, beforeEach, clearStore, describe, mockIpfsFile, newMockEvent, test } from "matchstick-as"
-import { Admin, CollaboratorAdded, CollaboratorRemoved, EventCreated, EventDeleted, EventEdited, EventOwnershipTransferred, EventPaused, EventUnpaused } from "../../build/generated/Admin/Admin";
-import { Event, User } from "../../build/generated/schema";
-import { handleCollaboratorAdded, handleCollaboratorRemoved, handleEventCreated, handleEventDeleted, handleEventOwnershipTransferred, handleEventPaused, handleEventUnpaused, handleEventUriModification } from "../../src/handlers/adminHandler";
+import { Admin, CollaboratorAdded, CollaboratorRemoved, CreatorRoyaltyModifiedOnEvent, EventCreated, EventDeleted, EventEdited, EventOwnershipTransferred, EventPaused, EventUnpaused } from "../../build/generated/Admin/Admin";
+import { Event, Ticket, User } from "../../build/generated/schema";
+import { handleCollaboratorAdded, handleCollaboratorRemoved, handleCreatorRoyaltyModifiedOnEvent, handleEventCreated, handleEventDeleted, handleEventOwnershipTransferred, handleEventPaused, handleEventUnpaused, handleEventUriModification } from "../../src/handlers/adminHandler";
 import { log } from "matchstick-as/assembly/log";
 import { param } from "../utils";
 import { loadOrCreateUser } from "../../src/modules/User";
+import { getTicketId } from "../../src/modules/Ticket";
 
 
 
@@ -40,9 +41,6 @@ describe("Event Changes", () => {
     mockIpfsFile('FAKE_URI', 'tests/ipfs/fake_event_metadata.json');
 
     handleEventCreated(event);
-    
-    let loaded = Event.load('e0x1');
-    if(!loaded) return;
 
     // Test agains storage [Entity, id, attr, expected_value]
     assert.fieldEquals('Event', 'e0x1', 'id', 'e0x1');
@@ -102,7 +100,37 @@ describe("Event Changes", () => {
   });
 
   test("Handle creator royalty modified on event", () => {
-    log.warning("TO DO", []);
+    let ticket = new Ticket(getTicketId(BigInt.fromString('1')));
+    ticket.creatorRoyalty = 10;
+    ticket.event = 'e0x0';
+    ticket.save(); 
+
+    let entity = Event.load('e0x0');
+    if(!entity) throw Error('Event not found');
+    entity.description = 'asd';
+    entity.tickets = ['tt0x1'];
+    entity.save();
+
+    let mockEvent = newMockEvent();
+    let event = new CreatorRoyaltyModifiedOnEvent(
+      mockEvent.address,
+      mockEvent.logIndex,
+      mockEvent.transactionLogIndex,
+      mockEvent.logType,
+      mockEvent.block,
+      mockEvent.transaction,
+      mockEvent.parameters,
+      mockEvent.receipt
+    )
+    
+    event.parameters = [
+      param('eventId', BigInt.fromString('0')),
+      param('newRoyalty', BigInt.fromString('1'))
+    ];
+
+    assert.fieldEquals('Ticket', ticket.id, 'creatorRoyalty', '10')
+    handleCreatorRoyaltyModifiedOnEvent(event)
+    assert.fieldEquals('Ticket', ticket.id, 'creatorRoyalty', '1')
   });
 
   test("Handle event modified", () => {

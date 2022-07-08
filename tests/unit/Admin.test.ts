@@ -1,16 +1,17 @@
 import { Address, BigInt, ethereum } from "@graphprotocol/graph-ts";
 import { assert, beforeAll, beforeEach, clearStore, describe, mockIpfsFile, newMockEvent, test } from "matchstick-as"
-import { Admin, CollaboratorAdded, CollaboratorRemoved, CreatorRoyaltyModifiedOnEvent, EventCreated, EventDeleted, EventEdited, EventOwnershipTransferred, EventPaused, EventUnpaused } from "../../build/generated/Admin/Admin";
-import { Event, Ticket, User } from "../../build/generated/schema";
-import { handleCollaboratorAdded, handleCollaboratorRemoved, handleCreatorRoyaltyModifiedOnEvent, handleEventCreated, handleEventDeleted, handleEventOwnershipTransferred, handleEventPaused, handleEventUnpaused, handleEventUriModification } from "../../src/handlers/adminHandler";
+import { Admin, CollaboratorAdded, CollaboratorRemoved, CreatorRoyaltyModifiedOnEvent, EventCreated, EventDeleted, EventEdited, EventOwnershipTransferred, EventPaused, EventUnpaused, MembershipAssignedToTicket, MembershipRemovedFromTicket, MembershipTokenIdRemovedFromTicket } from "../../build/generated/Admin/Admin";
+import { AllowedMembership, Event, Ticket, User } from "../../build/generated/schema";
+import { handleCollaboratorAdded, handleCollaboratorRemoved, handleCreatorRoyaltyModifiedOnEvent, handleDisallowMembership, handleDisallowMembershipTokenId, handleEventCreated, handleEventDeleted, handleEventOwnershipTransferred, handleEventPaused, handleEventUnpaused, handleEventUriModification, handleMembershipsAssigned } from "../../src/handlers/adminHandler";
 import { log } from "matchstick-as/assembly/log";
 import { param } from "../utils";
 import { loadOrCreateUser } from "../../src/modules/User";
 import { getTicketId } from "../../src/modules/Ticket";
+import { getAllowedMembershipId } from "../../src/modules/Membership";
 
 
 
-describe("Event Changes", () => {
+describe("Admin", () => {
   beforeEach(() => {
       clearStore() // <-- clear the store before each test in the file
 
@@ -266,6 +267,111 @@ describe("Event Changes", () => {
     handleEventUnpaused(event)
     assert.fieldEquals('Event', 'e0x0', 'paused', 'false');
   });
+
+  test("Handle membership assigned", () => {
+    let ticket = new Ticket(getTicketId(BigInt.fromString('1')));
+    ticket.event = 'e0x0';
+    ticket.save(); 
+
+    let entity = Event.load('e0x0');
+    if(!entity) throw Error('Event not found');
+    entity.paused = true;
+    entity.save();
+
+    let mockEvent = newMockEvent();
+    let event = new MembershipAssignedToTicket(
+      mockEvent.address,
+      mockEvent.logIndex,
+      mockEvent.transactionLogIndex,
+      mockEvent.logType,
+      mockEvent.block,
+      mockEvent.transaction,
+      mockEvent.parameters,
+      mockEvent.receipt
+    )
+    
+    let contractAddress = '0xa16081f360e3847006db660bae1c6d1b2e17ec2a';
+    event.parameters = [
+      param('ticketId', BigInt.fromString('1')),
+      param('contractAddress', contractAddress),
+      param('ids', []),
+    ];
+    let membershipId = ticket.id + '-' + contractAddress;
+
+    assert.notInStore('AllowedMembership', membershipId);
+    handleMembershipsAssigned(event)
+    assert.fieldEquals('AllowedMembership', membershipId, 'address', contractAddress);
+  });
+
+  test("Handle disallow membership", () => {
+    let ticket = new Ticket(getTicketId(BigInt.fromString('1')));
+    ticket.event = 'e0x0';
+    ticket.save(); 
+
+    let contractAddress = '0xa16081f360e3847006db660bae1c6d1b2e17ec2a';
+    let allowed = new AllowedMembership(getAllowedMembershipId(ticket.id, contractAddress));
+    allowed.address = contractAddress;
+    allowed.tokenIds = [BigInt.fromString('1')];
+    allowed.save();
+
+    let mockEvent = newMockEvent();
+    let event = new MembershipRemovedFromTicket(
+      mockEvent.address,
+      mockEvent.logIndex,
+      mockEvent.transactionLogIndex,
+      mockEvent.logType,
+      mockEvent.block,
+      mockEvent.transaction,
+      mockEvent.parameters,
+      mockEvent.receipt
+    )
+    
+    event.parameters = [
+      param('ticketId', BigInt.fromString('1')),
+      param('contractAddress', contractAddress),
+    ];
+    let membershipId = ticket.id + '-' + contractAddress;
+
+    assert.fieldEquals('AllowedMembership', membershipId, 'address', contractAddress);
+    handleDisallowMembership(event)
+    assert.notInStore('AllowedMembership', membershipId);
+  });
+
+  test("Handle disallow membership token id", () => {
+    let ticket = new Ticket(getTicketId(BigInt.fromString('1')));
+    ticket.event = 'e0x0';
+    ticket.save(); 
+
+    let contractAddress = '0xa16081f360e3847006db660bae1c6d1b2e17ec2a';
+    let allowed = new AllowedMembership(getAllowedMembershipId(ticket.id, contractAddress));
+    allowed.address = contractAddress;
+    allowed.tokenIds = [BigInt.fromString('1')];
+    allowed.save();
+
+    let mockEvent = newMockEvent();
+    let event = new MembershipTokenIdRemovedFromTicket(
+      mockEvent.address,
+      mockEvent.logIndex,
+      mockEvent.transactionLogIndex,
+      mockEvent.logType,
+      mockEvent.block,
+      mockEvent.transaction,
+      mockEvent.parameters,
+      mockEvent.receipt
+    )
+    
+    event.parameters = [
+      param('ticketId', BigInt.fromString('1')),
+      param('contractAddress', contractAddress),
+      param('tokenId', BigInt.fromString('1')),
+    ];
+    let membershipId = ticket.id + '-' + contractAddress;
+
+    assert.fieldEquals('AllowedMembership', membershipId, 'tokenIds', '[1]');
+    handleDisallowMembershipTokenId(event)
+    assert.fieldEquals('AllowedMembership', membershipId, 'tokenIds', '[]');
+  });
+
 })
 
 
@@ -281,5 +387,10 @@ export {
   handleCollaboratorAdded,
   handleCollaboratorRemoved,
   handleEventPaused,
-  handleEventUnpaused
+  handleEventUnpaused,
+  handleCreatorRoyaltyModifiedOnEvent,
+  handleMembershipsAssigned,
+  handleDisallowMembership, 
+  handleDisallowMembershipTokenId,
 }
+

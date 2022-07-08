@@ -119,18 +119,11 @@ export function handleEventDeleted(event: EventDeleted): void {
 }
 
 export function handleMembershipsAssigned(event: MembershipAssignedToTicket): void {
-  /*let ticketEntity = Ticket.load(getTicketId(event.params.ticketId));
-  if(ticketEntity == null ) {
-    log.error("Ticket Not Found on handleMembershipsAssigned. id : {}", [event.params.ticketId.toHex()]);
-    return;
-  }*/
   let ticketId = getTicketId(event.params.ticketId)
   let allowedMembership = new AllowedMembership(getAllowedMembershipId(ticketId, event.params.contractAddress.toHex()));
   allowedMembership.address = event.params.contractAddress.toHex();
   allowedMembership.tokenIds = event.params.ids;
   allowedMembership.ticket = ticketId
-
-  log.info("dataSource.network(): {}", [dataSource.network()]);
 
   let membershipAddress: string;
   if( dataSource.network() == 'matic') {

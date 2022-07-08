@@ -405,4 +405,14 @@ describe("MembershipsMarketplace", () => {
 // For coverage analysis
 // Include all handlers beign tested
 export { 
+  handleAllowanceAdded, 
+  handleAllowanceConsumed, 
+  handleAllowanceRemoved, 
+  handleAskRemoved, 
+  handleAskSetted, 
+  handleCreatorRoyaltyModifiedOnMembership, 
+  handleMembershipBought,
+  handleMembershipDeleted, 
+  handleMembershipPublished, 
+  handleMembershipUriModification
 }

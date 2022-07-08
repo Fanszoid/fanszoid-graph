@@ -4,6 +4,7 @@
   "description": "Fanszoid subgraph for Mumbai",
   "main": "index.js",
   "scripts": {
+    "test": "graph test",
     "codegen": "graph codegen --debug --output-dir build/generated/",
     "build-data": "ts-node ./scripts/completeSubgraph.ts --network mumbai",
     "deploy:mumbai": "ts-node ./scripts/completeSubgraph.ts --network mumbai && graph deploy --product hosted-service fanz-events/fanz-events-mumbai  --ipfs http://ipfs.fanszoid.com/",

@@ -31,4 +31,4 @@ jobs:
       # - name: Checking Syntax
       #   run: npm run lint:check
       - name: Running Tests and print coverage
-        run: graph test
+        run: npm test

@@ -27,6 +27,7 @@ describe("Memberships", () => {
       let user1 = new User(address1);
       user1.save();
       let membership = new Membership("m0x0");
+      membership.organizer = org;
       membership.save();
       let balance1 = new Balance("m0x0-".concat(address1));
       balance1.type = 'Membership';

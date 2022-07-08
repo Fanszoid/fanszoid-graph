@@ -158,6 +158,7 @@ describe("MembershipsMarketplace", () => {
 
   test("Handle membership published", () => {   
     let eventInStorage = new Event("e0x0");
+    eventInStorage.organizer = org;
     eventInStorage.save();
   
     let mockEvent = newMockEvent();
@@ -176,7 +177,7 @@ describe("MembershipsMarketplace", () => {
 
     let allowance = new MembershipPublished1SaleInfoAllowancesStruct();
     allowance[0] = parseValue(BigInt.fromString('1'));
-    allowance[1] = parseValue(['0x87d250a5c9674788F946F10E95641bba4DEa838f']);
+    allowance[1] = parseValue([]);
 
     let saleInfo = new MembershipPublished1SaleInfoStruct();
     saleInfo[0] = parseValue(BigInt.fromString('10')); 
@@ -189,7 +190,7 @@ describe("MembershipsMarketplace", () => {
     saleInfo[7] = parseValue([allowance]); 
     
     event.parameters = [
-      param('organizer', '0x87d250a5c9674788F946F10E95641bba4DEa838f'),
+      param('organizer', org),
       param('membershipId', BigInt.fromString('1')),
       param('amount', BigInt.fromString('10')),
       param('saleInfo', saleInfo),
@@ -199,7 +200,7 @@ describe("MembershipsMarketplace", () => {
     assert.notInStore('Membership', 'mem0x1')
     handleMembershipPublished(event)
     assert.fieldEquals('Membership', 'mem0x1', 'name', 'FAKE')
-    let balanceId = getBalanceId(BigInt.fromString('1'), Address.fromString('0x87d250a5c9674788F946F10E95641bba4DEa838f'), true);
+    let balanceId = getBalanceId(BigInt.fromString('1'), Address.fromString(org), true);
     assert.fieldEquals('Balance', balanceId, 'amountOwned', '10')
   });
 

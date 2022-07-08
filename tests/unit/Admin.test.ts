@@ -16,6 +16,8 @@ describe("Admin", () => {
       clearStore() // <-- clear the store before each test in the file
 
       let event = new Event("e0x0");
+      event.collaborators = [];
+      event.paused = false;
       event.save();
   });
   

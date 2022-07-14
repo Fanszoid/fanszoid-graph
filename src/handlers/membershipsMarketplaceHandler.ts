@@ -34,17 +34,34 @@ import { parseMetadata } from "./utils"
 import { loadOrCreateUser } from "../modules/User";
 
 export function handleAllowanceAdded(event: AllowanceAdded): void {
-  let membershipEntity = loadOrCreateMembership(event.params.membershipId);
-  if (!membershipEntity) {
-    log.error("Membership Not Found on handleAllowanceAdded. id : {}", [event.params.membershipId.toString()]);
-    return;
-  }
   let allowance = new Allowance(getAllowanceId(event.params.allowanceId, true));
   allowance.amount = event.params.allowance.amount.toI32();
   allowance.allowedAddresses = event.params.allowance.allowedAddresses.map<string>( (add:Address) => add.toHex());
   allowance.save();
 
-  membershipEntity.allowances.push(allowance.id);
+  let membershipId = getMembershipId(event.params.membershipId)
+  let membershipEntity = Membership.load(membershipId);
+  if (!membershipEntity) {
+    // not created yet. create it empty, it will be filled by handleTicketPublished
+    membershipEntity = new Membership(membershipId);
+
+    membershipEntity.organizer = "";
+    membershipEntity.creatorRoyalty = 0;
+    membershipEntity.isResellable = false;
+    membershipEntity.totalAmount = 0;
+    membershipEntity.isPrivate = false;
+    membershipEntity.allowances = [allowance.id];
+    membershipEntity.validTickets = [];
+  } else {
+    let allowances = membershipEntity.allowances
+    if(allowances && allowances.length > 0) {
+      allowances.push(allowance.id)
+    } else {
+      allowances = [allowance.id];
+    }
+    membershipEntity.allowances = allowances
+  }
+
   membershipEntity.save();
 }
 
@@ -69,12 +86,15 @@ export function handleAllowanceRemoved(event: AllowanceRemoved): void {
     log.error("Allowance Not Found on handleAllowanceConsumed. id : {}", [event.params.allowanceId.toString()]);
     return;
   }
-  let index = membershipEntity.allowances.indexOf(allowanceLoaded.id);
-  if (index == -1) {
+  let index = membershipEntity.allowances!.indexOf(allowanceLoaded.id);
+  if ( membershipEntity.allowances === null || index == -1) {
     log.error("Allowance Not Found on saved. id : {}", [allowanceLoaded.id.toString()]);
     return;
   }
-  membershipEntity.allowances.splice(index, 1);
+  
+  let aux = membershipEntity.allowances || [];
+  aux!.splice(index, 1);
+  membershipEntity.allowances = aux;
   membershipEntity.save();
   store.remove(
     'Allowance',

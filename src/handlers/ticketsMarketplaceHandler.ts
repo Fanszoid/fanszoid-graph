@@ -34,17 +34,32 @@ import { store, log, Address } from "@graphprotocol/graph-ts";
 import { parseMetadata } from "./utils";
 
 export function handleAllowanceAdded(event: AllowanceAdded): void {
-  let ticketEntity = loadOrCreateTicket(event.params.ticketId);
-  if (!ticketEntity) {
-    log.error("Ticket Not Found on handleAllowanceAdded. id : {}", [event.params.ticketId.toString()]);
-    return;
-  }
   let allowance = new Allowance(getAllowanceId(event.params.allowanceId, false));
   allowance.amount = event.params.allowance.amount.toI32();
   allowance.allowedAddresses = event.params.allowance.allowedAddresses.map<string>( (add:Address) => add.toHex());
   allowance.save();
+  let ticketId = getTicketId(event.params.ticketId)
+  let ticketEntity = Ticket.load(ticketId);
+  if (!ticketEntity) {
+    // not created yet. create it empty, it will be filled by handleTicketPublished
+    ticketEntity = new Ticket(ticketId);
 
-  ticketEntity.allowances.push(allowance.id);
+    ticketEntity.creatorRoyalty = 0;
+    ticketEntity.isResellable = false;
+    ticketEntity.totalAmount = 0;
+    ticketEntity.isPrivate = false;
+    ticketEntity.allowances = [allowance.id];
+    
+  } else {
+    let allowances = ticketEntity.allowances || []
+    if(allowances && allowances.length > 0) {
+      allowances.push(allowance.id)
+    } else {
+      allowances = [allowance.id];
+    }
+    ticketEntity.allowances = allowances
+  }
+
   ticketEntity.save();
 }
 
@@ -69,12 +84,14 @@ export function handleAllowanceRemoved(event: AllowanceRemoved): void {
     log.error("Allowance Not Found on handleAllowanceRemoved. id : {}", [event.params.allowanceId.toString()]);
     return;
   }
-  let index = ticketEntity.allowances.indexOf(allowanceLoaded.id);
-  if (index == -1) {
-    log.error("Allowance Not Found on saved. id : {}", [allowanceLoaded.id.toString()]);
+  let index = ticketEntity.allowances!.indexOf(allowanceLoaded.id);
+  if (  ticketEntity.allowances === null || index == -1) {
+    log.error("Allowance Not Found on saved, index: {}. id : {}", [index.toString() ,allowanceLoaded.id.toString()]);
     return;
   }
-  ticketEntity.allowances.splice(index, 1);
+  let aux = ticketEntity.allowances || [];
+  aux!.splice(index, 1);
+  ticketEntity.allowances = aux;
   ticketEntity.save();
   store.remove(
     'Allowance',

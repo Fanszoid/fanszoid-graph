@@ -108,6 +108,7 @@ export function handleEventCreated(event: EventCreated): void {
   parseMetadata(event.params.uri, eventEntity, eventAttrs);
     
   eventEntity.organizer = organizerUser.address;
+  eventEntity.attendees = BigInt.fromI32(0);
   eventEntity.save();
 }
 

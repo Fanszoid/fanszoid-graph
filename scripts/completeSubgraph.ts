@@ -21,7 +21,7 @@ const startBlockByNetwork: Record<Network, Record<string, number>> = {
 }
 
 const contractAddressByNetwork: Record<Network, Record<string, string>> = {
-  [Network.MATIC]: {  // TODO: Set prod addresss here
+  [Network.MATIC]: {
     admin: "0xf4EfD08600Bbe35C187252FBb1eCD2F7a264D162",
     event: "0xfc1F8ccDc5897983e56058548ff591F0F333eE9B",
     ticket: 	"0x8f0553207e486D2C6f0636bf8f67D4D76EB84656",

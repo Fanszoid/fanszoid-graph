@@ -11,7 +11,10 @@ export function parseMetadata(uri: string, entity: Entity, attrs: string[]): voi
       data = ipfs.cat(hash);
       retries--;
     }
-    if (!data) return;
+    if (!data) {
+      log.error("IPFS error: Could not parse metadata for hash {}", [hash]);
+      return
+    };
   
     let jsonParsed = json.fromBytes(data);
     let value: TypedMap<string, JSONValue>;

@@ -93,9 +93,14 @@ export function handleEventUriModification(event: EventEdited): void {
     log.error("Event Not Found on handleEventUriModification. id : {}", [event.params.eventId.toString()]);
     return;
   }
-  parseMetadata(event.params.newUri, eventEntity, eventAttrs);
-  eventEntity.metadata = event.params.newUri;
-  eventEntity.save();
+  let parsed = parseMetadata(event.params.newUri, eventEntity, eventAttrs);
+  
+  if( parsed ) {
+    eventEntity.metadata = event.params.newUri;
+    eventEntity.save();
+  } else {
+    log.error("Error parsing metadata on handleEventUriModification, metadata hash is: {}", [event.params.newUri])
+  }
 }
 
 export function handleEventCreated(event: EventCreated): void {
@@ -105,11 +110,15 @@ export function handleEventCreated(event: EventCreated): void {
   );
 
   eventEntity.metadata = event.params.uri;
-  parseMetadata(event.params.uri, eventEntity, eventAttrs);
+  let parsed = parseMetadata(event.params.uri, eventEntity, eventAttrs);
     
-  eventEntity.organizer = organizerUser.address;
-  eventEntity.attendees = BigInt.fromI32(0);
-  eventEntity.save();
+  if( parsed ) {
+    eventEntity.organizer = organizerUser.address;
+    eventEntity.attendees = BigInt.fromI32(0);
+    eventEntity.save();
+  } else {
+    log.error("Error parsing metadata on handleEventCreated, metadata hash is: {}", [event.params.uri])
+  }
 }
 
 export function handleEventDeleted(event: EventDeleted): void {

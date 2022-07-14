@@ -7,8 +7,8 @@
     "test": "graph test",
     "codegen": "graph codegen --debug --output-dir build/generated/",
     "build-data": "ts-node ./scripts/completeSubgraph.ts --network mumbai",
-    "deploy:mumbai": "ts-node ./scripts/completeSubgraph.ts --network mumbai && graph deploy --product hosted-service fanz-events/fanz-events-mumbai  --ipfs http://ipfs.fanszoid.com/",
-    "deploy:matic": "ts-node ./scripts/completeSubgraph.ts --network matic && graph deploy --product hosted-service fanz-events/fanz-events-matic  --ipfs http://ipfs.fanszoid.com/"
+    "deploy:mumbai": "ts-node ./scripts/completeSubgraph.ts --network mumbai && graph deploy --product hosted-service fanz-events/fanz-events-mumbai  --ipfs https://ipfs.fanz.events/",
+    "deploy:matic": "ts-node ./scripts/completeSubgraph.ts --network matic && graph deploy --product hosted-service fanz-events/fanz-events-matic  --ipfs https://ipfs.fanz.events/"
   },
   "repository": {
     "type": "git",

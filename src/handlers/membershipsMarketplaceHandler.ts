@@ -108,9 +108,15 @@ export function handleMembershipUriModification(event: MembershipEdited): void {
     log.error("Membership Not Found on handleMembershipUriModification. id : {}", [event.params.membershipId.toString()]);
     return;
   }
-  parseMetadata(event.params.newUri, membershipEntity, membershipAttrs);
-  membershipEntity.metadata = event.params.newUri;
-  membershipEntity.save();
+  
+  let parsed = parseMetadata(event.params.newUri, membershipEntity, membershipAttrs);
+  
+  if(parsed) {
+    membershipEntity.metadata = event.params.newUri;
+    membershipEntity.save();
+  } else {
+    log.error("Error parsing metadata on handleMembershipUriModification, metadata hash is: {}", [event.params.newUri])
+  }
 }
 
 export function handleMembershipPublished(event: MembershipPublished1): void {
@@ -125,26 +131,32 @@ export function handleMembershipPublished(event: MembershipPublished1): void {
   membership.metadata = event.params.uri;
   membership.totalAmount = event.params.amount.toI32();
   membership.isPrivate = event.params.saleInfo.isPrivate;
+  membership.validTickets = [];
   
-  parseMetadata(event.params.uri, membership, membershipAttrs);
+  let parsed = parseMetadata(event.params.uri, membership, membershipAttrs);
   
-  membership.save();
+  if(parsed) {
+    membership.save();
 
-  let membershipBalance = Balance.load(getBalanceId(event.params.membershipId, event.params.organizer, true));
-  if( membershipBalance !== null ){
-    log.error("handleMembershipPublished: Balance already existed, id : {}", [getBalanceId(event.params.membershipId, event.params.organizer, true)]);
-    return;
+    let membershipBalance = Balance.load(getBalanceId(event.params.membershipId, event.params.organizer, true));
+    if( membershipBalance !== null ){
+      log.error("handleMembershipPublished: Balance already existed, id : {}", [getBalanceId(event.params.membershipId, event.params.organizer, true)]);
+      return;
+    }
+    membershipBalance = new Balance(getBalanceId(event.params.membershipId, event.params.organizer, true));
+    membershipBalance.membership = membership.id;
+    membershipBalance.type = 'Membership';
+    membershipBalance.askingPrice = event.params.saleInfo.price;
+    membershipBalance.amountOnSell = event.params.saleInfo.amountToSell.toI32();
+    membershipBalance.amountOwned = event.params.amount.toI32();
+    membershipBalance.owner = event.params.organizer.toHex();
+    membershipBalance.isEventOwner = true;
+
+    membershipBalance.save();
+  } else {
+    log.error("Error parsing metadata on loadOrCreateMembership, metadata hash is: {}", [event.params.uri])
   }
-  membershipBalance = new Balance(getBalanceId(event.params.membershipId, event.params.organizer, true));
-  membershipBalance.membership = membership.id;
-  membershipBalance.type = 'Membership';
-  membershipBalance.askingPrice = event.params.saleInfo.price;
-  membershipBalance.amountOnSell = event.params.saleInfo.amountToSell.toI32();
-  membershipBalance.amountOwned = event.params.amount.toI32();
-  membershipBalance.owner = event.params.organizer.toHex();
-  membershipBalance.isEventOwner = true;
-
-  membershipBalance.save();
+  
 }
 
 export function handleMembershipDeleted(event: MembershipsDeleted): void {
@@ -268,24 +280,29 @@ export function handleMembershipPublishedLegacy(event: MembershipPublished): voi
   membership.metadata = event.params.uri;
   membership.totalAmount = event.params.amount.toI32();
 
-  parseMetadata(event.params.uri, membership, membershipAttrs);
+  let parsed = parseMetadata(event.params.uri, membership, membershipAttrs);
 
-  membership.save();
-  let membershipBalance = Balance.load(getBalanceId(event.params.membershipId, event.params.organizer, true));
-  if( membershipBalance !== null ){
-    log.error("handleMembershipPublished: Balance already existed, id : {}", [getBalanceId(event.params.membershipId, event.params.organizer, true)]);
-    return;
+  if(parsed) {
+    membership.save();
+    let membershipBalance = Balance.load(getBalanceId(event.params.membershipId, event.params.organizer, true));
+    if( membershipBalance !== null ){
+      log.error("handleMembershipPublished: Balance already existed, id : {}", [getBalanceId(event.params.membershipId, event.params.organizer, true)]);
+      return;
+    }
+    membershipBalance = new Balance(getBalanceId(event.params.membershipId, event.params.organizer, true));
+    membershipBalance.membership = membershipId;
+    membershipBalance.type = 'Membership';
+    membershipBalance.askingPrice = event.params.price;
+    membershipBalance.amountOnSell = event.params.amountToSell.toI32();
+    membershipBalance.amountOwned = event.params.amount.toI32();
+    membershipBalance.owner = event.params.organizer.toHex();
+    membershipBalance.isEventOwner = true;
+
+    membershipBalance.save();
+  } else {
+    log.error("Error parsing metadata on handleMembershipPublishedLegacy, metadata hash is: {}", [event.params.uri])
   }
-  membershipBalance = new Balance(getBalanceId(event.params.membershipId, event.params.organizer, true));
-  membershipBalance.membership = membershipId;
-  membershipBalance.type = 'Membership';
-  membershipBalance.askingPrice = event.params.price;
-  membershipBalance.amountOnSell = event.params.amountToSell.toI32();
-  membershipBalance.amountOwned = event.params.amount.toI32();
-  membershipBalance.owner = event.params.organizer.toHex();
-  membershipBalance.isEventOwner = true;
-
-  membershipBalance.save();
+  
 }
 
 export function handleMembershipDeletedLegacy(event: MembershipDeleted): void {

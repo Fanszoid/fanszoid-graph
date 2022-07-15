@@ -50,7 +50,7 @@ type Event @entity {
   organizer: User!
   metadata: String
   attendees: BigInt!
-  paused: Boolean!
+  paused: Boolean
   collaborators: [User!]! 
   
   title: String!
@@ -87,7 +87,7 @@ type Ticket @entity {
   metadata: String
   allowedMemberships: [AllowedMembership!]  @derivedFrom(field: "ticket")
   isPrivate: Boolean!
-  allowances: [Allowance!]!
+  allowances: [Allowance!]
 
   memberships: [Membership!]! @derivedFrom(field: "validTickets")
 
@@ -107,7 +107,7 @@ type Membership @entity {
   validTickets: [Ticket!]!
   metadata: String
   isPrivate: Boolean!
-  allowances: [Allowance!]!
+  allowances: [Allowance!]
 
   name: String
   description: String

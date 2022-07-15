@@ -2,7 +2,7 @@ import { log, ipfs, json, JSONValue, TypedMap, Entity, JSONValueKind, TypedMapEn
 import { bigIntEventAttrs } from "../modules/Event";
 import { Allowance, SocialNetwork } from "../../build/generated/schema";
 
-export function parseMetadata(uri: string, entity: Entity, attrs: string[]): void {
+export function parseMetadata(uri: string, entity: Entity, attrs: string[]): boolean {
     let uriParts = uri.split("/");
     let hash = uriParts[uriParts.length - 1];
     let retries = 3;
@@ -11,7 +11,10 @@ export function parseMetadata(uri: string, entity: Entity, attrs: string[]): voi
       data = ipfs.cat(hash);
       retries--;
     }
-    if (!data) return;
+    if (!data) {
+      log.error("IPFS error: Could not parse metadata for hash {}", [hash]);
+      return false
+    };
   
     let jsonParsed = json.fromBytes(data);
     let value: TypedMap<string, JSONValue>;
@@ -23,12 +26,12 @@ export function parseMetadata(uri: string, entity: Entity, attrs: string[]): voi
         value = jsonObject.toObject();
       } else {
         log.error("parseMetadata: Invalid metadata obj kind {}", [jsonObject.kind.toString()]);
-        return;
+        return false;
       }
   
     } else {
       log.error("parseMetadata: Invalid metadata kind {}", [jsonParsed.kind.toString()]);
-      return;
+      return false;
     }
   
     if (value) {
@@ -58,9 +61,6 @@ export function parseMetadata(uri: string, entity: Entity, attrs: string[]): voi
                   url = socialValue.value.toString();
                 }
               }
-
-              
-              log.info("Socials reached, name: {}, url: {}", [ name, url]);
                 
                 let socialNetwork = new SocialNetwork(entity.getString("id") + '-' + name);
                 socialNetwork.name = name;
@@ -75,12 +75,15 @@ export function parseMetadata(uri: string, entity: Entity, attrs: string[]): voi
             entity.setString(attrs[i], parseJSONValueToString(aux));
           }
         } else {
-          log.debug("Could not get attr: " + attrs[i].toString() + " " + value.entries.map<string>((entry: TypedMapEntry<string, JSONValue>) => "[" + entry.key + ',' + parseJSONValueToString(entry.value) + "]").toString(), []);
+          log.debug("Could not get attr: " + attrs[i].toString(), []);
         }
       }
     } else {
       log.error("parseMetadata: value is null, data: {}", [data.toString()]);
+      return false
     }
+
+    return true
   }
   
 export function parseJSONValueToString(value: JSONValue): string{

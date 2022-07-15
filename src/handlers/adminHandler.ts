@@ -81,7 +81,9 @@ export function handleCollaboratorRemoved(event: CollaboratorRemoved): void {
     log.error("handleCollaboratorRemoved: User not found : {}", [event.params.collaborator.toString()]);
     return;
   }
-  eventEntity.collaborators.splice(index, 1);
+  let aux = eventEntity.collaborators;
+  aux.splice(index, 1);
+  eventEntity.collaborators = aux;
   eventEntity.save();
 }
 
@@ -91,9 +93,14 @@ export function handleEventUriModification(event: EventEdited): void {
     log.error("Event Not Found on handleEventUriModification. id : {}", [event.params.eventId.toString()]);
     return;
   }
-  parseMetadata(event.params.newUri, eventEntity, eventAttrs);
-  eventEntity.metadata = event.params.newUri;
-  eventEntity.save();
+  let parsed = parseMetadata(event.params.newUri, eventEntity, eventAttrs);
+  
+  if( parsed ) {
+    eventEntity.metadata = event.params.newUri;
+    eventEntity.save();
+  } else {
+    log.error("Error parsing metadata on handleEventUriModification, metadata hash is: {}", [event.params.newUri])
+  }
 }
 
 export function handleEventCreated(event: EventCreated): void {
@@ -103,10 +110,15 @@ export function handleEventCreated(event: EventCreated): void {
   );
 
   eventEntity.metadata = event.params.uri;
-  parseMetadata(event.params.uri, eventEntity, eventAttrs);
+  let parsed = parseMetadata(event.params.uri, eventEntity, eventAttrs);
     
-  eventEntity.organizer = organizerUser.address;
-  eventEntity.save();
+  if( parsed ) {
+    eventEntity.organizer = organizerUser.address;
+    eventEntity.attendees = BigInt.fromI32(0);
+    eventEntity.save();
+  } else {
+    log.error("Error parsing metadata on handleEventCreated, metadata hash is: {}", [event.params.uri])
+  }
 }
 
 export function handleEventDeleted(event: EventDeleted): void {
@@ -117,18 +129,11 @@ export function handleEventDeleted(event: EventDeleted): void {
 }
 
 export function handleMembershipsAssigned(event: MembershipAssignedToTicket): void {
-  /*let ticketEntity = Ticket.load(getTicketId(event.params.ticketId));
-  if(ticketEntity == null ) {
-    log.error("Ticket Not Found on handleMembershipsAssigned. id : {}", [event.params.ticketId.toHex()]);
-    return;
-  }*/
   let ticketId = getTicketId(event.params.ticketId)
   let allowedMembership = new AllowedMembership(getAllowedMembershipId(ticketId, event.params.contractAddress.toHex()));
   allowedMembership.address = event.params.contractAddress.toHex();
   allowedMembership.tokenIds = event.params.ids;
   allowedMembership.ticket = ticketId
-
-  log.info("dataSource.network(): {}", [dataSource.network()]);
 
   let membershipAddress: string;
   if( dataSource.network() == 'matic') {

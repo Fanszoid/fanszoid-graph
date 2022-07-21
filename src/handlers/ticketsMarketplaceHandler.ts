@@ -301,6 +301,7 @@ export function handleTicketPublishedLegacy(event: TicketPublished): void {
   ticket.isResellable = event.params.isResellable;
   ticket.metadata = event.params.uri;
   ticket.totalAmount = event.params.amount.toI32();
+  ticket.isPrivate = false;
 
   let parsed = parseMetadata(event.params.uri, ticket, ticketAttrs);
 

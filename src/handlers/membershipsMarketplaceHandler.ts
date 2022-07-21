@@ -279,6 +279,8 @@ export function handleMembershipPublishedLegacy(event: MembershipPublished): voi
   membership.isResellable = event.params.isResellable;
   membership.metadata = event.params.uri;
   membership.totalAmount = event.params.amount.toI32();
+  membership.isPrivate = false;
+  membership.validTickets = [];
 
   let parsed = parseMetadata(event.params.uri, membership, membershipAttrs);
 

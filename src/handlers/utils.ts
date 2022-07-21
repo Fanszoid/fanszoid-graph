@@ -62,7 +62,7 @@ export function parseMetadata(uri: string, entity: Entity, attrs: string[]): boo
                 }
               }
                 
-                let socialNetwork = new SocialNetwork(entity.getString("id") + '-' + name);
+                let socialNetwork = new SocialNetwork(entity.getString("id") + '-' + name + '-' + i.toString());
                 socialNetwork.name = name;
                 socialNetwork.url = url;
                 socialNetwork.event = entity.getString("id");

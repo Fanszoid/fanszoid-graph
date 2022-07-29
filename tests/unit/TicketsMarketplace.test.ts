@@ -29,12 +29,19 @@ describe("TicketsMarketplace", () => {
       let user1 = new User(address1);
       user1.save();
       let ticket = new Ticket(getTicketId(BigInt.fromString('0')));
+      ticket.creatorRoyalty = 10;
+      ticket.isResellable = false;
+      ticket.isPrivate = false;
+      ticket.totalAmount = 10;
       ticket.save();
       let balance1 = new Balance("t0x0-".concat(address1));
       balance1.type = 'Ticket';
       balance1.amountOwned = 5;
+      balance1.amountOnSell = 5;
       balance1.event = 'e0x0';
       balance1.ticket = ticket.id;
+      balance1.owner = org;
+      balance1.isEventOwner = false;
       balance1.save();
 
       let user2 = new User(address2);
@@ -103,6 +110,10 @@ describe("TicketsMarketplace", () => {
     allowance.amount = 2;
     allowance.save(); 
     let ticket = new Ticket(getTicketId(BigInt.fromString('1')));
+    ticket.creatorRoyalty = 10;
+    ticket.isResellable = false;
+    ticket.isPrivate = false;
+    ticket.totalAmount = 10;
     ticket.allowances = ['ta-0x1'];
     ticket.save(); 
     
@@ -131,6 +142,10 @@ describe("TicketsMarketplace", () => {
 
   test("Handle ticket uri modification", () => {
     let ticket = new Ticket(getTicketId(BigInt.fromString('1')));
+    ticket.creatorRoyalty = 10;
+    ticket.isResellable = false;
+    ticket.isPrivate = false;
+    ticket.totalAmount = 10;
     ticket.name = 'NAME';
     ticket.save(); 
     
@@ -208,6 +223,10 @@ describe("TicketsMarketplace", () => {
 
   test("Handle ticket deleted", () => {
     let ticket = new Ticket(getTicketId(BigInt.fromString('1')));
+    ticket.creatorRoyalty = 10;
+    ticket.isResellable = false;
+    ticket.isPrivate = false;
+    ticket.totalAmount = 10;
     ticket.name = 'NAME';
     ticket.save(); 
     let balanceId = getBalanceId(
@@ -219,6 +238,8 @@ describe("TicketsMarketplace", () => {
     balance.ticket = 'tt0x1';
     balance.owner = '0x87d250a5c9674788F946F10E95641bba4DEa838f';
     balance.amountOwned = 3;
+    balance.amountOnSell = 3;
+    balance.isEventOwner = false;
     balance.save();
     
     let mockEvent = newMockEvent();
@@ -246,6 +267,10 @@ describe("TicketsMarketplace", () => {
 
   test("Handle ticket bought", () => {
     let ticket = new Ticket(getTicketId(BigInt.fromString('1')));
+    ticket.creatorRoyalty = 10;
+    ticket.isResellable = false;
+    ticket.isPrivate = false;
+    ticket.totalAmount = 10;
     ticket.name = 'NAME';
     ticket.save(); 
     let balanceId = getBalanceId(
@@ -259,6 +284,7 @@ describe("TicketsMarketplace", () => {
     balance.amountOwned = 3;
     balance.amountOnSell = 3;
     balance.askingPrice = BigInt.fromString('10');
+    balance.isEventOwner = false;
     balance.save();
     
     let mockEvent = newMockEvent();
@@ -289,6 +315,10 @@ describe("TicketsMarketplace", () => {
 
   test("Handle ask setted", () => {
     let ticket = new Ticket(getTicketId(BigInt.fromString('1')));
+    ticket.creatorRoyalty = 10;
+    ticket.isResellable = false;
+    ticket.isPrivate = false;
+    ticket.totalAmount = 10;
     ticket.name = 'NAME';
     ticket.save(); 
     let balanceId = getBalanceId(
@@ -301,6 +331,7 @@ describe("TicketsMarketplace", () => {
     balance.owner = '0x87d250a5c9674788F946F10E95641bba4DEa838f';
     balance.amountOwned = 3;
     balance.amountOnSell = 0;
+    balance.isEventOwner = false;
     balance.save();
     
     let mockEvent = newMockEvent();
@@ -329,6 +360,10 @@ describe("TicketsMarketplace", () => {
 
   test("Handle ask removed", () => {
     let ticket = new Ticket(getTicketId(BigInt.fromString('1')));
+    ticket.creatorRoyalty = 10;
+    ticket.isResellable = false;
+    ticket.isPrivate = false;
+    ticket.totalAmount = 10;
     ticket.name = 'NAME';
     ticket.save(); 
     let balanceId = getBalanceId(
@@ -341,6 +376,7 @@ describe("TicketsMarketplace", () => {
     balance.owner = '0x87d250a5c9674788F946F10E95641bba4DEa838f';
     balance.amountOwned = 3;
     balance.amountOnSell = 3;
+    balance.isEventOwner = false;
     balance.save();
     
     let mockEvent = newMockEvent();
@@ -369,6 +405,9 @@ describe("TicketsMarketplace", () => {
     let ticket = new Ticket(getTicketId(BigInt.fromString('1')));
     ticket.name = 'NAME';
     ticket.creatorRoyalty = 1;
+    ticket.isResellable = false;
+    ticket.isPrivate = false;
+    ticket.totalAmount = 10;
     ticket.save(); 
     let balanceId = getBalanceId(
       BigInt.fromString('1'), 
@@ -380,6 +419,7 @@ describe("TicketsMarketplace", () => {
     balance.owner = '0x87d250a5c9674788F946F10E95641bba4DEa838f';
     balance.amountOwned = 3;
     balance.amountOnSell = 3;
+    balance.isEventOwner = false;
     balance.save();
     
     let mockEvent = newMockEvent();

@@ -105,6 +105,9 @@ describe("Admin", () => {
   test("Handle creator royalty modified on event", () => {
     let ticket = new Ticket(getTicketId(BigInt.fromString('1')));
     ticket.creatorRoyalty = 10;
+    ticket.isResellable = false;
+    ticket.isPrivate = false;
+    ticket.totalAmount = 10;
     ticket.event = 'e0x0';
     ticket.save(); 
 
@@ -272,6 +275,10 @@ describe("Admin", () => {
 
   test("Handle membership assigned", () => {
     let ticket = new Ticket(getTicketId(BigInt.fromString('1')));
+    ticket.creatorRoyalty = 10;
+    ticket.isResellable = false;
+    ticket.isPrivate = false;
+    ticket.totalAmount = 10;
     ticket.event = 'e0x0';
     ticket.save(); 
 
@@ -307,6 +314,10 @@ describe("Admin", () => {
 
   test("Handle disallow membership", () => {
     let ticket = new Ticket(getTicketId(BigInt.fromString('1')));
+    ticket.creatorRoyalty = 10;
+    ticket.isResellable = false;
+    ticket.isPrivate = false;
+    ticket.totalAmount = 10;
     ticket.event = 'e0x0';
     ticket.save(); 
 
@@ -341,6 +352,10 @@ describe("Admin", () => {
 
   test("Handle disallow membership token id", () => {
     let ticket = new Ticket(getTicketId(BigInt.fromString('1')));
+    ticket.creatorRoyalty = 10;
+    ticket.isResellable = false;
+    ticket.isPrivate = false;
+    ticket.totalAmount = 10;
     ticket.event = 'e0x0';
     ticket.save(); 
 

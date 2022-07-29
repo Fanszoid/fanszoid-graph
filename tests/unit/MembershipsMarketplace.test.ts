@@ -28,12 +28,20 @@ describe("MembershipsMarketplace", () => {
       let user1 = new User(address1);
       user1.save();
       let membership = new Membership(getMembershipId(BigInt.fromString('0')));
+      membership.organizer = org;
+      membership.creatorRoyalty = 15;
+      membership.isResellable = true;
+      membership.totalAmount = 150;
+      membership.isPrivate = false;
       membership.save();
       let balance1 = new Balance("t0x0-".concat(address1));
       balance1.type = 'Membership';
       balance1.amountOwned = 5;
       balance1.event = 'e0x0';
       balance1.membership = membership.id;
+      balance1.owner = org;
+      balance1.amountOnSell = 5;
+      balance1.isEventOwner = false;
       balance1.save();
 
       let user2 = new User(address2);
@@ -102,6 +110,11 @@ describe("MembershipsMarketplace", () => {
     allowance.amount = 2;
     allowance.save(); 
     let membership = new Membership(getMembershipId(BigInt.fromString('1')));
+    membership.organizer = org;
+    membership.creatorRoyalty = 15;
+    membership.isResellable = true;
+    membership.totalAmount = 150;
+    membership.isPrivate = false;
     membership.allowances = ['ma-0x1'];
     membership.save(); 
     
@@ -130,6 +143,11 @@ describe("MembershipsMarketplace", () => {
 
   test("Handle membership uri modification", () => {
     let membership = new Membership(getMembershipId(BigInt.fromString('1')));
+    membership.organizer = org;
+    membership.creatorRoyalty = 15;
+    membership.isResellable = true;
+    membership.totalAmount = 150;
+    membership.isPrivate = false;
     membership.name = 'NAME';
     membership.save(); 
     
@@ -206,6 +224,11 @@ describe("MembershipsMarketplace", () => {
 
   test("Handle membership deleted", () => {
     let membership = new Membership(getMembershipId(BigInt.fromString('1')));
+    membership.organizer = org;
+    membership.creatorRoyalty = 15;
+    membership.isResellable = true;
+    membership.totalAmount = 150;
+    membership.isPrivate = false;
     membership.name = 'NAME';
     membership.save(); 
     let balanceId = getBalanceId(
@@ -217,6 +240,11 @@ describe("MembershipsMarketplace", () => {
     balance.membership = 'mem0x1';
     balance.owner = '0x87d250a5c9674788F946F10E95641bba4DEa838f';
     balance.amountOwned = 3;
+    balance.amountOnSell = 3;
+    balance.type = 'Membership';
+    balance.event = 'e0x0';
+    balance.isEventOwner = false;
+
     balance.save();
     
     let mockEvent = newMockEvent();
@@ -244,6 +272,11 @@ describe("MembershipsMarketplace", () => {
 
   test("Handle membership bought", () => {
     let membership = new Membership(getMembershipId(BigInt.fromString('1')));
+    membership.organizer = org;
+    membership.creatorRoyalty = 15;
+    membership.isResellable = true;
+    membership.totalAmount = 150;
+    membership.isPrivate = false;
     membership.name = 'NAME';
     membership.save(); 
     let balanceId = getBalanceId(
@@ -257,6 +290,7 @@ describe("MembershipsMarketplace", () => {
     balance.amountOwned = 3;
     balance.amountOnSell = 3;
     balance.askingPrice = BigInt.fromString('10');
+    balance.isEventOwner = false;
     balance.save();
     
     let mockEvent = newMockEvent();
@@ -287,6 +321,11 @@ describe("MembershipsMarketplace", () => {
 
   test("Handle ask sememed", () => {
     let membership = new Membership(getMembershipId(BigInt.fromString('1')));
+    membership.organizer = org;
+    membership.creatorRoyalty = 15;
+    membership.isResellable = true;
+    membership.totalAmount = 150;
+    membership.isPrivate = false;
     membership.name = 'NAME';
     membership.save(); 
     let balanceId = getBalanceId(
@@ -299,6 +338,7 @@ describe("MembershipsMarketplace", () => {
     balance.owner = '0x87d250a5c9674788F946F10E95641bba4DEa838f';
     balance.amountOwned = 3;
     balance.amountOnSell = 0;
+    balance.isEventOwner = false;
     balance.save();
     
     let mockEvent = newMockEvent();
@@ -327,6 +367,11 @@ describe("MembershipsMarketplace", () => {
 
   test("Handle ask removed", () => {
     let membership = new Membership(getMembershipId(BigInt.fromString('1')));
+    membership.organizer = org;
+    membership.creatorRoyalty = 15;
+    membership.isResellable = true;
+    membership.totalAmount = 150;
+    membership.isPrivate = false;
     membership.name = 'NAME';
     membership.save(); 
     let balanceId = getBalanceId(
@@ -339,6 +384,7 @@ describe("MembershipsMarketplace", () => {
     balance.owner = '0x87d250a5c9674788F946F10E95641bba4DEa838f';
     balance.amountOwned = 3;
     balance.amountOnSell = 3;
+    balance.isEventOwner = false;
     balance.save();
     
     let mockEvent = newMockEvent();
@@ -365,6 +411,10 @@ describe("MembershipsMarketplace", () => {
 
   test("Handle royalty modified", () => {
     let membership = new Membership(getMembershipId(BigInt.fromString('1')));
+    membership.organizer = org;
+    membership.isResellable = true;
+    membership.totalAmount = 150;
+    membership.isPrivate = false;
     membership.name = 'NAME';
     membership.creatorRoyalty = 1;
     membership.save(); 
@@ -378,6 +428,7 @@ describe("MembershipsMarketplace", () => {
     balance.owner = '0x87d250a5c9674788F946F10E95641bba4DEa838f';
     balance.amountOwned = 3;
     balance.amountOnSell = 3;
+    balance.isEventOwner = false;
     balance.save();
     
     let mockEvent = newMockEvent();

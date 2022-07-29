@@ -28,12 +28,19 @@ describe("Memberships", () => {
       user1.save();
       let membership = new Membership("m0x0");
       membership.organizer = org;
+      membership.creatorRoyalty = 15;
+      membership.isResellable = true;
+      membership.totalAmount = 150;
+      membership.isPrivate = false;
       membership.save();
       let balance1 = new Balance("m0x0-".concat(address1));
       balance1.type = 'Membership';
       balance1.amountOwned = 5;
       balance1.event = 'e0x0';
       balance1.membership = membership.id;
+      balance1.owner = org;
+      balance1.amountOnSell = 5;
+      balance1.isEventOwner = false;
       balance1.save();
 
       let user2 = new User(address2);

@@ -29,12 +29,19 @@ describe("Tickets", () => {
       let user1 = new User(address1);
       user1.save();
       let ticket = new Ticket(getTicketId(BigInt.fromString('0')));
+      ticket.creatorRoyalty = 10;
+      ticket.isResellable = false;
+      ticket.isPrivate = false;
+      ticket.totalAmount = 10;
       ticket.save();
       let balance1 = new Balance("t0x0-".concat(address1));
       balance1.type = 'Ticket';
       balance1.amountOwned = 5;
       balance1.event = 'e0x0';
       balance1.ticket = ticket.id;
+      balance1.owner = org;
+      balance1.amountOnSell = 5;
+      balance1.isEventOwner = false;
       balance1.save();
 
       let user2 = new User(address2);

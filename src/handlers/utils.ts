@@ -70,7 +70,16 @@ export function parseMetadata(uri: string, entity: Entity, attrs: string[]): boo
                 socialNetwork.save();
               }
             }
-          } 
+          }
+          // hardcode our IPFS server.
+          else if( attrs[i] == "image") {
+            let strArr = parseJSONValueToString(aux).split("/")
+            if(strArr.length > 0 && strArr[strArr.length - 1].length > 0) {
+              entity.setString(attrs[i], "https://ipfs.fanz.events/ipfs/" + strArr[strArr.length - 1]);
+            } else {
+              entity.setString(attrs[i], parseJSONValueToString(aux));
+            }
+          }
           else {
             entity.setString(attrs[i], parseJSONValueToString(aux));
           }

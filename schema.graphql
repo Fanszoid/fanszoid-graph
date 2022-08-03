@@ -72,6 +72,7 @@ type Event @entity {
   createdAt: String
   updatedAt: String
   image: String
+  timezone: String
   startDateUTC: BigInt
   endDateUTC: BigInt
 }

@@ -339,7 +339,6 @@ describe("Admin", () => {
     allowed.address = contractAddress;
     allowed.tokenIds = [BigInt.fromString('1')];
     allowed.ticket = ticket.id;
-    allowed.contractAddress = contractAddress;
     allowed.save();
 
     let mockEvent = newMockEvent();
@@ -379,7 +378,6 @@ describe("Admin", () => {
     allowed.address = contractAddress;
     allowed.tokenIds = [BigInt.fromString('1')];
     allowed.ticket = ticket.id;
-    allowed.contractAddress = contractAddress;
     allowed.save();
 
     let mockEvent = newMockEvent();

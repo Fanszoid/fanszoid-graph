@@ -1,4 +1,4 @@
-import { log, ipfs, json, JSONValue, TypedMap, Entity, JSONValueKind, TypedMapEntry, BigInt, Bytes } from "@graphprotocol/graph-ts";
+import { log, ipfs, json, JSONValue, TypedMap, Entity, JSONValueKind, TypedMapEntry, BigInt, Bytes, Value } from "@graphprotocol/graph-ts";
 import { bigIntEventAttrs } from "../modules/Event";
 import { Allowance, SocialNetwork } from "../../build/generated/schema";
 
@@ -39,10 +39,11 @@ export function parseMetadata(uri: string, entity: Entity, attrs: string[]): boo
         let aux = value.get(attrs[i]);
         if (aux) {
           if( bigIntEventAttrs.indexOf(attrs[i]) >= 0 ) {
-            if( parseJSONValueToString(aux) == '' ) {
+            let parsedToStringValue = parseJSONValueToString(aux)
+            if( parsedToStringValue == '' || !isStringAnInteger(parsedToStringValue) ) {
               entity.setBigInt(attrs[i], BigInt.fromI32(0))
             } else {
-              entity.setBigInt(attrs[i], BigInt.fromString(parseJSONValueToString(aux)))
+              entity.setBigInt(attrs[i], BigInt.fromString(parsedToStringValue))
             }
           } 
           // especial parsing for socials
@@ -117,3 +118,12 @@ export function parseJSONValueToString(value: JSONValue): string{
         return "";
     }
   }
+
+export function isStringAnInteger(value: String): boolean {
+  for( var i = 0; i < value.length; i++ ) {
+    if( value.charAt(i) < '0' && value.charAt(i) > '9' ) {
+      return false;
+    }
+  }
+  return true;
+}

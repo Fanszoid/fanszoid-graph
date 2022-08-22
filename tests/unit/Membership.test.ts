@@ -41,6 +41,7 @@ describe("Memberships", () => {
       membership.isResellable = true;
       membership.totalAmount = 150;
       membership.isPrivate = false;
+      membership.validTickets = [];
       membership.save();
       let balance1 = new Balance("m0x0-".concat(address1));
       balance1.type = 'Membership';

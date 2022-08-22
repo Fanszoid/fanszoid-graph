@@ -190,6 +190,7 @@ describe("MembershipsMarketplace", () => {
   test("Handle membership published", () => {   
     let eventInStorage = new Event("e0x0");
     eventInStorage.organizer = org;
+    eventInStorage.attendees = BigInt.fromI32(0);
     eventInStorage.save();
   
     let mockEvent = newMockEvent();

@@ -35,6 +35,7 @@ describe("TicketsMarketplace", () => {
       event.save();
 
       let user1 = new User(address1);
+      user1.address = address1;
       user1.save();
       let ticket = new Ticket(getTicketId(BigInt.fromString('0')));
       ticket.creatorRoyalty = 10;
@@ -53,6 +54,7 @@ describe("TicketsMarketplace", () => {
       balance1.save();
 
       let user2 = new User(address2);
+      user2.address = address2;
       user2.save();
   });
 

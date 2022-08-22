@@ -33,6 +33,7 @@ describe("Memberships", () => {
       event.save();
 
       let user1 = new User(address1);
+      user1.address = address1;
       user1.save();
       let membership = new Membership("m0x0");
       membership.organizer = org;
@@ -52,6 +53,7 @@ describe("Memberships", () => {
       balance1.save();
 
       let user2 = new User(address2);
+      user2.address = address2; 
       user2.save();
   });
   

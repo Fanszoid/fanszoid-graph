@@ -34,6 +34,7 @@ describe("MembershipsMarketplace", () => {
       event.save();
 
       let user1 = new User(address1);
+      user1.address = address1;
       user1.save();
       let membership = new Membership(getMembershipId(BigInt.fromString('0')));
       membership.organizer = org;
@@ -53,6 +54,7 @@ describe("MembershipsMarketplace", () => {
       balance1.save();
 
       let user2 = new User(address2);
+      user2.address = address2;
       user2.save();
   });
 

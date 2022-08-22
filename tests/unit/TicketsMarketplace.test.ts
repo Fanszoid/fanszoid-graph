@@ -186,6 +186,15 @@ describe("TicketsMarketplace", () => {
 
   test("Handle ticket published", () => {   
     let eventInStorage = new Event("e0x0");
+    eventInStorage.organizer = org;
+    eventInStorage.attendees = BigInt.fromString('0');
+    eventInStorage.collaborators = [];
+    eventInStorage.title = 'Title';
+    eventInStorage.description = 'Description';
+    eventInStorage.type = 'metaverse';
+    eventInStorage.category = 'art'
+    eventInStorage.startDateUTC = BigInt.fromString('0');
+    eventInStorage.endDateUTC = BigInt.fromString('0');
     eventInStorage.save();
   
     let mockEvent = newMockEvent();

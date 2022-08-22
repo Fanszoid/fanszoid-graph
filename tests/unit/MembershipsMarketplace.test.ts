@@ -42,6 +42,7 @@ describe("MembershipsMarketplace", () => {
       membership.isResellable = true;
       membership.totalAmount = 150;
       membership.isPrivate = false;
+      membership.validTickets = [];
       membership.save();
       let balance1 = new Balance("t0x0-".concat(address1));
       balance1.type = 'Membership';
@@ -126,6 +127,7 @@ describe("MembershipsMarketplace", () => {
     membership.totalAmount = 150;
     membership.isPrivate = false;
     membership.allowances = ['ma-0x1'];
+    membership.validTickets = [];
     membership.save(); 
     
     let mockEvent = newMockEvent();
@@ -159,6 +161,7 @@ describe("MembershipsMarketplace", () => {
     membership.totalAmount = 150;
     membership.isPrivate = false;
     membership.name = 'NAME';
+    membership.validTickets = [];
     membership.save(); 
     
     let mockEvent = newMockEvent();
@@ -240,6 +243,7 @@ describe("MembershipsMarketplace", () => {
     membership.totalAmount = 150;
     membership.isPrivate = false;
     membership.name = 'NAME';
+    membership.validTickets = [];
     membership.save(); 
     let balanceId = getBalanceId(
       BigInt.fromString('1'), 
@@ -288,6 +292,7 @@ describe("MembershipsMarketplace", () => {
     membership.totalAmount = 150;
     membership.isPrivate = false;
     membership.name = 'NAME';
+    membership.validTickets = [];
     membership.save(); 
     let balanceId = getBalanceId(
       BigInt.fromString('1'), 
@@ -337,6 +342,7 @@ describe("MembershipsMarketplace", () => {
     membership.totalAmount = 150;
     membership.isPrivate = false;
     membership.name = 'NAME';
+    membership.validTickets = [];
     membership.save(); 
     let balanceId = getBalanceId(
       BigInt.fromString('1'), 
@@ -383,6 +389,7 @@ describe("MembershipsMarketplace", () => {
     membership.totalAmount = 150;
     membership.isPrivate = false;
     membership.name = 'NAME';
+    membership.validTickets = [];
     membership.save(); 
     let balanceId = getBalanceId(
       BigInt.fromString('1'), 
@@ -427,6 +434,7 @@ describe("MembershipsMarketplace", () => {
     membership.isPrivate = false;
     membership.name = 'NAME';
     membership.creatorRoyalty = 1;
+    membership.validTickets = [];
     membership.save(); 
     let balanceId = getBalanceId(
       BigInt.fromString('1'), 

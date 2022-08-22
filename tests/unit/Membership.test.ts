@@ -22,6 +22,7 @@ describe("Memberships", () => {
       clearStore() // <-- clear the store before each test in the file
       let event = new Event("e0x0");
       event.organizer = org;
+      event.attendees = BigInt.fromString('0');
       event.save();
 
       let user1 = new User(address1);

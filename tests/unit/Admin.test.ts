@@ -23,6 +23,7 @@ describe("Admin", () => {
       let event = new Event("e0x0");
       event.organizer = org;
       event.collaborators = [];
+      event.attendees = BigInt.fromString('0');
       event.paused = false;
       event.save();
   });

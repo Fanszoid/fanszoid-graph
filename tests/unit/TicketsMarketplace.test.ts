@@ -28,6 +28,12 @@ describe("TicketsMarketplace", () => {
       event.collaborators = [];
       event.title = 'Title';
       event.description = 'Description';
+      event.type = 'metaverse';
+      event.category = 'art'
+      event.dclX = 0;
+      event.dclY = 0;
+      event.startDateUTC = BigInt.fromString('0');
+      event.endDateUTC = BigInt.fromString('0');
       event.save();
 
       let user1 = new User(address1);

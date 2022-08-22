@@ -91,6 +91,7 @@ describe("TicketsMarketplace", () => {
   test("Handle allowance consumed", () => {
     let allowance = new Allowance("ta-0x1");
     allowance.amount = 2;
+    allowance.allowedAddresses = [];
     allowance.save(); 
     
     let mockEvent = newMockEvent();
@@ -118,6 +119,7 @@ describe("TicketsMarketplace", () => {
   test("Handle allowance removed", () => {
     let allowance = new Allowance("ta-0x1");
     allowance.amount = 2;
+    allowance.allowedAddresses = [];
     allowance.save(); 
     let ticket = new Ticket(getTicketId(BigInt.fromString('1')));
     ticket.creatorRoyalty = 10;
@@ -245,11 +247,13 @@ describe("TicketsMarketplace", () => {
       false
     );
     let balance = new Balance(balanceId);
+    balance.type = 'Ticket';
     balance.ticket = 'tt0x1';
     balance.owner = '0x87d250a5c9674788F946F10E95641bba4DEa838f';
     balance.amountOwned = 3;
     balance.amountOnSell = 3;
     balance.isEventOwner = false;
+    balance.type = 'Ticket';
     balance.save();
     
     let mockEvent = newMockEvent();
@@ -295,6 +299,7 @@ describe("TicketsMarketplace", () => {
     balance.amountOnSell = 3;
     balance.askingPrice = BigInt.fromString('10');
     balance.isEventOwner = false;
+    balance.type = 'Ticket';
     balance.save();
     
     let mockEvent = newMockEvent();
@@ -342,6 +347,7 @@ describe("TicketsMarketplace", () => {
     balance.amountOwned = 3;
     balance.amountOnSell = 0;
     balance.isEventOwner = false;
+    balance.type = 'Ticket';
     balance.save();
     
     let mockEvent = newMockEvent();
@@ -387,6 +393,7 @@ describe("TicketsMarketplace", () => {
     balance.amountOwned = 3;
     balance.amountOnSell = 3;
     balance.isEventOwner = false;
+    balance.type = 'Ticket';
     balance.save();
     
     let mockEvent = newMockEvent();
@@ -430,6 +437,7 @@ describe("TicketsMarketplace", () => {
     balance.amountOwned = 3;
     balance.amountOnSell = 3;
     balance.isEventOwner = false;
+    balance.type = 'Ticket';
     balance.save();
     
     let mockEvent = newMockEvent();

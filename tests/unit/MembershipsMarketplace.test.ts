@@ -92,6 +92,7 @@ describe("MembershipsMarketplace", () => {
   test("Handle allowance consumed", () => {
     let allowance = new Allowance("ma-0x1");
     allowance.amount = 2;
+    allowance.allowedAddresses = address1;
     allowance.save(); 
     
     let mockEvent = newMockEvent();
@@ -119,6 +120,7 @@ describe("MembershipsMarketplace", () => {
   test("Handle allowance removed", () => {
     let allowance = new Allowance("ma-0x1");
     allowance.amount = 2;
+    allowance.allowedAddresses = address1;
     allowance.save(); 
     let membership = new Membership(getMembershipId(BigInt.fromString('1')));
     membership.organizer = org;

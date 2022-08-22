@@ -12,12 +12,20 @@ import { getAllowedMembershipId } from "../../src/modules/Membership";
 
 
 describe("Admin", () => {
+
+  let org: string = '';
+
+  beforeAll(() => {
+    org = Address.fromString('0xa16081f360e3847006db660bae1c6d1b2e17ec2a').toHex();
+  });
+
   beforeEach(() => {
       clearStore() // <-- clear the store before each test in the file
 
       let event = new Event("e0x0");
       event.collaborators = [];
       event.paused = false;
+      event.organizer = org;
       event.save();
   });
   

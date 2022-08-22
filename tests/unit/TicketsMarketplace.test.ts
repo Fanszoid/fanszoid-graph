@@ -26,6 +26,8 @@ describe("TicketsMarketplace", () => {
       event.organizer = org;
       event.attendees = BigInt.fromString('0');
       event.collaborators = [];
+      event.title = 'Title';
+      event.description = 'Description';
       event.save();
 
       let user1 = new User(address1);

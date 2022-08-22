@@ -25,6 +25,8 @@ describe("Admin", () => {
       event.collaborators = [];
       event.attendees = BigInt.fromString('0');
       event.paused = false;
+      event.title = 'Title';
+      event.description = 'Description';
       event.save();
   });
   

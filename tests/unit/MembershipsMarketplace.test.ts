@@ -194,6 +194,14 @@ describe("MembershipsMarketplace", () => {
     eventInStorage.organizer = org;
     eventInStorage.attendees = BigInt.fromI32(0);
     eventInStorage.collaborators = [];
+    eventInStorage.attendees = BigInt.fromString('0');
+    eventInStorage.collaborators = [];
+    eventInStorage.title = 'Title';
+    eventInStorage.description = 'Description';
+    eventInStorage.type = 'metaverse';
+    eventInStorage.category = 'art'
+    eventInStorage.startDateUTC = BigInt.fromString('0');
+    eventInStorage.endDateUTC = BigInt.fromString('0');
     eventInStorage.save();
   
     let mockEvent = newMockEvent();

@@ -338,6 +338,8 @@ describe("Admin", () => {
     let allowed = new AllowedMembership(getAllowedMembershipId(ticket.id, contractAddress));
     allowed.address = contractAddress;
     allowed.tokenIds = [BigInt.fromString('1')];
+    allowed.ticket = ticket.id;
+    allowed.contractAddress = contractAddress;
     allowed.save();
 
     let mockEvent = newMockEvent();
@@ -376,6 +378,8 @@ describe("Admin", () => {
     let allowed = new AllowedMembership(getAllowedMembershipId(ticket.id, contractAddress));
     allowed.address = contractAddress;
     allowed.tokenIds = [BigInt.fromString('1')];
+    allowed.ticket = ticket.id;
+    allowed.contractAddress = contractAddress;
     allowed.save();
 
     let mockEvent = newMockEvent();

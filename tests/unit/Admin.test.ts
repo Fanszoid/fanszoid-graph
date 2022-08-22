@@ -9,11 +9,9 @@ import { loadOrCreateUser } from "../../src/modules/User";
 import { getTicketId } from "../../src/modules/Ticket";
 import { getAllowedMembershipId } from "../../src/modules/Membership";
 
-
+let org: string = '';
 
 describe("Admin", () => {
-
-  let org: string = '';
 
   beforeAll(() => {
     org = Address.fromString('0xa16081f360e3847006db660bae1c6d1b2e17ec2a').toHex();
@@ -23,9 +21,9 @@ describe("Admin", () => {
       clearStore() // <-- clear the store before each test in the file
 
       let event = new Event("e0x0");
+      event.organizer = org;
       event.collaborators = [];
       event.paused = false;
-      event.organizer = org;
       event.save();
   });
   

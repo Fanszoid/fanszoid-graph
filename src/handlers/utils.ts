@@ -1,4 +1,4 @@
-import { log, ipfs, json, JSONValue, TypedMap, Entity, JSONValueKind, TypedMapEntry, BigInt, Bytes, Value } from "@graphprotocol/graph-ts";
+import { log, ipfs, json, JSONValue, TypedMap, Entity, JSONValueKind, TypedMapEntry, BigInt, Bytes } from "@graphprotocol/graph-ts";
 import { bigIntEventAttrs } from "../modules/Event";
 import { Allowance, SocialNetwork } from "../../build/generated/schema";
 

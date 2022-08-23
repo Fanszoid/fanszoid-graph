@@ -24,17 +24,9 @@ describe("Tickets", () => {
       let event = new Event("e0x0");
       event.organizer = org;
       event.attendees = BigInt.fromString('0');
-      event.collaborators = [];
-      event.title = 'Title';
-      event.description = 'Description';
-      event.type = 'metaverse';
-      event.category = 'art'
-      event.startDateUTC = BigInt.fromString('0');
-      event.endDateUTC = BigInt.fromString('0');
       event.save();
 
       let user1 = new User(address1);
-      user1.address = address1;
       user1.save();
       let ticket = new Ticket(getTicketId(BigInt.fromString('0')));
       ticket.creatorRoyalty = 10;
@@ -53,7 +45,6 @@ describe("Tickets", () => {
       balance1.save();
 
       let user2 = new User(address2);
-      user2.address = address2;
       user2.save();
   });
   

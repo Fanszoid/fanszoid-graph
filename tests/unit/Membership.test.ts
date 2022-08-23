@@ -22,18 +22,9 @@ describe("Memberships", () => {
       clearStore() // <-- clear the store before each test in the file
       let event = new Event("e0x0");
       event.organizer = org;
-      event.attendees = BigInt.fromString('0');
-      event.collaborators = [];
-      event.title = 'Title';
-      event.description = 'Description';
-      event.type = 'metaverse';
-      event.category = 'art'
-      event.startDateUTC = BigInt.fromString('0');
-      event.endDateUTC = BigInt.fromString('0');
       event.save();
 
       let user1 = new User(address1);
-      user1.address = address1;
       user1.save();
       let membership = new Membership("m0x0");
       membership.organizer = org;
@@ -41,7 +32,6 @@ describe("Memberships", () => {
       membership.isResellable = true;
       membership.totalAmount = 150;
       membership.isPrivate = false;
-      membership.validTickets = [];
       membership.save();
       let balance1 = new Balance("m0x0-".concat(address1));
       balance1.type = 'Membership';
@@ -54,7 +44,6 @@ describe("Memberships", () => {
       balance1.save();
 
       let user2 = new User(address2);
-      user2.address = address2; 
       user2.save();
   });
   

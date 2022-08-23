@@ -39,11 +39,10 @@ export function parseMetadata(uri: string, entity: Entity, attrs: string[]): boo
         let aux = value.get(attrs[i]);
         if (aux) {
           if( bigIntEventAttrs.indexOf(attrs[i]) >= 0 ) {
-            let parsedToStringValue = parseJSONValueToString(aux)
-            if( parsedToStringValue == '' || !isStringAnInteger(parsedToStringValue) ) {
+            if( parseJSONValueToString(aux) == '' ) {
               entity.setBigInt(attrs[i], BigInt.fromI32(0))
             } else {
-              entity.setBigInt(attrs[i], BigInt.fromString(parsedToStringValue))
+              entity.setBigInt(attrs[i], BigInt.fromString(parseJSONValueToString(aux)))
             }
           } 
           // especial parsing for socials
@@ -118,12 +117,3 @@ export function parseJSONValueToString(value: JSONValue): string{
         return "";
     }
   }
-
-export function isStringAnInteger(value: String): boolean {
-  for( var i = 0; i < value.length; i++ ) {
-    if( value.charAt(i) < '0' && value.charAt(i) > '9' ) {
-      return false;
-    }
-  }
-  return true;
-}

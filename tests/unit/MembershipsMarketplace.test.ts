@@ -23,18 +23,9 @@ describe("MembershipsMarketplace", () => {
       clearStore() // <-- clear the store before each test in the file
       let event = new Event("e0x0");
       event.organizer = org;
-      event.attendees = BigInt.fromString('0');
-      event.collaborators = [];
-      event.title = 'Title';
-      event.description = 'Description';
-      event.type = 'metaverse';
-      event.category = 'art'
-      event.startDateUTC = BigInt.fromString('0');
-      event.endDateUTC = BigInt.fromString('0');
       event.save();
 
       let user1 = new User(address1);
-      user1.address = address1;
       user1.save();
       let membership = new Membership(getMembershipId(BigInt.fromString('0')));
       membership.organizer = org;
@@ -42,7 +33,6 @@ describe("MembershipsMarketplace", () => {
       membership.isResellable = true;
       membership.totalAmount = 150;
       membership.isPrivate = false;
-      membership.validTickets = [];
       membership.save();
       let balance1 = new Balance("t0x0-".concat(address1));
       balance1.type = 'Membership';
@@ -55,7 +45,6 @@ describe("MembershipsMarketplace", () => {
       balance1.save();
 
       let user2 = new User(address2);
-      user2.address = address2;
       user2.save();
   });
 
@@ -92,7 +81,6 @@ describe("MembershipsMarketplace", () => {
   test("Handle allowance consumed", () => {
     let allowance = new Allowance("ma-0x1");
     allowance.amount = 2;
-    allowance.allowedAddresses = [];
     allowance.save(); 
     
     let mockEvent = newMockEvent();
@@ -120,7 +108,6 @@ describe("MembershipsMarketplace", () => {
   test("Handle allowance removed", () => {
     let allowance = new Allowance("ma-0x1");
     allowance.amount = 2;
-    allowance.allowedAddresses = [];
     allowance.save(); 
     let membership = new Membership(getMembershipId(BigInt.fromString('1')));
     membership.organizer = org;
@@ -129,7 +116,6 @@ describe("MembershipsMarketplace", () => {
     membership.totalAmount = 150;
     membership.isPrivate = false;
     membership.allowances = ['ma-0x1'];
-    membership.validTickets = [];
     membership.save(); 
     
     let mockEvent = newMockEvent();
@@ -163,7 +149,6 @@ describe("MembershipsMarketplace", () => {
     membership.totalAmount = 150;
     membership.isPrivate = false;
     membership.name = 'NAME';
-    membership.validTickets = [];
     membership.save(); 
     
     let mockEvent = newMockEvent();
@@ -192,16 +177,6 @@ describe("MembershipsMarketplace", () => {
   test("Handle membership published", () => {   
     let eventInStorage = new Event("e0x0");
     eventInStorage.organizer = org;
-    eventInStorage.attendees = BigInt.fromI32(0);
-    eventInStorage.collaborators = [];
-    eventInStorage.attendees = BigInt.fromString('0');
-    eventInStorage.collaborators = [];
-    eventInStorage.title = 'Title';
-    eventInStorage.description = 'Description';
-    eventInStorage.type = 'metaverse';
-    eventInStorage.category = 'art'
-    eventInStorage.startDateUTC = BigInt.fromString('0');
-    eventInStorage.endDateUTC = BigInt.fromString('0');
     eventInStorage.save();
   
     let mockEvent = newMockEvent();
@@ -255,7 +230,6 @@ describe("MembershipsMarketplace", () => {
     membership.totalAmount = 150;
     membership.isPrivate = false;
     membership.name = 'NAME';
-    membership.validTickets = [];
     membership.save(); 
     let balanceId = getBalanceId(
       BigInt.fromString('1'), 
@@ -270,7 +244,7 @@ describe("MembershipsMarketplace", () => {
     balance.type = 'Membership';
     balance.event = 'e0x0';
     balance.isEventOwner = false;
-    balance.type = 'Membership';
+
     balance.save();
     
     let mockEvent = newMockEvent();
@@ -304,7 +278,6 @@ describe("MembershipsMarketplace", () => {
     membership.totalAmount = 150;
     membership.isPrivate = false;
     membership.name = 'NAME';
-    membership.validTickets = [];
     membership.save(); 
     let balanceId = getBalanceId(
       BigInt.fromString('1'), 
@@ -318,7 +291,6 @@ describe("MembershipsMarketplace", () => {
     balance.amountOnSell = 3;
     balance.askingPrice = BigInt.fromString('10');
     balance.isEventOwner = false;
-    balance.type = 'Membership';
     balance.save();
     
     let mockEvent = newMockEvent();
@@ -355,7 +327,6 @@ describe("MembershipsMarketplace", () => {
     membership.totalAmount = 150;
     membership.isPrivate = false;
     membership.name = 'NAME';
-    membership.validTickets = [];
     membership.save(); 
     let balanceId = getBalanceId(
       BigInt.fromString('1'), 
@@ -368,7 +339,6 @@ describe("MembershipsMarketplace", () => {
     balance.amountOwned = 3;
     balance.amountOnSell = 0;
     balance.isEventOwner = false;
-    balance.type = 'Membership';
     balance.save();
     
     let mockEvent = newMockEvent();
@@ -403,7 +373,6 @@ describe("MembershipsMarketplace", () => {
     membership.totalAmount = 150;
     membership.isPrivate = false;
     membership.name = 'NAME';
-    membership.validTickets = [];
     membership.save(); 
     let balanceId = getBalanceId(
       BigInt.fromString('1'), 
@@ -416,7 +385,6 @@ describe("MembershipsMarketplace", () => {
     balance.amountOwned = 3;
     balance.amountOnSell = 3;
     balance.isEventOwner = false;
-    balance.type = 'Membership';
     balance.save();
     
     let mockEvent = newMockEvent();
@@ -449,7 +417,6 @@ describe("MembershipsMarketplace", () => {
     membership.isPrivate = false;
     membership.name = 'NAME';
     membership.creatorRoyalty = 1;
-    membership.validTickets = [];
     membership.save(); 
     let balanceId = getBalanceId(
       BigInt.fromString('1'), 
@@ -462,7 +429,6 @@ describe("MembershipsMarketplace", () => {
     balance.amountOwned = 3;
     balance.amountOnSell = 3;
     balance.isEventOwner = false;
-    balance.type = 'Membership';
     balance.save();
     
     let mockEvent = newMockEvent();

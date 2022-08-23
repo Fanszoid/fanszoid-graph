@@ -24,18 +24,9 @@ describe("TicketsMarketplace", () => {
       clearStore() // <-- clear the store before each test in the file
       let event = new Event("e0x0");
       event.organizer = org;
-      event.attendees = BigInt.fromString('0');
-      event.collaborators = [];
-      event.title = 'Title';
-      event.description = 'Description';
-      event.type = 'metaverse';
-      event.category = 'art'
-      event.startDateUTC = BigInt.fromString('0');
-      event.endDateUTC = BigInt.fromString('0');
       event.save();
 
       let user1 = new User(address1);
-      user1.address = address1;
       user1.save();
       let ticket = new Ticket(getTicketId(BigInt.fromString('0')));
       ticket.creatorRoyalty = 10;
@@ -54,7 +45,6 @@ describe("TicketsMarketplace", () => {
       balance1.save();
 
       let user2 = new User(address2);
-      user2.address = address2;
       user2.save();
   });
 
@@ -91,7 +81,6 @@ describe("TicketsMarketplace", () => {
   test("Handle allowance consumed", () => {
     let allowance = new Allowance("ta-0x1");
     allowance.amount = 2;
-    allowance.allowedAddresses = [];
     allowance.save(); 
     
     let mockEvent = newMockEvent();
@@ -119,7 +108,6 @@ describe("TicketsMarketplace", () => {
   test("Handle allowance removed", () => {
     let allowance = new Allowance("ta-0x1");
     allowance.amount = 2;
-    allowance.allowedAddresses = [];
     allowance.save(); 
     let ticket = new Ticket(getTicketId(BigInt.fromString('1')));
     ticket.creatorRoyalty = 10;
@@ -186,15 +174,6 @@ describe("TicketsMarketplace", () => {
 
   test("Handle ticket published", () => {   
     let eventInStorage = new Event("e0x0");
-    eventInStorage.organizer = org;
-    eventInStorage.attendees = BigInt.fromString('0');
-    eventInStorage.collaborators = [];
-    eventInStorage.title = 'Title';
-    eventInStorage.description = 'Description';
-    eventInStorage.type = 'metaverse';
-    eventInStorage.category = 'art'
-    eventInStorage.startDateUTC = BigInt.fromString('0');
-    eventInStorage.endDateUTC = BigInt.fromString('0');
     eventInStorage.save();
   
     let mockEvent = newMockEvent();
@@ -256,13 +235,11 @@ describe("TicketsMarketplace", () => {
       false
     );
     let balance = new Balance(balanceId);
-    balance.type = 'Ticket';
     balance.ticket = 'tt0x1';
     balance.owner = '0x87d250a5c9674788F946F10E95641bba4DEa838f';
     balance.amountOwned = 3;
     balance.amountOnSell = 3;
     balance.isEventOwner = false;
-    balance.type = 'Ticket';
     balance.save();
     
     let mockEvent = newMockEvent();
@@ -308,7 +285,6 @@ describe("TicketsMarketplace", () => {
     balance.amountOnSell = 3;
     balance.askingPrice = BigInt.fromString('10');
     balance.isEventOwner = false;
-    balance.type = 'Ticket';
     balance.save();
     
     let mockEvent = newMockEvent();
@@ -356,7 +332,6 @@ describe("TicketsMarketplace", () => {
     balance.amountOwned = 3;
     balance.amountOnSell = 0;
     balance.isEventOwner = false;
-    balance.type = 'Ticket';
     balance.save();
     
     let mockEvent = newMockEvent();
@@ -402,7 +377,6 @@ describe("TicketsMarketplace", () => {
     balance.amountOwned = 3;
     balance.amountOnSell = 3;
     balance.isEventOwner = false;
-    balance.type = 'Ticket';
     balance.save();
     
     let mockEvent = newMockEvent();
@@ -446,7 +420,6 @@ describe("TicketsMarketplace", () => {
     balance.amountOwned = 3;
     balance.amountOnSell = 3;
     balance.isEventOwner = false;
-    balance.type = 'Ticket';
     balance.save();
     
     let mockEvent = newMockEvent();

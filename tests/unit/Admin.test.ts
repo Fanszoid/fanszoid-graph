@@ -9,15 +9,28 @@ import { loadOrCreateUser } from "../../src/modules/User";
 import { getTicketId } from "../../src/modules/Ticket";
 import { getAllowedMembershipId } from "../../src/modules/Membership";
 
-
+let org: string = '';
 
 describe("Admin", () => {
+
+  beforeAll(() => {
+    org = Address.fromString('0xa16081f360e3847006db660bae1c6d1b2e17ec2a').toHex();
+  });
+
   beforeEach(() => {
       clearStore() // <-- clear the store before each test in the file
 
       let event = new Event("e0x0");
+      event.organizer = org;
       event.collaborators = [];
+      event.attendees = BigInt.fromString('0');
       event.paused = false;
+      event.title = 'Title';
+      event.description = 'Description';
+      event.type = 'metaverse';
+      event.category = 'art'
+      event.startDateUTC = BigInt.fromString('0');
+      event.endDateUTC = BigInt.fromString('0');
       event.save();
   });
   
@@ -325,6 +338,7 @@ describe("Admin", () => {
     let allowed = new AllowedMembership(getAllowedMembershipId(ticket.id, contractAddress));
     allowed.address = contractAddress;
     allowed.tokenIds = [BigInt.fromString('1')];
+    allowed.ticket = ticket.id;
     allowed.save();
 
     let mockEvent = newMockEvent();
@@ -363,6 +377,7 @@ describe("Admin", () => {
     let allowed = new AllowedMembership(getAllowedMembershipId(ticket.id, contractAddress));
     allowed.address = contractAddress;
     allowed.tokenIds = [BigInt.fromString('1')];
+    allowed.ticket = ticket.id;
     allowed.save();
 
     let mockEvent = newMockEvent();

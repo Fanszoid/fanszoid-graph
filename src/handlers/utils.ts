@@ -5,7 +5,7 @@ import { Allowance, SocialNetwork } from "../../build/generated/schema";
 export function parseMetadata(uri: string, entity: Entity, attrs: string[]): boolean {
     let uriParts = uri.split("/");
     let hash = uriParts[uriParts.length - 1];
-    let retries = 3;
+    let retries = 6;
     let data: Bytes | null = null;
     while(!data && retries > 0) {
       data = ipfs.cat(hash);

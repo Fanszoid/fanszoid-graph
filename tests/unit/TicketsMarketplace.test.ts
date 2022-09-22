@@ -83,13 +83,13 @@ describe("TicketsMarketplace", () => {
       param('allowance', struct)
     ];
 
-    assert.notInStore('Allowance', 'ta-0x1')
+    assert.notInStore('Allowance', 'ta0x1')
     handleAllowanceAdded(event)
-    assert.fieldEquals('Allowance', 'ta-0x1', 'id', 'ta-0x1')
+    assert.fieldEquals('Allowance', 'ta0x1', 'id', 'ta0x1')
   });
 
   test("Handle allowance consumed", () => {
-    let allowance = new Allowance("ta-0x1");
+    let allowance = new Allowance("ta0x1");
     allowance.amount = 2;
     allowance.allowedAddresses = [];
     allowance.save(); 
@@ -111,13 +111,13 @@ describe("TicketsMarketplace", () => {
       param('allowanceId', BigInt.fromString('1')),
     ];
 
-    assert.fieldEquals('Allowance', 'ta-0x1', 'amount', '2')
+    assert.fieldEquals('Allowance', 'ta0x1', 'amount', '2')
     handleAllowanceConsumed(event)
-    assert.fieldEquals('Allowance', 'ta-0x1', 'amount', '1')
+    assert.fieldEquals('Allowance', 'ta0x1', 'amount', '1')
   });
 
   test("Handle allowance removed", () => {
-    let allowance = new Allowance("ta-0x1");
+    let allowance = new Allowance("ta0x1");
     allowance.amount = 2;
     allowance.allowedAddresses = [];
     allowance.save(); 
@@ -126,7 +126,7 @@ describe("TicketsMarketplace", () => {
     ticket.isResellable = false;
     ticket.isPrivate = false;
     ticket.totalAmount = 10;
-    ticket.allowances = ['ta-0x1'];
+    ticket.allowances = ['ta0x1'];
     ticket.save(); 
     
     let mockEvent = newMockEvent();
@@ -147,9 +147,9 @@ describe("TicketsMarketplace", () => {
       param('allowanceId', BigInt.fromString('1')),
     ];
 
-    assert.fieldEquals('Allowance', 'ta-0x1', 'amount', '2')
+    assert.fieldEquals('Allowance', 'ta0x1', 'amount', '2')
     handleAllowanceRemoved(event)
-    assert.notInStore('Allowance', 'ta-0x1')
+    assert.notInStore('Allowance', 'ta0x1')
   });
 
   test("Handle ticket uri modification", () => {

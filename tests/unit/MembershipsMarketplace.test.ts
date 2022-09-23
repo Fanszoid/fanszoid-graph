@@ -84,13 +84,13 @@ describe("MembershipsMarketplace", () => {
       param('allowance', struct)
     ];
 
-    assert.notInStore('Allowance', 'ma-0x1')
+    assert.notInStore('Allowance', 'ma0x1')
     handleAllowanceAdded(event)
-    assert.fieldEquals('Allowance', 'ma-0x1', 'id', 'ma-0x1')
+    assert.fieldEquals('Allowance', 'ma0x1', 'id', 'ma0x1')
   });
 
   test("Handle allowance consumed", () => {
-    let allowance = new Allowance("ma-0x1");
+    let allowance = new Allowance("ma0x1");
     allowance.amount = 2;
     allowance.allowedAddresses = [];
     allowance.save(); 
@@ -112,13 +112,13 @@ describe("MembershipsMarketplace", () => {
       param('allowanceId', BigInt.fromString('1')),
     ];
 
-    assert.fieldEquals('Allowance', 'ma-0x1', 'amount', '2')
+    assert.fieldEquals('Allowance', 'ma0x1', 'amount', '2')
     handleAllowanceConsumed(event)
-    assert.fieldEquals('Allowance', 'ma-0x1', 'amount', '1')
+    assert.fieldEquals('Allowance', 'ma0x1', 'amount', '1')
   });
 
   test("Handle allowance removed", () => {
-    let allowance = new Allowance("ma-0x1");
+    let allowance = new Allowance("ma0x1");
     allowance.amount = 2;
     allowance.allowedAddresses = [];
     allowance.save(); 
@@ -128,7 +128,7 @@ describe("MembershipsMarketplace", () => {
     membership.isResellable = true;
     membership.totalAmount = 150;
     membership.isPrivate = false;
-    membership.allowances = ['ma-0x1'];
+    membership.allowances = ['ma0x1'];
     membership.validTickets = [];
     membership.save(); 
     
@@ -150,9 +150,9 @@ describe("MembershipsMarketplace", () => {
       param('allowanceId', BigInt.fromString('1')),
     ];
 
-    assert.fieldEquals('Allowance', 'ma-0x1', 'amount', '2')
+    assert.fieldEquals('Allowance', 'ma0x1', 'amount', '2')
     handleAllowanceRemoved(event)
-    assert.notInStore('Allowance', 'ma-0x1')
+    assert.notInStore('Allowance', 'ma0x1')
   });
 
   test("Handle membership uri modification", () => {

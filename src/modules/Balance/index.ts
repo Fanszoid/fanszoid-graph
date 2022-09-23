@@ -6,7 +6,7 @@ export function getBalanceId(balanceIdContract: BigInt, user: Address, isMembers
 }
 
 export function getAllowanceId(allowanceIdContract: BigInt, isMembership: boolean): string {
-  return (isMembership? "ma":"ta") + '-' +  allowanceIdContract.toHex();
+  return (isMembership? "ma":"ta") +  allowanceIdContract.toHex();
 }
 
 export function balancePriceMatches(price: BigInt, balance: Balance): boolean {

@@ -5,7 +5,7 @@ import { param, parseValue } from "../utils";
 import { handleTransferBatch, handleTransferSingle } from "../../src/handlers/ticketsHandler";
 import { getBalanceId } from "../../src/modules/Balance";
 import { handleAllowanceAdded, handleAllowanceConsumed, handleAllowanceRemoved, handleAskRemoved, handleAskSetted, handleAskSettedLegacy, handleCreatorRoyaltyModifiedOnTicket, handleTicketBought, handleTicketDeleted, handleTicketPublished, handleTicketPublishedLegacy, handleTicketUriModification } from "../../src/handlers/ticketsMarketplaceHandler";
-import { AllowanceAdded, AllowanceAddedAllowanceStruct, AllowanceConsumed, AllowanceRemoved, AskRemoved, AskSetted, AskSetted1, CreatorRoyaltyModifiedOnTicket, TicketBought, TicketDeleted, TicketEdited, TicketPublished, TicketPublished1, TicketPublished1SaleInfoAllowancesStruct, TicketPublished1SaleInfoStruct, TicketsDeleted } from "../../build/generated/TicketsMarketplace/TicketsMarketplace";
+import { AllowanceAdded, AllowanceAddedAllowanceStruct, AllowanceConsumed, AllowanceRemoved, AskRemoved, AskSetted, AskSetted1, CreatorRoyaltyModifiedOnTicket, TicketBought, TicketDeleted, TicketEdited, TicketPublished, TicketPublished1, TicketPublished1SaleInfoAllowancesStruct, TicketPublished1SaleInfoStruct, TicketPublished2, TicketPublished2SaleInfoAllowancesStruct, TicketsDeleted } from "../../build/generated/TicketsMarketplace/TicketsMarketplace";
 import { getTicketId } from "../../src/modules/Ticket";
 
 
@@ -199,7 +199,7 @@ describe("TicketsMarketplace", () => {
   
     let mockEvent = newMockEvent();
     
-    let event = new TicketPublished1(
+    let event = new TicketPublished2(
       mockEvent.address,
       mockEvent.logIndex,
       mockEvent.transactionLogIndex,
@@ -211,11 +211,11 @@ describe("TicketsMarketplace", () => {
     )
     mockIpfsFile('FAKE_URI', 'tests/ipfs/fake_2_ticket_metadata.json');
 
-    let allowance = new TicketPublished1SaleInfoAllowancesStruct();
+    let allowance = new TicketPublished2SaleInfoAllowancesStruct();
     allowance[0] = parseValue(BigInt.fromString('1'));
     allowance[1] = parseValue(['0x87d250a5c9674788F946F10E95641bba4DEa838f']);
 
-    let saleInfo = new TicketPublished1SaleInfoStruct();
+    let saleInfo = new TicketPublished2SaleInfoAllowancesStruct();
     saleInfo[0] = parseValue(BigInt.fromString('10')); 
     saleInfo[1] = parseValue(BigInt.fromString('0')); 
     saleInfo[2] = parseValue(BigInt.fromString('0')); 
@@ -224,6 +224,7 @@ describe("TicketsMarketplace", () => {
     saleInfo[5] = parseValue('FAKE_URI'); 
     saleInfo[6] = ethereum.Value.fromBoolean(true); 
     saleInfo[7] = parseValue([allowance]); 
+    saleInfo[8] = parseValue('0x87d250a5c9674788f946f10e95641bba4dea838f')
     
     event.parameters = [
       param('eventId', BigInt.fromString('0')),
@@ -231,15 +232,16 @@ describe("TicketsMarketplace", () => {
       param('ticketId', BigInt.fromString('1')),
       param('amount', BigInt.fromString('10')),
       param('saleInfo', saleInfo),
-      param('uri', 'FAKE_URI'),
+      param('uri', 'FAKE_URI')
     ];
 
     assert.notInStore('Ticket', 'tt0x1')
-    handleTicketPublishedLegacy(event)
+    handleTicketPublished(event)
     assert.fieldEquals('Ticket', 'tt0x1', 'event', 'e0x0')
     assert.fieldEquals('Ticket', 'tt0x1', 'name', 'FAKE')
     let balanceId = getBalanceId(BigInt.fromString('1'), Address.fromString('0x87d250a5c9674788F946F10E95641bba4DEa838f'), false);
     assert.fieldEquals('Balance', balanceId, 'amountOwned', '10')
+    assert.fieldEquals('Balance', balanceId, 'paymentTokenAddress', '0x87d250a5c9674788f946f10e95641bba4dea838f')
   });
 
   test("Handle ticket deleted", () => {

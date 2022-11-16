@@ -149,7 +149,7 @@ export function handleTicketPublished(event: TicketPublished2): void {
     ticketBalance.amountOwned = event.params.amount.toI32();
     ticketBalance.owner = event.params.organizer.toHex();
     ticketBalance.isEventOwner = true;
-    ticketBalance.paymentTokenAddress = event.params.saleInfo.tokenPaymentAddress.toHex();
+    ticketBalance.paymentTokenAddress = event.params.saleInfo.paymentTokenAddress.toHex();
 
     ticketBalance.save();
   } else {
@@ -223,7 +223,7 @@ export function handleAskSetted(event: AskSetted1): void {
   if(ticketBalance != null ) {
     ticketBalance.amountOnSell = event.params.amount.toI32();
     ticketBalance.askingPrice = event.params.ticketPrice;
-    ticketBalance.paymentTokenAddress = event.params.tokenPaymentAddress.toHex();
+    ticketBalance.paymentTokenAddress = event.params.paymentTokenAddress.toHex();
     
     ticketBalance.save();
   } else {

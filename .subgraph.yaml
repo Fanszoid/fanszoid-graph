@@ -9,11 +9,11 @@ schema:
 dataSources:
   - kind: ethereum/contract
     name: Ticket
-    network: {{network}}
+    network: mumbai
     source:
-      address: '{{address:ticket}}'
+      address: '0xd18Ce9e4ec21ED39C50BfB63d40a5c0C591e238B'
       abi: Ticket
-      startBlock: {{startBlock:ticket}}
+      startBlock: 26728706
     mapping:
       kind: ethereum/events
       apiVersion: 0.0.6
@@ -35,11 +35,11 @@ dataSources:
       file: ./src/handlers/ticketsHandler.ts
   - kind: ethereum/contract
     name: Membership
-    network: {{network}}
+    network: mumbai
     source:
-      address: '{{address:membership}}'
+      address: '0xF94F58EBA614a78118Cba0667F22268f478c88B8'
       abi: Membership
-      startBlock: {{startBlock:membership}}
+      startBlock: 26728706
     mapping:
       kind: ethereum/events
       apiVersion: 0.0.6
@@ -61,11 +61,11 @@ dataSources:
       file: ./src/handlers/membershipsHandler.ts
   - kind: ethereum/contract
     name: TicketsMarketplace
-    network: {{network}}
+    network: mumbai
     source:
-      address: '{{address:ticketsMarketplace}}'
+      address: '0x8193dEbbeA93238aeB710442b122D6B747DB24C4'
       abi: TicketsMarketplace
-      startBlock: {{startBlock:ticketsMarketplace}}
+      startBlock: 26728706
     mapping:
       kind: ethereum/events
       apiVersion: 0.0.6
@@ -107,11 +107,11 @@ dataSources:
       file: ./src/handlers/ticketsMarketplaceHandler.ts
   - kind: ethereum/contract
     name: MembershipsMarketplace
-    network: {{network}}
+    network: mumbai
     source:
-      address: '{{address:membershipsMarketplace}}'
+      address: '0xcB2C094d7C01111341d192D0c40dCE1Dbcbdd3dd'
       abi: MembershipsMarketplace
-      startBlock: {{startBlock:membershipsMarketplace}}
+      startBlock: 26728706
     mapping:
       kind: ethereum/events
       apiVersion: 0.0.6
@@ -153,11 +153,11 @@ dataSources:
       file: ./src/handlers/membershipsMarketplaceHandler.ts
   - kind: ethereum/contract
     name: Admin
-    network: {{network}}
+    network: mumbai
     source:
-      address: '{{address:admin}}'
+      address: '0x447C4DAd5b8257d8C53Ea95e472aAc9eA98ADDaf'
       abi: Admin
-      startBlock: {{startBlock:admin}}
+      startBlock: 26728706
     mapping:
       kind: ethereum/events
       apiVersion: 0.0.6

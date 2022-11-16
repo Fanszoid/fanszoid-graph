@@ -10,7 +10,9 @@ import {
   AllowanceConsumed,
   AllowanceRemoved,
   TicketDeleted,
-  TicketPublished1
+  TicketPublished1,
+  AskSetted1,
+  TicketPublished2
 } from "../../build/generated/TicketsMarketplace/TicketsMarketplace";
 import { Ticket, Balance, Allowance } from "../../build/generated/schema";
 import { 
@@ -115,7 +117,7 @@ export function handleTicketUriModification(event: TicketEdited): void {
   }
 }
 
-export function handleTicketPublished(event: TicketPublished1): void {
+export function handleTicketPublished(event: TicketPublished2): void {
   let eventEntity = loadOrCreateEvent(
     event.params.eventId
   );
@@ -147,6 +149,7 @@ export function handleTicketPublished(event: TicketPublished1): void {
     ticketBalance.amountOwned = event.params.amount.toI32();
     ticketBalance.owner = event.params.organizer.toHex();
     ticketBalance.isEventOwner = true;
+    ticketBalance.paymentTokenAddress = event.params.saleInfo.tokenPaymentAddress.toHex();
 
     ticketBalance.save();
   } else {
@@ -215,11 +218,12 @@ export function handleTicketBought(event: TicketBought): void {
   transfer.save()
 }
 
-export function handleAskSetted(event: AskSetted): void {
+export function handleAskSetted(event: AskSetted1): void {
   let ticketBalance = Balance.load(getBalanceId(event.params.ticketId, event.params.seller, false));
   if(ticketBalance != null ) {
     ticketBalance.amountOnSell = event.params.amount.toI32();
     ticketBalance.askingPrice = event.params.ticketPrice;
+    ticketBalance.paymentTokenAddress = event.params.tokenPaymentAddress.toHex();
     
     ticketBalance.save();
   } else {
@@ -283,7 +287,7 @@ export function handleTicketDeletedLegacy(event: TicketDeleted): void {
   }
 }
 
-export function handleTicketPublishedLegacy(event: TicketPublished): void {
+export function handleTicketPublishedLegacyLegacy(event: TicketPublished): void {
   let eventEntity = loadOrCreateEvent(
     event.params.eventId
   );
@@ -321,10 +325,65 @@ export function handleTicketPublishedLegacy(event: TicketPublished): void {
     ticketBalance.amountOwned = event.params.amount.toI32();
     ticketBalance.owner = event.params.organizer.toHex();
     ticketBalance.isEventOwner = true;
+    ticketBalance.paymentTokenAddress = '0x0000000000000000000000000000000000000000';
 
     ticketBalance.save();
   } else {
     log.error("Error parsing metadata on handleTicketPublishedLegacy, metadata hash is: {}", [event.params.uri])
   }
   
+}
+
+export function handleTicketPublishedLegacy(event: TicketPublished1): void {
+  let eventEntity = loadOrCreateEvent(
+    event.params.eventId
+  );
+    
+  let ticket = loadOrCreateTicket(event.params.ticketId);  
+  ticket.event = eventEntity.id;
+  ticket.creatorRoyalty = event.params.saleInfo.royalty.toI32();
+  ticket.isResellable = event.params.saleInfo.isResellable;
+  ticket.metadata = event.params.uri;
+  ticket.totalAmount = event.params.amount.toI32();
+  ticket.isPrivate = event.params.saleInfo.isPrivate;
+  
+  let parsed = parseMetadata(event.params.uri, ticket, ticketAttrs);
+  
+  if(parsed) {
+    ticket.save();
+    
+    let ticketBalance = Balance.load(getBalanceId(event.params.ticketId, event.params.organizer, false));
+    if( ticketBalance !== null ){
+      log.error("handleTicketPublished: Balance already existed, id : {}", [getBalanceId(event.params.ticketId, event.params.organizer, false)]);
+      return;
+    }
+    ticketBalance = new Balance(getBalanceId(event.params.ticketId, event.params.organizer, false));
+    ticketBalance.type = 'Ticket';
+    ticketBalance.ticket = ticket.id;
+    ticketBalance.event = eventEntity.id;
+    ticketBalance.askingPrice = event.params.saleInfo.price;
+    ticketBalance.amountOnSell = event.params.saleInfo.amountToSell.toI32();
+    ticketBalance.amountOwned = event.params.amount.toI32();
+    ticketBalance.owner = event.params.organizer.toHex();
+    ticketBalance.isEventOwner = true;
+    ticketBalance.paymentTokenAddress = '0x0000000000000000000000000000000000000000';
+
+    ticketBalance.save();
+  } else {
+    log.error("Error parsing metadata on handleTicketPublished, metadata hash is: {}", [event.params.uri])
+  }
+}
+
+export function handleAskSettedLegacy(event: AskSetted): void {
+  let ticketBalance = Balance.load(getBalanceId(event.params.ticketId, event.params.seller, false));
+  if(ticketBalance != null ) {
+    ticketBalance.amountOnSell = event.params.amount.toI32();
+    ticketBalance.askingPrice = event.params.ticketPrice;
+    ticketBalance.paymentTokenAddress = '0x0000000000000000000000000000000000000000';
+    
+    ticketBalance.save();
+  } else {
+    log.error("ticketBalance not found on handleAskSetted. id : {}", [getBalanceId(event.params.ticketId, event.params.seller, false)]);
+    return;
+  }
 }

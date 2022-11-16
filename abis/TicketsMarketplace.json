@@ -224,6 +224,43 @@
           "type": "uint256"
         },
         {
+          "indexed": true,
+          "internalType": "address",
+          "name": "seller",
+          "type": "address"
+        },
+        {
+          "indexed": false,
+          "internalType": "uint256",
+          "name": "ticketPrice",
+          "type": "uint256"
+        },
+        {
+          "indexed": false,
+          "internalType": "uint256",
+          "name": "amount",
+          "type": "uint256"
+        },
+        {
+          "indexed": false,
+          "internalType": "address",
+          "name": "tokenPaymentAddress",
+          "type": "address"
+        }
+      ],
+      "name": "AskSetted",
+      "type": "event"
+    },
+    {
+      "anonymous": false,
+      "inputs": [
+        {
+          "indexed": true,
+          "internalType": "uint256",
+          "name": "ticketId",
+          "type": "uint256"
+        },
+        {
           "indexed": false,
           "internalType": "uint256",
           "name": "newRoyalty",
@@ -464,6 +501,108 @@
               "internalType": "struct AllowanceInput[]",
               "name": "allowances",
               "type": "tuple[]"
+            }
+          ],
+          "indexed": false,
+          "internalType": "struct NewAssetSaleInfo",
+          "name": "saleInfo",
+          "type": "tuple"
+        },
+        {
+          "indexed": false,
+          "internalType": "string",
+          "name": "uri",
+          "type": "string"
+        }
+      ],
+      "name": "TicketPublished",
+      "type": "event"
+    },
+    {
+      "anonymous": false,
+      "inputs": [
+        {
+          "indexed": true,
+          "internalType": "uint256",
+          "name": "eventId",
+          "type": "uint256"
+        },
+        {
+          "indexed": false,
+          "internalType": "address",
+          "name": "organizer",
+          "type": "address"
+        },
+        {
+          "indexed": true,
+          "internalType": "uint256",
+          "name": "ticketId",
+          "type": "uint256"
+        },
+        {
+          "indexed": false,
+          "internalType": "uint256",
+          "name": "amount",
+          "type": "uint256"
+        },
+        {
+          "components": [
+            {
+              "internalType": "uint256",
+              "name": "amount",
+              "type": "uint256"
+            },
+            {
+              "internalType": "uint256",
+              "name": "price",
+              "type": "uint256"
+            },
+            {
+              "internalType": "uint256",
+              "name": "royalty",
+              "type": "uint256"
+            },
+            {
+              "internalType": "uint256",
+              "name": "amountToSell",
+              "type": "uint256"
+            },
+            {
+              "internalType": "bool",
+              "name": "isResellable",
+              "type": "bool"
+            },
+            {
+              "internalType": "string",
+              "name": "uri",
+              "type": "string"
+            },
+            {
+              "internalType": "bool",
+              "name": "isPrivate",
+              "type": "bool"
+            },
+            {
+              "components": [
+                {
+                  "internalType": "uint256",
+                  "name": "amount",
+                  "type": "uint256"
+                },
+                {
+                  "internalType": "address[]",
+                  "name": "allowedAddresses",
+                  "type": "address[]"
+                }
+              ],
+              "internalType": "struct AllowanceInput[]",
+              "name": "allowances",
+              "type": "tuple[]"
+            },
+            {
+              "internalType": "address",
+              "name": "tokenPaymentAddress",
+              "type": "address"
             }
           ],
           "indexed": false,

@@ -4,8 +4,8 @@ import { Allowance, Balance, Event, Ticket, User } from "../../build/generated/s
 import { param, parseValue } from "../utils";
 import { handleTransferBatch, handleTransferSingle } from "../../src/handlers/ticketsHandler";
 import { getBalanceId } from "../../src/modules/Balance";
-import { handleAllowanceAdded, handleAllowanceConsumed, handleAllowanceRemoved, handleAskRemoved, handleAskSetted, handleCreatorRoyaltyModifiedOnTicket, handleTicketBought, handleTicketDeleted, handleTicketPublished, handleTicketUriModification } from "../../src/handlers/ticketsMarketplaceHandler";
-import { AllowanceAdded, AllowanceAddedAllowanceStruct, AllowanceConsumed, AllowanceRemoved, AskRemoved, AskSetted, CreatorRoyaltyModifiedOnTicket, TicketBought, TicketDeleted, TicketEdited, TicketPublished, TicketPublished1, TicketPublished1SaleInfoAllowancesStruct, TicketPublished1SaleInfoStruct, TicketsDeleted } from "../../build/generated/TicketsMarketplace/TicketsMarketplace";
+import { handleAllowanceAdded, handleAllowanceConsumed, handleAllowanceRemoved, handleAskRemoved, handleAskSetted, handleAskSettedLegacy, handleCreatorRoyaltyModifiedOnTicket, handleTicketBought, handleTicketDeleted, handleTicketPublished, handleTicketPublishedLegacy, handleTicketUriModification } from "../../src/handlers/ticketsMarketplaceHandler";
+import { AllowanceAdded, AllowanceAddedAllowanceStruct, AllowanceConsumed, AllowanceRemoved, AskRemoved, AskSetted, AskSetted1, CreatorRoyaltyModifiedOnTicket, TicketBought, TicketDeleted, TicketEdited, TicketPublished, TicketPublished1, TicketPublished1SaleInfoAllowancesStruct, TicketPublished1SaleInfoStruct, TicketsDeleted } from "../../build/generated/TicketsMarketplace/TicketsMarketplace";
 import { getTicketId } from "../../src/modules/Ticket";
 
 
@@ -235,7 +235,7 @@ describe("TicketsMarketplace", () => {
     ];
 
     assert.notInStore('Ticket', 'tt0x1')
-    handleTicketPublished(event)
+    handleTicketPublishedLegacy(event)
     assert.fieldEquals('Ticket', 'tt0x1', 'event', 'e0x0')
     assert.fieldEquals('Ticket', 'tt0x1', 'name', 'FAKE')
     let balanceId = getBalanceId(BigInt.fromString('1'), Address.fromString('0x87d250a5c9674788F946F10E95641bba4DEa838f'), false);
@@ -337,7 +337,7 @@ describe("TicketsMarketplace", () => {
     assert.fieldEquals('Transfer', event.transaction.hash.toHex(), 'isSale', 'true')
   });
 
-  test("Handle ask setted", () => {
+  test("Handle ask setted legacy", () => {
     let ticket = new Ticket(getTicketId(BigInt.fromString('1')));
     ticket.creatorRoyalty = 10;
     ticket.isResellable = false;
@@ -375,12 +375,62 @@ describe("TicketsMarketplace", () => {
       param('ticketId', BigInt.fromString('1')),
       param('seller', '0x87d250a5c9674788F946F10E95641bba4DEa838f'),
       param('ticketPrice', BigInt.fromString('1')),
+      param('amount', BigInt.fromString('3'))
+    ];
+
+    assert.fieldEquals('Balance', balanceId, 'amountOnSell', '0')
+    handleAskSettedLegacy(event)
+    assert.fieldEquals('Balance', balanceId, 'amountOnSell', '3')
+    assert.fieldEquals('Balance', balanceId, 'paymentTokenAddress', '0x0000000000000000000000000000000000000000')
+  });
+
+  test("Handle ask setted", () => {
+    let ticket = new Ticket(getTicketId(BigInt.fromString('1')));
+    ticket.creatorRoyalty = 10;
+    ticket.isResellable = false;
+    ticket.isPrivate = false;
+    ticket.totalAmount = 10;
+    ticket.name = 'NAME';
+    ticket.save(); 
+    let balanceId = getBalanceId(
+      BigInt.fromString('1'), 
+      Address.fromString('0x87d250a5c9674788F946F10E95641bba4DEa838f'), 
+      false
+    );
+    let balance = new Balance(balanceId);
+    balance.ticket = 'tt0x1';
+    balance.owner = '0x87d250a5c9674788F946F10E95641bba4DEa838f';
+    balance.amountOwned = 3;
+    balance.amountOnSell = 0;
+    balance.isEventOwner = false;
+    balance.type = 'Ticket';
+    balance.paymentTokenAddress = '0x0000000000000000000000000000000000000000';
+    balance.save();
+    
+    let mockEvent = newMockEvent();
+    
+    let event = new AskSetted1(
+      mockEvent.address,
+      mockEvent.logIndex,
+      mockEvent.transactionLogIndex,
+      mockEvent.logType,
+      mockEvent.block,
+      mockEvent.transaction,
+      mockEvent.parameters,
+      mockEvent.receipt,
+    )
+    event.parameters = [
+      param('ticketId', BigInt.fromString('1')),
+      param('seller', '0x87d250a5c9674788F946F10E95641bba4DEa838f'),
+      param('ticketPrice', BigInt.fromString('1')),
       param('amount', BigInt.fromString('3')),
+      param('paymentTokenAddress', '0x87d250a5c9674788f946f10e95641bba4dea838f')
     ];
 
     assert.fieldEquals('Balance', balanceId, 'amountOnSell', '0')
     handleAskSetted(event)
     assert.fieldEquals('Balance', balanceId, 'amountOnSell', '3')
+    assert.fieldEquals('Balance', balanceId, 'paymentTokenAddress', '0x87d250a5c9674788f946f10e95641bba4dea838f')
   });
 
   test("Handle ask removed", () => {

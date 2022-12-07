@@ -85,14 +85,20 @@ export function parseMetadata(uri: string, entity: Entity, attrs: string[]): boo
               entity.setString(attrs[i], parseJSONValueToString(aux));
             }
           }
+          else if(attrs[i] == 'extra_requirement') {
+            entity.setString('extraRequirement', parseJSONValueToString(aux));
+          }
           else {
             entity.setString(attrs[i], parseJSONValueToString(aux));
           }
+        } else if(attrs[i] == 'extra_requirement') {
+          entity.setString('extraRequirement', 'none');
         } else {
           log.debug("Could not get attr: " + attrs[i].toString(), []);
         }
       }
-    } else {
+    } 
+    else {
       log.error("parseMetadata: value is null, data: {}", [data.toString()]);
       return false
     }

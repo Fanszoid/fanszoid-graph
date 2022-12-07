@@ -95,6 +95,8 @@ type Ticket @entity {
   name: String
   description: String
   image: String
+  extraRequirement: String
+
 }
 
 type Membership @entity {

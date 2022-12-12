@@ -32,6 +32,7 @@ import {
 } from "../modules/Balance";
 import { store, log, Address } from "@graphprotocol/graph-ts";
 import { parseMetadata } from "./utils";
+import { createRestrictionForTicketForMetadata } from "../modules/Restriction";
 
 export function handleAllowanceAdded(event: AllowanceAdded): void {
   let allowance = new Allowance(getAllowanceId(event.params.allowanceId, false));
@@ -106,6 +107,11 @@ export function handleTicketUriModification(event: TicketEdited): void {
     return;
   }
   let parsed = parseMetadata(event.params.newUri, ticketEntity, ticketAttrs);
+  let parsedRestrictions = createRestrictionForTicketForMetadata(ticketEntity, event.params.newUri);
+  if(!parsedRestrictions) {
+    ticketEntity.minAmountRestrictions = 0;
+    ticketEntity.restrictions = [];
+  }
 
   if(parsed) { 
     ticketEntity.metadata = event.params.newUri;
@@ -129,6 +135,12 @@ export function handleTicketPublished(event: TicketPublished1): void {
   ticket.isPrivate = event.params.saleInfo.isPrivate;
   
   let parsed = parseMetadata(event.params.uri, ticket, ticketAttrs);
+
+  let parsedRestrictions = createRestrictionForTicketForMetadata(ticket, event.params.uri);
+  if(!parsedRestrictions) {
+    ticket.minAmountRestrictions = 0;
+    ticket.restrictions = [];
+  }
   
   if(parsed) {
     ticket.save();
@@ -304,6 +316,11 @@ export function handleTicketPublishedLegacy(event: TicketPublished): void {
   ticket.isPrivate = false;
 
   let parsed = parseMetadata(event.params.uri, ticket, ticketAttrs);
+  let parsedRestrictions = createRestrictionForTicketForMetadata(ticket, event.params.uri);
+  if(!parsedRestrictions) {
+    ticket.minAmountRestrictions = 0;
+    ticket.restrictions = [];
+  }
 
   if(parsed) {
     ticket.save();

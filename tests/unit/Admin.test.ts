@@ -122,6 +122,8 @@ describe("Admin", () => {
     ticket.isPrivate = false;
     ticket.totalAmount = 10;
     ticket.event = 'e0x0';
+    ticket.minAmountRestrictions = 0;
+    ticket.restrictions = [];
     ticket.save(); 
 
     let entity = Event.load('e0x0');
@@ -293,6 +295,8 @@ describe("Admin", () => {
     ticket.isPrivate = false;
     ticket.totalAmount = 10;
     ticket.event = 'e0x0';
+    ticket.minAmountRestrictions = 0;
+    ticket.restrictions = [];
     ticket.save(); 
 
     let entity = Event.load('e0x0');
@@ -332,6 +336,8 @@ describe("Admin", () => {
     ticket.isPrivate = false;
     ticket.totalAmount = 10;
     ticket.event = 'e0x0';
+    ticket.minAmountRestrictions = 0;
+    ticket.restrictions = [];
     ticket.save(); 
 
     let contractAddress = '0xa16081f360e3847006db660bae1c6d1b2e17ec2a';
@@ -371,6 +377,8 @@ describe("Admin", () => {
     ticket.isPrivate = false;
     ticket.totalAmount = 10;
     ticket.event = 'e0x0';
+    ticket.minAmountRestrictions = 0;
+    ticket.restrictions = [];
     ticket.save(); 
 
     let contractAddress = '0xa16081f360e3847006db660bae1c6d1b2e17ec2a';

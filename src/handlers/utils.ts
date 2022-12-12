@@ -1,39 +1,56 @@
-import { log, ipfs, json, JSONValue, TypedMap, Entity, JSONValueKind, TypedMapEntry, BigInt, Bytes } from "@graphprotocol/graph-ts";
+import { log, ipfs, json, JSONValue, TypedMap, Entity, JSONValueKind, TypedMapEntry, BigInt, Bytes, Value, ValueKind } from "@graphprotocol/graph-ts";
 import { bigIntEventAttrs } from "../modules/Event";
-import { Allowance, SocialNetwork } from "../../build/generated/schema";
+import { Allowance, Restriction, SocialNetwork } from "../../build/generated/schema";
+import { loadOrCreateRestriction } from "../modules/Restriction";
+
+export function loadMetadata(uri: string) : TypedMap<string, JSONValue> | null {
+  let uriParts = uri.split("/");
+  let hash = uriParts[uriParts.length - 1];
+  let retries = 3;
+  let data: Bytes | null = null;
+  while(!data && retries > 0) {
+    data = ipfs.cat(hash);
+    retries--;
+  }
+  if (!data) {
+    log.error("IPFS error: Could not parse metadata for hash {}", [hash]);
+    return null
+  };
+
+  let jsonParsed = json.fromBytes(data);
+  let value: TypedMap<string, JSONValue>;
+
+  if (jsonParsed.kind == JSONValueKind.OBJECT) {
+    value = jsonParsed.toObject();
+  } else if (jsonParsed.kind == JSONValueKind.STRING) {
+    let jsonObject = json.fromString(jsonParsed.toString());
+    if (jsonObject.kind == JSONValueKind.OBJECT) {
+      value = jsonObject.toObject();
+    } else {
+      log.error("parseMetadata: Invalid metadata obj kind {}", [jsonObject.kind.toString()]);
+      return null;
+    }
+  } else {
+    log.error("parseMetadata: Invalid metadata kind {}", [jsonParsed.kind.toString()]);
+    return null;
+  }
+
+  if(!value) {
+    log.error("parseMetadata: value is null, data: {}", [data.toString()]);
+  }
+
+  return value;
+}
 
 export function parseMetadata(uri: string, entity: Entity, attrs: string[]): boolean {
-    let uriParts = uri.split("/");
-    let hash = uriParts[uriParts.length - 1];
-    let retries = 3;
-    let data: Bytes | null = null;
-    while(!data && retries > 0) {
-      data = ipfs.cat(hash);
-      retries--;
-    }
-    if (!data) {
-      log.error("IPFS error: Could not parse metadata for hash {}", [hash]);
+    let valueWithNull = loadMetadata(uri)
+
+    if(!valueWithNull) {
       return false
-    };
-  
-    let jsonParsed = json.fromBytes(data);
-    let value: TypedMap<string, JSONValue>;
-    if (jsonParsed.kind == JSONValueKind.OBJECT) {
-      value = jsonParsed.toObject();
-    } else if (jsonParsed.kind == JSONValueKind.STRING) {
-      let jsonObject = json.fromString(jsonParsed.toString());
-      if (jsonObject.kind == JSONValueKind.OBJECT) {
-        value = jsonObject.toObject();
-      } else {
-        log.error("parseMetadata: Invalid metadata obj kind {}", [jsonObject.kind.toString()]);
-        return false;
-      }
-  
-    } else {
-      log.error("parseMetadata: Invalid metadata kind {}", [jsonParsed.kind.toString()]);
-      return false;
     }
-  
+
+    let value = valueWithNull as TypedMap<string, JSONValue>
+    
     if (value) {
       for (let i = 0; i < attrs.length; i++) {
         let aux = value.get(attrs[i]);
@@ -88,18 +105,22 @@ export function parseMetadata(uri: string, entity: Entity, attrs: string[]): boo
           else if(attrs[i] == 'extra_requirement') {
             entity.setString('extraRequirement', parseJSONValueToString(aux));
           }
+          else if(attrs[i] == 'minAmountRestrictions') {
+            entity.setI32('minAmountRestrictions', 0)
+          }
           else {
             entity.setString(attrs[i], parseJSONValueToString(aux));
           }
         } else if(attrs[i] == 'extra_requirement') {
           entity.setString('extraRequirement', 'none');
+        } else if(attrs[i] == 'minAmountRestrictions') {
+          entity.setI32('minAmountRestrictions', 0)
         } else {
           log.debug("Could not get attr: " + attrs[i].toString(), []);
         }
       }
     } 
     else {
-      log.error("parseMetadata: value is null, data: {}", [data.toString()]);
       return false
     }
 

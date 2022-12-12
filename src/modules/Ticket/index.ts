@@ -2,7 +2,7 @@ import { Address, BigInt } from "@graphprotocol/graph-ts";
 import { Ticket } from"../../../build/generated/schema";
 
 export var ticketAttrs: string[] = [
-  'name', 'description', 'image', 'extra_requirement', 'extraRequirement'
+  'name', 'description', 'image', 'extra_requirement', 'extraRequirement', 'minAmountRestrictions'
 ];
 
 export function getTicketId(ticketIdContract: BigInt): string {

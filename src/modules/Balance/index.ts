@@ -2,7 +2,7 @@ import { Address, BigInt } from "@graphprotocol/graph-ts";
 import { Allowance, Balance } from"../../../build/generated/schema";
 
 export function getBalanceId(balanceIdContract: BigInt, user: Address, isMembership: boolean): string {
-  return (isMembership? "m":"t") + balanceIdContract.toHex() + "-" + user.toHex();
+  return (isMembership? "m":"t") + user.toHex()  + "-" + balanceIdContract.toHex();
 }
 
 export function getAllowanceId(allowanceIdContract: BigInt, isMembership: boolean): string {

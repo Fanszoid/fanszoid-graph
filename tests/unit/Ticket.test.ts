@@ -42,7 +42,7 @@ describe("Tickets", () => {
       ticket.isPrivate = false;
       ticket.totalAmount = 10;
       ticket.save();
-      let balance1 = new Balance("t0x0-".concat(address1));
+      let balance1 = new Balance(getBalanceId(new BigInt(0), Address.fromString(address1), false));;
       balance1.type = 'Ticket';
       balance1.amountOwned = 5;
       balance1.event = 'e0x0';
@@ -79,8 +79,8 @@ describe("Tickets", () => {
       param('value', BigInt.fromString('1'))
     ];
 
-    const balanceId1 = "t0x0-".concat(address1);
-    const balanceId2 = "t0x0-".concat(address2);    
+    const balanceId1 = "t".concat(address1).concat("-0x0");
+    const balanceId2 = "t".concat(address2).concat("-0x0");         
     
     // Test agains storage [Entity, id, attr, expected_value]
     assert.fieldEquals('Balance', balanceId1, 'amountOwned', '5');
@@ -112,8 +112,8 @@ describe("Tickets", () => {
       param('values', [BigInt.fromString('1')])
     ];
 
-    const balanceId1 = "t0x0-".concat(address1);
-    const balanceId2 = "t0x0-".concat(address2);    
+    const balanceId1 = "t".concat(address1).concat("-0x0");
+    const balanceId2 = "t".concat(address2).concat("-0x0");      
     
     // Test agains storage [Entity, id, attr, expected_value]
     assert.fieldEquals('Balance', balanceId1, 'amountOwned', '5');

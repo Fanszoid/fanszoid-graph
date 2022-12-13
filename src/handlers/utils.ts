@@ -105,16 +105,11 @@ export function parseMetadata(uri: string, entity: Entity, attrs: string[]): boo
           else if(attrs[i] == 'extra_requirement') {
             entity.setString('extraRequirement', parseJSONValueToString(aux));
           }
-          else if(attrs[i] == 'minAmountRestrictions') {
-            entity.setI32('minAmountRestrictions', 0)
-          }
           else {
             entity.setString(attrs[i], parseJSONValueToString(aux));
           }
         } else if(attrs[i] == 'extra_requirement') {
           entity.setString('extraRequirement', 'none');
-        } else if(attrs[i] == 'minAmountRestrictions') {
-          entity.setI32('minAmountRestrictions', 0)
         } else {
           log.debug("Could not get attr: " + attrs[i].toString(), []);
         }

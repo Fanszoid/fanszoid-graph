@@ -1,4 +1,4 @@
-import { JSONValue, JSONValueKind, TypedMap } from "@graphprotocol/graph-ts";
+import { JSONValue, JSONValueKind, log, TypedMap } from "@graphprotocol/graph-ts";
 import { Restriction, Ticket } from "../../../build/generated/schema";
 import { loadMetadata, parseJSONValueToString } from "../../handlers/utils";
 
@@ -26,24 +26,31 @@ export function createRestrictionForTicketForMetadata(ticket: Ticket, uri: strin
         return false;
     }
 
+    if(!value.get('minAmountRestrictions') || (value.get('minAmountRestrictions') as JSONValue).kind != JSONValueKind.NUMBER) {
+        return false;
+    }
+    
+    ticket.minAmountRestrictions = (value.get('minAmountRestrictions') as JSONValue).toBigInt().toI32();
+
     if(!value.get('restrictions') || (value.get('restrictions') as JSONValue).kind != JSONValueKind.ARRAY) {
         return false;
     }
 
     let restrictionListArray = (value.get('restrictions') as JSONValue).toArray() as Array<JSONValue>;
-    let finalRestrictionList : Restriction[] = [];
+    let finalRestrictionList : string[] = [];
 
     for(let i = 0; i < restrictionListArray.length; i++) {
         if(restrictionListArray[i].kind == JSONValueKind.OBJECT) {
             let restrictionObject = restrictionListArray[i].toObject();
-
             if(!!restrictionObject.get('condition') && !!restrictionObject.get('conditionType')) {
                 let restriction = loadOrCreateRestriction(parseJSONValueToString(restrictionObject.get('conditionType') as JSONValue), parseJSONValueToString(restrictionObject.get('condition') as JSONValue));
-                finalRestrictionList.push(restriction)
+                finalRestrictionList.push(getRestrictionId(parseJSONValueToString(restrictionObject.get('conditionType') as JSONValue), parseJSONValueToString(restrictionObject.get('condition') as JSONValue)));
                 restriction.save()
             }
         }
     }
+
+    ticket.restrictions = finalRestrictionList;
 
     return restrictionListArray.length > 0;
 }

@@ -97,7 +97,7 @@ type Ticket @entity {
   image: String
   extraRequirement: String
   minAmountRestrictions: Int!
-  restrictions: [Restriction!]!
+  restrictions: [Restriction!]! @derivedFrom(field: "ticket")
 
 }
 
@@ -189,4 +189,5 @@ type Restriction @entity {
   id: ID!
   condition: String!
   conditionType: String!
+  ticket: Ticket! @derivedFrom(field: "restrictions")
 }

@@ -270,7 +270,7 @@ describe("TicketsMarketplace", () => {
   
     let mockEvent = newMockEvent();
     
-    let event = new TicketPublished1(
+    let event = new TicketPublished2(
       mockEvent.address,
       mockEvent.logIndex,
       mockEvent.transactionLogIndex,
@@ -295,6 +295,7 @@ describe("TicketsMarketplace", () => {
     saleInfo[5] = parseValue('FAKE_URI'); 
     saleInfo[6] = ethereum.Value.fromBoolean(true); 
     saleInfo[7] = parseValue([allowance]); 
+    saleInfo[8] = parseValue('0x0000000000000000000000000000000000000000');
     
     event.parameters = [
       param('eventId', BigInt.fromString('0')),
@@ -314,7 +315,7 @@ describe("TicketsMarketplace", () => {
     assert.fieldEquals('Balance', balanceId, 'amountOwned', '10')
   });
 
-  test("Handle ticket published with extra requirement", () => {   
+  test("Handle ticket published with extra requirement camel case", () => {   
     let eventInStorage = new Event("e0x0");
     eventInStorage.organizer = org;
     eventInStorage.attendees = BigInt.fromString('0');
@@ -329,7 +330,7 @@ describe("TicketsMarketplace", () => {
   
     let mockEvent = newMockEvent();
     
-    let event = new TicketPublished1(
+    let event = new TicketPublished2(
       mockEvent.address,
       mockEvent.logIndex,
       mockEvent.transactionLogIndex,
@@ -354,6 +355,7 @@ describe("TicketsMarketplace", () => {
     saleInfo[5] = parseValue('FAKE_URI'); 
     saleInfo[6] = ethereum.Value.fromBoolean(true); 
     saleInfo[7] = parseValue([allowance]); 
+    saleInfo[8] = parseValue('0x0000000000000000000000000000000000000000');
     
     event.parameters = [
       param('eventId', BigInt.fromString('0')),
@@ -388,7 +390,7 @@ describe("TicketsMarketplace", () => {
   
     let mockEvent = newMockEvent();
     
-    let event = new TicketPublished1(
+    let event = new TicketPublished2(
       mockEvent.address,
       mockEvent.logIndex,
       mockEvent.transactionLogIndex,
@@ -413,6 +415,7 @@ describe("TicketsMarketplace", () => {
     saleInfo[5] = parseValue('FAKE_URI'); 
     saleInfo[6] = ethereum.Value.fromBoolean(true); 
     saleInfo[7] = parseValue([allowance]); 
+    saleInfo[8] = parseValue('0x0000000000000000000000000000000000000000');
     
     event.parameters = [
       param('eventId', BigInt.fromString('0')),
@@ -588,6 +591,9 @@ describe("TicketsMarketplace", () => {
     ticket.isPrivate = false;
     ticket.totalAmount = 10;
     ticket.name = 'NAME';
+    ticket.minAmountRestrictions = 0;
+    ticket.restrictions = [];
+    ticket.extraRequirement = 'none';
     ticket.save(); 
     let balanceId = getBalanceId(
       BigInt.fromString('1'), 

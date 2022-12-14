@@ -20,7 +20,7 @@ export function loadMetadata(uri: string) : TypedMap<string, JSONValue> | null {
   let jsonParsed = json.try_fromBytes(data);
 
   if(!jsonParsed.isOk) {
-    return false
+    return null;
   }
   
   let value: TypedMap<string, JSONValue>;

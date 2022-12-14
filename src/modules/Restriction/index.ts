@@ -27,6 +27,7 @@ export function createRestrictionForTicketForMetadata(ticket: Ticket, uri: strin
     }
 
     if(!value.get('minAmountRestrictions') || (value.get('minAmountRestrictions') as JSONValue).kind != JSONValueKind.NUMBER) {
+        log.debug('NOT MIN AMOUNT', [])
         return false;
     }
     
@@ -40,6 +41,7 @@ export function createRestrictionForTicketForMetadata(ticket: Ticket, uri: strin
     let finalRestrictionList : string[] = [];
 
     for(let i = 0; i < restrictionListArray.length; i++) {
+        log.debug("DEBUG {}", [i.toString()])
         if(restrictionListArray[i].kind == JSONValueKind.OBJECT) {
             let restrictionObject = restrictionListArray[i].toObject();
             if(!!restrictionObject.get('condition') && !!restrictionObject.get('conditionType')) {

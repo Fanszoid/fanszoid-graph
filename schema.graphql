@@ -143,6 +143,7 @@ type Balance @entity {
   isEventOwner: Boolean!
   sent: [Transfer!] @derivedFrom(field: "senderBalance")
   received: [Transfer!] @derivedFrom(field: "receiverBalance")
+  paymentTokenAddress: String
 }
 
 type User @entity {

@@ -17,13 +17,18 @@ export function loadMetadata(uri: string) : TypedMap<string, JSONValue> | null {
     return null
   };
 
-  let jsonParsed = json.fromBytes(data);
+  let jsonParsed = json.try_fromBytes(data);
+
+  if(!jsonParsed.isOk) {
+    return false
+  }
+  
   let value: TypedMap<string, JSONValue>;
 
-  if (jsonParsed.kind == JSONValueKind.OBJECT) {
-    value = jsonParsed.toObject();
-  } else if (jsonParsed.kind == JSONValueKind.STRING) {
-    let jsonObject = json.fromString(jsonParsed.toString());
+  if (jsonParsed.value.kind == JSONValueKind.OBJECT) {
+    value = jsonParsed.value.toObject();
+  } else if (jsonParsed.value.kind == JSONValueKind.STRING) {
+    let jsonObject = json.fromString(jsonParsed.value.toString());
     if (jsonObject.kind == JSONValueKind.OBJECT) {
       value = jsonObject.toObject();
     } else {
@@ -31,7 +36,7 @@ export function loadMetadata(uri: string) : TypedMap<string, JSONValue> | null {
       return null;
     }
   } else {
-    log.error("parseMetadata: Invalid metadata kind {}", [jsonParsed.kind.toString()]);
+    log.error("parseMetadata: Invalid metadata kind {}", [jsonParsed.value.kind.toString()]);
     return null;
   }
 

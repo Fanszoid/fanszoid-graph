@@ -42,6 +42,8 @@ describe("TicketsMarketplace", () => {
       ticket.isResellable = false;
       ticket.isPrivate = false;
       ticket.totalAmount = 10;
+      ticket.minAmountRestrictions = 0;
+      ticket.restrictions = [];
       ticket.save();
       let balance1 = new Balance("t0x0-".concat(address1));
       balance1.type = 'Ticket';
@@ -127,6 +129,8 @@ describe("TicketsMarketplace", () => {
     ticket.isPrivate = false;
     ticket.totalAmount = 10;
     ticket.allowances = ['ta-0x1'];
+    ticket.minAmountRestrictions = 0;
+    ticket.restrictions = [];
     ticket.save(); 
     
     let mockEvent = newMockEvent();
@@ -159,6 +163,8 @@ describe("TicketsMarketplace", () => {
     ticket.isPrivate = false;
     ticket.totalAmount = 10;
     ticket.name = 'NAME';
+    ticket.minAmountRestrictions = 0;
+    ticket.restrictions = [];
     ticket.save(); 
     
     let mockEvent = newMockEvent();
@@ -182,6 +188,8 @@ describe("TicketsMarketplace", () => {
     assert.fieldEquals('Ticket', 'tt0x1', 'name', 'NAME')
     handleTicketUriModification(event)
     assert.fieldEquals('Ticket', 'tt0x1', 'name', 'FAKE')
+    assert.fieldEquals('Ticket', 'tt0x1', 'restrictions', '[]')
+    assert.fieldEquals('Ticket', 'tt0x1', 'minAmountRestrictions', '0')
   });
 
   test("Handle ticket published", () => {   
@@ -238,11 +246,195 @@ describe("TicketsMarketplace", () => {
     assert.notInStore('Ticket', 'tt0x1')
     handleTicketPublished(event)
     assert.fieldEquals('Ticket', 'tt0x1', 'event', 'e0x0')
+    assert.fieldEquals('Ticket', 'tt0x1', 'extraRequirement', 'none')
+    assert.fieldEquals('Ticket', 'tt0x1', 'restrictions', '[]')
+    assert.fieldEquals('Ticket', 'tt0x1', 'minAmountRestrictions', '0')
     assert.fieldEquals('Ticket', 'tt0x1', 'name', 'FAKE')
     let balanceId = getBalanceId(BigInt.fromString('1'), Address.fromString('0x87d250a5c9674788F946F10E95641bba4DEa838f'), false);
     assert.fieldEquals('Balance', balanceId, 'amountOwned', '10')
     assert.fieldEquals('Balance', balanceId, 'paymentTokenAddress', '0x87d250a5c9674788f946f10e95641bba4dea838f')
   });
+
+  test("Handle ticket published with extra requirement", () => {   
+    let eventInStorage = new Event("e0x0");
+    eventInStorage.organizer = org;
+    eventInStorage.attendees = BigInt.fromString('0');
+    eventInStorage.collaborators = [];
+    eventInStorage.title = 'Title';
+    eventInStorage.description = 'Description';
+    eventInStorage.type = 'metaverse';
+    eventInStorage.category = 'art'
+    eventInStorage.startDateUTC = BigInt.fromString('0');
+    eventInStorage.endDateUTC = BigInt.fromString('0');
+    eventInStorage.save();
+  
+    let mockEvent = newMockEvent();
+    
+    let event = new TicketPublished2(
+      mockEvent.address,
+      mockEvent.logIndex,
+      mockEvent.transactionLogIndex,
+      mockEvent.logType,
+      mockEvent.block,
+      mockEvent.transaction,
+      mockEvent.parameters,
+      mockEvent.receipt
+    )
+    mockIpfsFile('FAKE_URI', 'tests/ipfs/fake_ticket_with_extra_requirement.json');
+
+    let allowance = new TicketPublished1SaleInfoAllowancesStruct();
+    allowance[0] = parseValue(BigInt.fromString('1'));
+    allowance[1] = parseValue(['0x87d250a5c9674788F946F10E95641bba4DEa838f']);
+
+    let saleInfo = new TicketPublished1SaleInfoStruct();
+    saleInfo[0] = parseValue(BigInt.fromString('10')); 
+    saleInfo[1] = parseValue(BigInt.fromString('0')); 
+    saleInfo[2] = parseValue(BigInt.fromString('0')); 
+    saleInfo[3] = parseValue(BigInt.fromString('10')); 
+    saleInfo[4] = ethereum.Value.fromBoolean(true); 
+    saleInfo[5] = parseValue('FAKE_URI'); 
+    saleInfo[6] = ethereum.Value.fromBoolean(true); 
+    saleInfo[7] = parseValue([allowance]); 
+    saleInfo[8] = parseValue('0x0000000000000000000000000000000000000000');
+    
+    event.parameters = [
+      param('eventId', BigInt.fromString('0')),
+      param('organizer', '0x87d250a5c9674788F946F10E95641bba4DEa838f'),
+      param('ticketId', BigInt.fromString('1')),
+      param('amount', BigInt.fromString('10')),
+      param('saleInfo', saleInfo),
+      param('uri', 'FAKE_URI'),
+    ];
+
+    assert.notInStore('Ticket', 'tt0x1')
+    handleTicketPublished(event)
+    assert.fieldEquals('Ticket', 'tt0x1', 'event', 'e0x0')
+    assert.fieldEquals('Ticket', 'tt0x1', 'extraRequirement', 'extraReq')
+    assert.fieldEquals('Ticket', 'tt0x1', 'name', 'FAKE')
+    let balanceId = getBalanceId(BigInt.fromString('1'), Address.fromString('0x87d250a5c9674788F946F10E95641bba4DEa838f'), false);
+    assert.fieldEquals('Balance', balanceId, 'amountOwned', '10')
+  });
+
+  test("Handle ticket published with extra requirement camel case", () => {   
+    let eventInStorage = new Event("e0x0");
+    eventInStorage.organizer = org;
+    eventInStorage.attendees = BigInt.fromString('0');
+    eventInStorage.collaborators = [];
+    eventInStorage.title = 'Title';
+    eventInStorage.description = 'Description';
+    eventInStorage.type = 'metaverse';
+    eventInStorage.category = 'art'
+    eventInStorage.startDateUTC = BigInt.fromString('0');
+    eventInStorage.endDateUTC = BigInt.fromString('0');
+    eventInStorage.save();
+  
+    let mockEvent = newMockEvent();
+    
+    let event = new TicketPublished2(
+      mockEvent.address,
+      mockEvent.logIndex,
+      mockEvent.transactionLogIndex,
+      mockEvent.logType,
+      mockEvent.block,
+      mockEvent.transaction,
+      mockEvent.parameters,
+      mockEvent.receipt
+    )
+    mockIpfsFile('FAKE_URI', 'tests/ipfs/fake_ticket_with_extra_requirement_camel_case.json');
+
+    let allowance = new TicketPublished1SaleInfoAllowancesStruct();
+    allowance[0] = parseValue(BigInt.fromString('1'));
+    allowance[1] = parseValue(['0x87d250a5c9674788F946F10E95641bba4DEa838f']);
+
+    let saleInfo = new TicketPublished1SaleInfoStruct();
+    saleInfo[0] = parseValue(BigInt.fromString('10')); 
+    saleInfo[1] = parseValue(BigInt.fromString('0')); 
+    saleInfo[2] = parseValue(BigInt.fromString('0')); 
+    saleInfo[3] = parseValue(BigInt.fromString('10')); 
+    saleInfo[4] = ethereum.Value.fromBoolean(true); 
+    saleInfo[5] = parseValue('FAKE_URI'); 
+    saleInfo[6] = ethereum.Value.fromBoolean(true); 
+    saleInfo[7] = parseValue([allowance]); 
+    saleInfo[8] = parseValue('0x0000000000000000000000000000000000000000');
+    
+    event.parameters = [
+      param('eventId', BigInt.fromString('0')),
+      param('organizer', '0x87d250a5c9674788F946F10E95641bba4DEa838f'),
+      param('ticketId', BigInt.fromString('1')),
+      param('amount', BigInt.fromString('10')),
+      param('saleInfo', saleInfo),
+      param('uri', 'FAKE_URI'),
+    ];
+
+    assert.notInStore('Ticket', 'tt0x1')
+    handleTicketPublished(event)
+    assert.fieldEquals('Ticket', 'tt0x1', 'event', 'e0x0')
+    assert.fieldEquals('Ticket', 'tt0x1', 'extraRequirement', 'extraReq')
+    assert.fieldEquals('Ticket', 'tt0x1', 'name', 'FAKE')
+    let balanceId = getBalanceId(BigInt.fromString('1'), Address.fromString('0x87d250a5c9674788F946F10E95641bba4DEa838f'), false);
+    assert.fieldEquals('Balance', balanceId, 'amountOwned', '10')
+  });
+
+  test("Handle ticket published with restrictions", () => {   
+    let eventInStorage = new Event("e0x0");
+    eventInStorage.organizer = org;
+    eventInStorage.attendees = BigInt.fromString('0');
+    eventInStorage.collaborators = [];
+    eventInStorage.title = 'Title';
+    eventInStorage.description = 'Description';
+    eventInStorage.type = 'metaverse';
+    eventInStorage.category = 'art'
+    eventInStorage.startDateUTC = BigInt.fromString('0');
+    eventInStorage.endDateUTC = BigInt.fromString('0');
+    eventInStorage.save();
+  
+    let mockEvent = newMockEvent();
+    
+    let event = new TicketPublished2(
+      mockEvent.address,
+      mockEvent.logIndex,
+      mockEvent.transactionLogIndex,
+      mockEvent.logType,
+      mockEvent.block,
+      mockEvent.transaction,
+      mockEvent.parameters,
+      mockEvent.receipt
+    )
+    mockIpfsFile('FAKE_URI', 'tests/ipfs/fake_ipfs_with_restrictions.json');
+
+    let allowance = new TicketPublished1SaleInfoAllowancesStruct();
+    allowance[0] = parseValue(BigInt.fromString('1'));
+    allowance[1] = parseValue(['0x87d250a5c9674788F946F10E95641bba4DEa838f']);
+
+    let saleInfo = new TicketPublished1SaleInfoStruct();
+    saleInfo[0] = parseValue(BigInt.fromString('10')); 
+    saleInfo[1] = parseValue(BigInt.fromString('0')); 
+    saleInfo[2] = parseValue(BigInt.fromString('0')); 
+    saleInfo[3] = parseValue(BigInt.fromString('10')); 
+    saleInfo[4] = ethereum.Value.fromBoolean(true); 
+    saleInfo[5] = parseValue('FAKE_URI'); 
+    saleInfo[6] = ethereum.Value.fromBoolean(true); 
+    saleInfo[7] = parseValue([allowance]); 
+    saleInfo[8] = parseValue('0x0000000000000000000000000000000000000000');
+    
+    event.parameters = [
+      param('eventId', BigInt.fromString('0')),
+      param('organizer', '0x87d250a5c9674788F946F10E95641bba4DEa838f'),
+      param('ticketId', BigInt.fromString('1')),
+      param('amount', BigInt.fromString('10')),
+      param('saleInfo', saleInfo),
+      param('uri', 'FAKE_URI'),
+    ];
+
+    assert.notInStore('Ticket', 'tt0x1')
+    handleTicketPublished(event)
+    assert.fieldEquals('Ticket', 'tt0x1', 'event', 'e0x0')
+    assert.fieldEquals('Ticket', 'tt0x1', 'minAmountRestrictions', '1')
+    assert.fieldEquals('Ticket', 'tt0x1', 'name', 'FAKE')
+    let balanceId = getBalanceId(BigInt.fromString('1'), Address.fromString('0x87d250a5c9674788F946F10E95641bba4DEa838f'), false);
+    assert.fieldEquals('Balance', balanceId, 'amountOwned', '10')
+  });
+
 
   test("Handle ticket deleted", () => {
     let ticket = new Ticket(getTicketId(BigInt.fromString('1')));
@@ -251,6 +443,8 @@ describe("TicketsMarketplace", () => {
     ticket.isPrivate = false;
     ticket.totalAmount = 10;
     ticket.name = 'NAME';
+    ticket.minAmountRestrictions = 0;
+    ticket.restrictions = [];
     ticket.save(); 
     let balanceId = getBalanceId(
       BigInt.fromString('1'), 
@@ -297,6 +491,8 @@ describe("TicketsMarketplace", () => {
     ticket.isPrivate = false;
     ticket.totalAmount = 10;
     ticket.name = 'NAME';
+    ticket.minAmountRestrictions = 0;
+    ticket.restrictions = [];
     ticket.save(); 
     let balanceId = getBalanceId(
       BigInt.fromString('1'), 
@@ -346,6 +542,8 @@ describe("TicketsMarketplace", () => {
     ticket.isPrivate = false;
     ticket.totalAmount = 10;
     ticket.name = 'NAME';
+    ticket.minAmountRestrictions = 0;
+    ticket.restrictions = [];
     ticket.save(); 
     let balanceId = getBalanceId(
       BigInt.fromString('1'), 
@@ -393,6 +591,9 @@ describe("TicketsMarketplace", () => {
     ticket.isPrivate = false;
     ticket.totalAmount = 10;
     ticket.name = 'NAME';
+    ticket.minAmountRestrictions = 0;
+    ticket.restrictions = [];
+    ticket.extraRequirement = 'none';
     ticket.save(); 
     let balanceId = getBalanceId(
       BigInt.fromString('1'), 
@@ -442,6 +643,8 @@ describe("TicketsMarketplace", () => {
     ticket.isPrivate = false;
     ticket.totalAmount = 10;
     ticket.name = 'NAME';
+    ticket.minAmountRestrictions = 0;
+    ticket.restrictions = [];
     ticket.save(); 
     let balanceId = getBalanceId(
       BigInt.fromString('1'), 
@@ -486,6 +689,8 @@ describe("TicketsMarketplace", () => {
     ticket.isResellable = false;
     ticket.isPrivate = false;
     ticket.totalAmount = 10;
+    ticket.minAmountRestrictions = 0;
+    ticket.restrictions = [];
     ticket.save(); 
     let balanceId = getBalanceId(
       BigInt.fromString('1'), 

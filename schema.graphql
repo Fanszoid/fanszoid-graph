@@ -95,6 +95,10 @@ type Ticket @entity {
   name: String
   description: String
   image: String
+  extraRequirement: String
+  minAmountRestrictions: Int!
+  restrictions: [Restriction!]! @derivedFrom(field: "ticket")
+
 }
 
 type Membership @entity {
@@ -180,4 +184,11 @@ type AllowedMembership @entity {
   address: String!
   tokenIds: [BigInt!]
   ticket: Ticket!
+}
+
+type Restriction @entity {
+  id: ID!
+  condition: String!
+  conditionType: String!
+  ticket: Ticket! @derivedFrom(field: "restrictions")
 }

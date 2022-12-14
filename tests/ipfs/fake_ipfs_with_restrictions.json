@@ -1,0 +1,17 @@
+{
+    "name":"FAKE",
+    "description":"<p>test</p>",
+    "image":"",
+    "minAmountRestrictions":1,
+    "restrictions":[
+        {
+            "conditionType": "POAP",
+            "condition": "65000"
+        },
+        {
+            "conditionType": "POAP",
+            "condition": "5000"
+        }
+    ],
+    "extra_requirement":"none"
+}

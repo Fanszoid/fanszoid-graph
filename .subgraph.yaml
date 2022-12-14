@@ -81,8 +81,10 @@ dataSources:
           file: ./abis/TicketsMarketplace.json
       eventHandlers:
         - event: TicketPublished(indexed uint256,address,indexed uint256,uint256,uint256,uint256,uint256,bool,string)
-          handler: handleTicketPublishedLegacy
+          handler: handleTicketPublishedLegacyLegacy
         - event: TicketPublished(indexed uint256,address,indexed uint256,uint256,(uint256,uint256,uint256,uint256,bool,string,bool,(uint256,address[])[]),string)
+          handler: handleTicketPublishedLegacy
+        - event: TicketPublished(indexed uint256,address,indexed uint256,uint256,(uint256,uint256,uint256,uint256,bool,string,bool,(uint256,address[])[],address),string)
           handler: handleTicketPublished
         - event: TicketEdited(indexed uint256,string)
           handler: handleTicketUriModification
@@ -92,8 +94,10 @@ dataSources:
           handler: handleTicketDeletedLegacy
         - event: TicketsDeleted(uint256[],address,uint256[])
           handler: handleTicketDeleted
-        - event: AskSetted(indexed uint256,indexed address,uint256,uint256)
+        - event: AskSetted(indexed uint256,indexed address,uint256,uint256,address)
           handler: handleAskSetted
+        - event: AskSetted(indexed uint256,indexed address,uint256,uint256)
+          handler: handleAskSettedLegacy
         - event: AskRemoved(indexed address,indexed uint256)
           handler: handleAskRemoved
         - event: CreatorRoyaltyModifiedOnTicket(indexed uint256,uint256)

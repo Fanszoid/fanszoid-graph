@@ -52,6 +52,8 @@ export function handleAllowanceAdded(event: AllowanceAdded): void {
     ticketEntity.totalAmount = 0;
     ticketEntity.isPrivate = false;
     ticketEntity.allowances = [allowance.id];
+    ticketEntity.minAmountRestrictions = 0;
+    ticketEntity.restrictions = [];
     
   } else {
     let allowances = ticketEntity.allowances || []
@@ -365,6 +367,12 @@ export function handleTicketPublishedLegacy(event: TicketPublished1): void {
   ticket.isPrivate = event.params.saleInfo.isPrivate;
   
   let parsed = parseMetadata(event.params.uri, ticket, ticketAttrs);
+  let parsedRestrictions = createRestrictionForTicketForMetadata(ticket, event.params.uri);
+  if(!parsedRestrictions) {
+    ticket.minAmountRestrictions = 0;
+    ticket.restrictions = [];
+  }
+
   
   if(parsed) {
     ticket.save();

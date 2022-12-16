@@ -189,4 +189,6 @@ type Restriction @entity {
   id: ID!
   condition: String!
   conditionType: String!
+  name: String
+  imageUrl: String
 }

@@ -2,6 +2,8 @@ import { JSONValue, JSONValueKind, log, TypedMap } from "@graphprotocol/graph-ts
 import { Restriction, Ticket } from "../../../build/generated/schema";
 import { loadMetadata, parseJSONValueToString } from "../../handlers/utils";
 
+const OPTIONAL_RESTRICTIONS_PARAMS = ['imageUrl', 'name'];
+
 export function getRestrictionId(conditionType: string, condition: string) : string {
     return `${conditionType}-${condition}`
 }
@@ -43,9 +45,17 @@ export function createRestrictionForTicketForMetadata(ticket: Ticket, uri: strin
         if(restrictionListArray[i].kind == JSONValueKind.OBJECT) {
             let restrictionObject = restrictionListArray[i].toObject();
             if(!!restrictionObject.get('condition') && !!restrictionObject.get('conditionType')) {
-                let restriction = loadOrCreateRestriction(parseJSONValueToString(restrictionObject.get('conditionType') as JSONValue), parseJSONValueToString(restrictionObject.get('condition') as JSONValue));
+                let restriction = Restriction.load(getRestrictionId(parseJSONValueToString(restrictionObject.get('conditionType') as JSONValue), parseJSONValueToString(restrictionObject.get('condition') as JSONValue)));
+                if(!restriction) {
+                    restriction = loadOrCreateRestriction(parseJSONValueToString(restrictionObject.get('conditionType') as JSONValue), parseJSONValueToString(restrictionObject.get('condition') as JSONValue));
+                    for(let j = 0; j < OPTIONAL_RESTRICTIONS_PARAMS.length; j++) {
+                        if(!!restrictionObject.get(OPTIONAL_RESTRICTIONS_PARAMS[i])) {
+                            restriction.setString(OPTIONAL_RESTRICTIONS_PARAMS[i], parseJSONValueToString(restrictionObject.get(OPTIONAL_RESTRICTIONS_PARAMS[i]) as JSONValue))
+                        }
+                    }
+                    restriction.save()
+                }
                 finalRestrictionList.push(getRestrictionId(parseJSONValueToString(restrictionObject.get('conditionType') as JSONValue), parseJSONValueToString(restrictionObject.get('condition') as JSONValue)));
-                restriction.save()
             }
         }
     }

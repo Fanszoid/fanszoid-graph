@@ -52,7 +52,7 @@ export function handleAllowanceAdded(event: AllowanceAdded): void {
     ticketEntity.totalAmount = 0;
     ticketEntity.isPrivate = false;
     ticketEntity.allowances = [allowance.id];
-    ticketEntity.minAmountRestrictions = 0;
+    ticketEntity.minRestrictionAmount = 0;
     ticketEntity.restrictions = [];
     
   } else {
@@ -113,7 +113,7 @@ export function handleTicketUriModification(event: TicketEdited): void {
   let parsed = parseMetadata(event.params.newUri, ticketEntity, ticketAttrs);
   let parsedRestrictions = createRestrictionForTicketForMetadata(ticketEntity, event.params.newUri);
   if(!parsedRestrictions) {
-    ticketEntity.minAmountRestrictions = 0;
+    ticketEntity.minRestrictionAmount = 0;
     ticketEntity.restrictions = [];
   }
 
@@ -142,7 +142,7 @@ export function handleTicketPublished(event: TicketPublished2): void {
 
   let parsedRestrictions = createRestrictionForTicketForMetadata(ticket, event.params.uri);
   if(!parsedRestrictions) {
-    ticket.minAmountRestrictions = 0;
+    ticket.minRestrictionAmount = 0;
     ticket.restrictions = [];
   }
   
@@ -324,7 +324,7 @@ export function handleTicketPublishedLegacyLegacy(event: TicketPublished): void 
   let parsed = parseMetadata(event.params.uri, ticket, ticketAttrs);
   let parsedRestrictions = createRestrictionForTicketForMetadata(ticket, event.params.uri);
   if(!parsedRestrictions) {
-    ticket.minAmountRestrictions = 0;
+    ticket.minRestrictionAmount = 0;
     ticket.restrictions = [];
   }
 
@@ -369,7 +369,7 @@ export function handleTicketPublishedLegacy(event: TicketPublished1): void {
   let parsed = parseMetadata(event.params.uri, ticket, ticketAttrs);
   let parsedRestrictions = createRestrictionForTicketForMetadata(ticket, event.params.uri);
   if(!parsedRestrictions) {
-    ticket.minAmountRestrictions = 0;
+    ticket.minRestrictionAmount = 0;
     ticket.restrictions = [];
   }
 

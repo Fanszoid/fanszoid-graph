@@ -122,7 +122,7 @@ describe("Admin", () => {
     ticket.isPrivate = false;
     ticket.totalAmount = 10;
     ticket.event = 'e0x0';
-    ticket.minAmountRestrictions = 0;
+    ticket.minRestrictionAmount = 0;
     ticket.restrictions = [];
     ticket.save(); 
 
@@ -295,7 +295,7 @@ describe("Admin", () => {
     ticket.isPrivate = false;
     ticket.totalAmount = 10;
     ticket.event = 'e0x0';
-    ticket.minAmountRestrictions = 0;
+    ticket.minRestrictionAmount = 0;
     ticket.restrictions = [];
     ticket.save(); 
 
@@ -336,7 +336,7 @@ describe("Admin", () => {
     ticket.isPrivate = false;
     ticket.totalAmount = 10;
     ticket.event = 'e0x0';
-    ticket.minAmountRestrictions = 0;
+    ticket.minRestrictionAmount = 0;
     ticket.restrictions = [];
     ticket.save(); 
 
@@ -377,7 +377,7 @@ describe("Admin", () => {
     ticket.isPrivate = false;
     ticket.totalAmount = 10;
     ticket.event = 'e0x0';
-    ticket.minAmountRestrictions = 0;
+    ticket.minRestrictionAmount = 0;
     ticket.restrictions = [];
     ticket.save(); 
 

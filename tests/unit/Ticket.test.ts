@@ -41,7 +41,7 @@ describe("Tickets", () => {
       ticket.isResellable = false;
       ticket.isPrivate = false;
       ticket.totalAmount = 10;
-      ticket.minAmountRestrictions = 0;
+      ticket.minRestrictionAmount = 0;
       ticket.restrictions = [];
       ticket.save();
       let balance1 = new Balance(getBalanceId(new BigInt(0), Address.fromString(address1), false));;

@@ -26,11 +26,11 @@ export function createRestrictionForTicketForMetadata(ticket: Ticket, uri: strin
         return false;
     }
 
-    if(!value.get('minAmountRestrictions') || (value.get('minAmountRestrictions') as JSONValue).kind != JSONValueKind.NUMBER) {
+    if(!value.get('minRestrictionAmount') || (value.get('minRestrictionAmount') as JSONValue).kind != JSONValueKind.NUMBER) {
         return false;
     }
     
-    ticket.minAmountRestrictions = (value.get('minAmountRestrictions') as JSONValue).toBigInt().toI32();
+    ticket.minRestrictionAmount = (value.get('minRestrictionAmount') as JSONValue).toBigInt().toI32();
 
     if(!value.get('restrictions') || (value.get('restrictions') as JSONValue).kind != JSONValueKind.ARRAY) {
         return false;

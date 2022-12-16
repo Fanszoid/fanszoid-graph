@@ -96,7 +96,7 @@ type Ticket @entity {
   description: String
   image: String
   extraRequirement: String
-  minAmountRestrictions: Int!
+  minRestrictionAmount: Int!
   restrictions: [Restriction!]!
 }
 

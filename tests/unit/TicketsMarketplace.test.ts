@@ -42,7 +42,7 @@ describe("TicketsMarketplace", () => {
       ticket.isResellable = false;
       ticket.isPrivate = false;
       ticket.totalAmount = 10;
-      ticket.minAmountRestrictions = 0;
+      ticket.minRestrictionAmount = 0;
       ticket.restrictions = [];
       ticket.save();
       let balance1 = new Balance("t0x0-".concat(address1));
@@ -129,7 +129,7 @@ describe("TicketsMarketplace", () => {
     ticket.isPrivate = false;
     ticket.totalAmount = 10;
     ticket.allowances = ['ta-0x1'];
-    ticket.minAmountRestrictions = 0;
+    ticket.minRestrictionAmount = 0;
     ticket.restrictions = [];
     ticket.save(); 
     
@@ -163,7 +163,7 @@ describe("TicketsMarketplace", () => {
     ticket.isPrivate = false;
     ticket.totalAmount = 10;
     ticket.name = 'NAME';
-    ticket.minAmountRestrictions = 0;
+    ticket.minRestrictionAmount = 0;
     ticket.restrictions = [];
     ticket.save(); 
     
@@ -189,7 +189,7 @@ describe("TicketsMarketplace", () => {
     handleTicketUriModification(event)
     assert.fieldEquals('Ticket', 'tt0x1', 'name', 'FAKE')
     assert.fieldEquals('Ticket', 'tt0x1', 'restrictions', '[]')
-    assert.fieldEquals('Ticket', 'tt0x1', 'minAmountRestrictions', '0')
+    assert.fieldEquals('Ticket', 'tt0x1', 'minRestrictionAmount', '0')
   });
 
   test("Handle ticket published", () => {   
@@ -248,7 +248,7 @@ describe("TicketsMarketplace", () => {
     assert.fieldEquals('Ticket', 'tt0x1', 'event', 'e0x0')
     assert.fieldEquals('Ticket', 'tt0x1', 'extraRequirement', 'none')
     assert.fieldEquals('Ticket', 'tt0x1', 'restrictions', '[]')
-    assert.fieldEquals('Ticket', 'tt0x1', 'minAmountRestrictions', '0')
+    assert.fieldEquals('Ticket', 'tt0x1', 'minRestrictionAmount', '0')
     assert.fieldEquals('Ticket', 'tt0x1', 'name', 'FAKE')
     let balanceId = getBalanceId(BigInt.fromString('1'), Address.fromString('0x87d250a5c9674788F946F10E95641bba4DEa838f'), false);
     assert.fieldEquals('Balance', balanceId, 'amountOwned', '10')
@@ -429,7 +429,7 @@ describe("TicketsMarketplace", () => {
     assert.notInStore('Ticket', 'tt0x1')
     handleTicketPublished(event)
     assert.fieldEquals('Ticket', 'tt0x1', 'event', 'e0x0')
-    assert.fieldEquals('Ticket', 'tt0x1', 'minAmountRestrictions', '1')
+    assert.fieldEquals('Ticket', 'tt0x1', 'minRestrictionAmount', '1')
     assert.fieldEquals('Ticket', 'tt0x1', 'name', 'FAKE')
     let balanceId = getBalanceId(BigInt.fromString('1'), Address.fromString('0x87d250a5c9674788F946F10E95641bba4DEa838f'), false);
     assert.fieldEquals('Balance', balanceId, 'amountOwned', '10')
@@ -443,7 +443,7 @@ describe("TicketsMarketplace", () => {
     ticket.isPrivate = false;
     ticket.totalAmount = 10;
     ticket.name = 'NAME';
-    ticket.minAmountRestrictions = 0;
+    ticket.minRestrictionAmount = 0;
     ticket.restrictions = [];
     ticket.save(); 
     let balanceId = getBalanceId(
@@ -491,7 +491,7 @@ describe("TicketsMarketplace", () => {
     ticket.isPrivate = false;
     ticket.totalAmount = 10;
     ticket.name = 'NAME';
-    ticket.minAmountRestrictions = 0;
+    ticket.minRestrictionAmount = 0;
     ticket.restrictions = [];
     ticket.save(); 
     let balanceId = getBalanceId(
@@ -542,7 +542,7 @@ describe("TicketsMarketplace", () => {
     ticket.isPrivate = false;
     ticket.totalAmount = 10;
     ticket.name = 'NAME';
-    ticket.minAmountRestrictions = 0;
+    ticket.minRestrictionAmount = 0;
     ticket.restrictions = [];
     ticket.save(); 
     let balanceId = getBalanceId(
@@ -591,7 +591,7 @@ describe("TicketsMarketplace", () => {
     ticket.isPrivate = false;
     ticket.totalAmount = 10;
     ticket.name = 'NAME';
-    ticket.minAmountRestrictions = 0;
+    ticket.minRestrictionAmount = 0;
     ticket.restrictions = [];
     ticket.extraRequirement = 'none';
     ticket.save(); 
@@ -643,7 +643,7 @@ describe("TicketsMarketplace", () => {
     ticket.isPrivate = false;
     ticket.totalAmount = 10;
     ticket.name = 'NAME';
-    ticket.minAmountRestrictions = 0;
+    ticket.minRestrictionAmount = 0;
     ticket.restrictions = [];
     ticket.save(); 
     let balanceId = getBalanceId(
@@ -689,7 +689,7 @@ describe("TicketsMarketplace", () => {
     ticket.isResellable = false;
     ticket.isPrivate = false;
     ticket.totalAmount = 10;
-    ticket.minAmountRestrictions = 0;
+    ticket.minRestrictionAmount = 0;
     ticket.restrictions = [];
     ticket.save(); 
     let balanceId = getBalanceId(

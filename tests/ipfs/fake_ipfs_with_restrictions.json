@@ -2,7 +2,7 @@
     "name":"FAKE",
     "description":"<p>test</p>",
     "image":"",
-    "minAmountRestrictions":1,
+    "minRestrictionAmount":1,
     "restrictions":[
         {
             "conditionType": "POAP",

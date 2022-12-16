@@ -54,7 +54,7 @@ export function createRestrictionForTicketForMetadata(ticket: Ticket, uri: strin
                         }
                     }
                     if(!restriction.imageUrl && !!restrictionObject.get('image_url')) {
-                        restriction.imageUrl = parseJSONValueToString(restrictionObject.get('image') as JSONValue)
+                        restriction.imageUrl = parseJSONValueToString(restrictionObject.get('image_url') as JSONValue)
                     }
                     restriction.save()
                 }

@@ -49,8 +49,8 @@ export function createRestrictionForTicketForMetadata(ticket: Ticket, uri: strin
                 if(!restriction) {
                     restriction = loadOrCreateRestriction(parseJSONValueToString(restrictionObject.get('conditionType') as JSONValue), parseJSONValueToString(restrictionObject.get('condition') as JSONValue));
                     for(let j = 0; j < OPTIONAL_RESTRICTIONS_PARAMS.length; j++) {
-                        if(!!restrictionObject.get(OPTIONAL_RESTRICTIONS_PARAMS[i])) {
-                            restriction.setString(OPTIONAL_RESTRICTIONS_PARAMS[i], parseJSONValueToString(restrictionObject.get(OPTIONAL_RESTRICTIONS_PARAMS[i]) as JSONValue))
+                        if(!!restrictionObject[i].get(OPTIONAL_RESTRICTIONS_PARAMS[j])) {
+                            restriction.setString(OPTIONAL_RESTRICTIONS_PARAMS[j], parseJSONValueToString(restrictionObject[i].get(OPTIONAL_RESTRICTIONS_PARAMS[j]) as JSONValue))
                         }
                     }
                     restriction.save()

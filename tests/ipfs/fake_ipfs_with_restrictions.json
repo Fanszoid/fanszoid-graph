@@ -1,17 +1,1 @@
-{
-    "name":"FAKE",
-    "description":"<p>test</p>",
-    "image":"",
-    "minRestrictionAmount":1,
-    "restrictions":[
-        {
-            "conditionType": "POAP",
-            "condition": "65000"
-        },
-        {
-            "conditionType": "POAP",
-            "condition": "5000"
-        }
-    ],
-    "extra_requirement":"none"
-}
+{"name":"Test ticket 2","description":"<p>test</p>","image":"https://ipfs.fanz.events/ipfs/QmXVTdeSddzyTgywaFh3VUaU5rqHk7QnpUmnikPHXPjfpr","minRestrictionAmount":1,"restrictions":[{"conditionType":"POAP","condition":65000,"name":"Better Space Ep.11","imageUrl":"https://assets.poap.xyz/better-space-ep11-2022-logo-1663106437011.png"}],"extraRequirement":"POAP Ownership"}

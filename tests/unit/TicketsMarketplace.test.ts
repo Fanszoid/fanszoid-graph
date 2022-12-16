@@ -430,8 +430,10 @@ describe("TicketsMarketplace", () => {
     handleTicketPublished(event)
     assert.fieldEquals('Ticket', 'tt0x1', 'event', 'e0x0')
     assert.fieldEquals('Ticket', 'tt0x1', 'minRestrictionAmount', '1')
-    assert.fieldEquals('Ticket', 'tt0x1', 'name', 'FAKE')
+    assert.fieldEquals('Ticket', 'tt0x1', 'name', 'Test ticket 2')
     let balanceId = getBalanceId(BigInt.fromString('1'), Address.fromString('0x87d250a5c9674788F946F10E95641bba4DEa838f'), false);
+
+    assert.fieldEquals('Restriction', 'POAP-65000', 'imageUrl', 'https://assets.poap.xyz/better-space-ep11-2022-logo-1663106437011.png')
     assert.fieldEquals('Balance', balanceId, 'amountOwned', '10')
   });
 

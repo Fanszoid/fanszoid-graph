@@ -151,6 +151,7 @@ export function handleMembershipPublished(event: MembershipPublished1): void {
     membershipBalance.amountOwned = event.params.amount.toI32();
     membershipBalance.owner = event.params.organizer.toHex();
     membershipBalance.isEventOwner = true;
+    membershipBalance.paymentTokenAddress = '0x0000000000000000000000000000000000000000';
 
     membershipBalance.save();
   } else {
@@ -299,6 +300,7 @@ export function handleMembershipPublishedLegacy(event: MembershipPublished): voi
     membershipBalance.amountOwned = event.params.amount.toI32();
     membershipBalance.owner = event.params.organizer.toHex();
     membershipBalance.isEventOwner = true;
+    membershipBalance.paymentTokenAddress = '0x0000000000000000000000000000000000000000';
 
     membershipBalance.save();
   } else {

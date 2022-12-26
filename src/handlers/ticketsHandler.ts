@@ -2,13 +2,14 @@ import {
   TransferBatch,
   TransferSingle,
 } from "../../build/generated/Ticket/Ticket";
-import { Event, Balance } from "../../build/generated/schema";
+import { Event, Balance, TicketIdentifier } from "../../build/generated/schema";
 import {
   getBalanceId,
   balanceHasNAmountAvailable
 } from "../modules/Balance";
 import {
   getTicketId,
+  getTicketIdentifierId,
 } from "../modules/Ticket";
 import {
   loadOrCreateTransfer,
@@ -123,11 +124,39 @@ function internalTransferToken(
     }
     toBalance.save();
     eventEntity.save();
+
+    // ticket identifiers handling.
+    
+    for(let i=0; i < value.toI32(); i++) {
+      if(fromBalance.ticketIdentifiers && fromBalance.ticketIdentifiers!.length > 0 ) {
+        // change owner of ticketIdentifier
+        let ticketIdentifier = TicketIdentifier.load(fromBalance.ticketIdentifiers![-1])
+        if(ticketIdentifier == null ){
+          log.error("Last ticketIdentifier not found on from balance. id : {}", [fromBalance.id]);
+          return;
+        }
+        ticketIdentifier.owner = to.toHex();
+
+        ticketIdentifier.save();
+      } else {
+        // create new ticketIdentifier
+        let ticketIdentifier = new TicketIdentifier(getTicketIdentifierId(id, txHash,to, i))
+        ticketIdentifier.owner = to.toHex();
+        ticketIdentifier.ticket = getTicketId(id);
+        ticketIdentifier.ticketBalance = toBalance.id;
+
+        ticketIdentifier.save();
+      }
+    }
+
+    
   } else {
     log.info("Transfer single, to: {}, from: {}. Nothing done...", [
       to.toHex(),
       from.toHex(),
     ]);
   }
+
+  
 }
 

@@ -89,6 +89,7 @@ type Ticket @entity {
   allowedMemberships: [AllowedMembership!]  @derivedFrom(field: "ticket")
   isPrivate: Boolean!
   allowances: [Allowance!]
+  ticketIdentifiers: [TicketIdentifier!] @derivedFrom(field: "ticket")
 
   memberships: [Membership!]! @derivedFrom(field: "validTickets")
 
@@ -140,9 +141,18 @@ type Balance @entity {
   amountOwned: Int!
   owner: User!
   isEventOwner: Boolean!
+  ticketIdentifiers: [TicketIdentifier!] @derivedFrom(field: "ticketBalance")
   sent: [Transfer!] @derivedFrom(field: "senderBalance")
   received: [Transfer!] @derivedFrom(field: "receiverBalance")
   paymentTokenAddress: String
+}
+
+# Entity to keep accountability of each single ticket off-chain (for entrance validation purposes).
+type TicketIdentifier @entity {
+  id: ID!
+  ticket: Ticket!
+  owner: User!
+  ticketBalance: Balance!
 }
 
 type User @entity {
@@ -150,6 +160,7 @@ type User @entity {
   address: String!
   events: [Event!] @derivedFrom(field: "organizer")
   ticketBalances: [Balance!] @derivedFrom(field: "owner")
+  ticketIdentifiers: [TicketIdentifier!] @derivedFrom(field: "owner")
   membershipBalances: [Balance!] @derivedFrom(field: "owner")
   sentTickets: [Transfer!] @derivedFrom(field: "sender")
   receivedTickets: [Transfer!] @derivedFrom(field: "receiver")

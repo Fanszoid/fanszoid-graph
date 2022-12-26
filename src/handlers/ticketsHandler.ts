@@ -126,25 +126,30 @@ function internalTransferToken(
     eventEntity.save();
 
     // ticket identifiers handling.
-    if(fromBalance.ticketIdentifiers && fromBalance.ticketIdentifiers!.length > 0 ) {
-      // change owner of ticketIdentifier
-      let ticketIdentifier = TicketIdentifier.load(fromBalance.ticketIdentifiers![-1])
-      if(ticketIdentifier == null ){
-        log.error("Last ticketIdentifier not found on from balance. id : {}", [fromBalance.id]);
-        return;
+    
+    for(let i=0; i < value.toI32(); i++) {
+      if(fromBalance.ticketIdentifiers && fromBalance.ticketIdentifiers!.length > 0 ) {
+        // change owner of ticketIdentifier
+        let ticketIdentifier = TicketIdentifier.load(fromBalance.ticketIdentifiers![-1])
+        if(ticketIdentifier == null ){
+          log.error("Last ticketIdentifier not found on from balance. id : {}", [fromBalance.id]);
+          return;
+        }
+        ticketIdentifier.owner = to.toHex();
+
+        ticketIdentifier.save();
+      } else {
+        // create new ticketIdentifier
+        let ticketIdentifier = new TicketIdentifier(getTicketIdentifierId(id, txHash,to, i))
+        ticketIdentifier.owner = to.toHex();
+        ticketIdentifier.ticket = getTicketId(id);
+        ticketIdentifier.ticketBalance = toBalance.id;
+
+        ticketIdentifier.save();
       }
-      ticketIdentifier.owner = to.toHex();
-
-      ticketIdentifier.save();
-    } else {
-      // create new ticketIdentifier
-      let ticketIdentifier = new TicketIdentifier(getTicketIdentifierId(id, txHash,to))
-      ticketIdentifier.owner = to.toHex();
-      ticketIdentifier.ticket = getTicketId(id);
-      ticketIdentifier.ticketBalance = toBalance.id;
-
-      ticketIdentifier.save();
     }
+
+    
   } else {
     log.info("Transfer single, to: {}, from: {}. Nothing done...", [
       to.toHex(),

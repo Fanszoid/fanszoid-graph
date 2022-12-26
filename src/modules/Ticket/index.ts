@@ -9,8 +9,8 @@ export function getTicketId(ticketIdContract: BigInt): string {
   return "tt" + ticketIdContract.toHex();
 }
 
-export function getTicketIdentifierId(ticketIdContract: BigInt, txHash: string, user: Address): string {
-  return "tid" + ticketIdContract.toHex() + "-" + txHash + "-" + user.toHex();
+export function getTicketIdentifierId(ticketIdContract: BigInt, txHash: string, user: Address, offset: number): string {
+  return "tid" + ticketIdContract.toHex() + "-" + txHash + "-" + user.toHex() + "-" + offset.toString();
 }
 
 export function loadOrCreateTicket(

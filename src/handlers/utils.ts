@@ -6,7 +6,7 @@ import { loadOrCreateRestriction } from "../modules/Restriction";
 export function loadMetadata(uri: string) : TypedMap<string, JSONValue> | null {
   let uriParts = uri.split("/");
   let hash = uriParts[uriParts.length - 1];
-  let retries = 3;
+  let retries = 5;
   let data: Bytes | null = null;
   while(!data && retries > 0) {
     data = ipfs.cat(hash);

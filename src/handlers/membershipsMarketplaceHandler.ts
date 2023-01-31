@@ -152,6 +152,7 @@ export function handleMembershipPublished(event: MembershipPublished1): void {
     membershipBalance.owner = event.params.organizer.toHex();
     membershipBalance.isEventOwner = true;
     membershipBalance.paymentTokenAddress = '0x0000000000000000000000000000000000000000';
+    membershipBalance.ticketIdentifiersIds = [];
 
     membershipBalance.save();
   } else {
@@ -301,6 +302,7 @@ export function handleMembershipPublishedLegacy(event: MembershipPublished): voi
     membershipBalance.owner = event.params.organizer.toHex();
     membershipBalance.isEventOwner = true;
     membershipBalance.paymentTokenAddress = '0x0000000000000000000000000000000000000000';
+    membershipBalance.ticketIdentifiersIds = [];
 
     membershipBalance.save();
   } else {

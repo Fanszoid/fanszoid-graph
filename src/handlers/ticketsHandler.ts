@@ -15,7 +15,7 @@ import {
   loadOrCreateTransfer,
 } from "../modules/Transfer";
 import { loadOrCreateUser } from "../modules/User";
-import { Address, log, store } from "@graphprotocol/graph-ts";
+import { Address, ByteArray, Bytes, log, store } from "@graphprotocol/graph-ts";
 import { BigInt } from "@graphprotocol/graph-ts/common/numbers";
 
 export function handleTransferSingle(event: TransferSingle): void {
@@ -67,18 +67,11 @@ function internalTransferToken(
       return;
     }
 
-    if (fromBalance.type == 'Ticket' && fromBalance.event == null) {
-      log.error("Event not found on ticket balance. id : {}", [fromBalance.id]);
-      return;
-    }
-
     let eventEntity = Event.load((fromBalance.event as string));
     if(eventEntity == null ) {
       log.error("Event not found on internalTransferToken. id : {}", [(fromBalance.event as string)]);
       return;
     }
-
-    fromBalance.amountOwned = fromBalance.amountOwned - value.toI32();
     
     let toBalanceId = getBalanceId(id, to, false)
     let toBalance = Balance.load(toBalanceId);
@@ -91,12 +84,65 @@ function internalTransferToken(
       toBalance.isEventOwner = to.toHex() == eventEntity.organizer;
       toBalance.amountOwned = value.toI32();
       toBalance.amountOnSell = 0;
+      toBalance.ticketIdentifiersIds = [];
       if (toBalance.owner != eventEntity.organizer) {
         eventEntity.attendees = eventEntity.attendees.plus(BigInt.fromI32(1));
       }
     } else {
       toBalance.amountOwned = toBalance.amountOwned + value.toI32();
     }
+
+    // ticket identifiers handling.
+    
+    for(let i=0; i < value.toI32(); i++) {
+      log.info("Ticket transfer on loop: i={}", [i.toString()])
+      if(fromBalance.ticketIdentifiersIds != null && fromBalance.ticketIdentifiersIds.length > 0 ) {
+        // change owner of ticketIdentifier
+        log.info("Changing owner of ticket Identifier...", [])
+        let tiId = fromBalance.ticketIdentifiersIds[fromBalance.ticketIdentifiersIds.length-1]
+        let ticketIdentifier = TicketIdentifier.load(tiId.toString())
+        if(ticketIdentifier == null ){
+          log.error("Last ticketIdentifier not found on from balance. id : {}", [fromBalance.id]);
+          return;
+        }
+
+        ticketIdentifier.owner = to.toHex();
+        ticketIdentifier.ticketBalance = toBalance.id;
+        ticketIdentifier.save();
+
+        let fromTiIds = fromBalance.ticketIdentifiersIds;
+        fromTiIds.pop();
+        fromBalance.ticketIdentifiersIds = fromTiIds;
+
+        let toTiIds = toBalance.ticketIdentifiersIds;
+        toTiIds.push(tiId);
+        toBalance.ticketIdentifiersIds = toTiIds;
+      } else {
+        log.info("creating new ticket Identifier...", [])
+        // create new ticketIdentifier
+        let tId = getTicketIdentifierId(id, txHash,to, i)
+
+        let ticketIdentifier = new TicketIdentifier(tId)
+        ticketIdentifier.owner = to.toHex();
+        ticketIdentifier.ticket = getTicketId(id);
+        ticketIdentifier.ticketBalance = toBalance.id;
+
+        ticketIdentifier.save();
+
+        let toTiIds = toBalance.ticketIdentifiersIds;
+        toTiIds.push(Bytes.fromByteArray(ByteArray.fromUTF8(tId)));
+        toBalance.ticketIdentifiersIds = toTiIds;
+      }
+    }
+
+    if (fromBalance.type == 'Ticket' && fromBalance.event == null) {
+      log.error("Event not found on ticket balance. id : {}", [fromBalance.id]);
+      return;
+    }
+
+    
+
+    fromBalance.amountOwned = fromBalance.amountOwned - value.toI32();
 
     let transfer = loadOrCreateTransfer(txHash);
 
@@ -125,29 +171,7 @@ function internalTransferToken(
     toBalance.save();
     eventEntity.save();
 
-    // ticket identifiers handling.
     
-    for(let i=0; i < value.toI32(); i++) {
-      if(fromBalance.ticketIdentifiers && fromBalance.ticketIdentifiers!.length > 0 ) {
-        // change owner of ticketIdentifier
-        let ticketIdentifier = TicketIdentifier.load(fromBalance.ticketIdentifiers![-1])
-        if(ticketIdentifier == null ){
-          log.error("Last ticketIdentifier not found on from balance. id : {}", [fromBalance.id]);
-          return;
-        }
-        ticketIdentifier.owner = to.toHex();
-
-        ticketIdentifier.save();
-      } else {
-        // create new ticketIdentifier
-        let ticketIdentifier = new TicketIdentifier(getTicketIdentifierId(id, txHash,to, i))
-        ticketIdentifier.owner = to.toHex();
-        ticketIdentifier.ticket = getTicketId(id);
-        ticketIdentifier.ticketBalance = toBalance.id;
-
-        ticketIdentifier.save();
-      }
-    }
 
     
   } else {
@@ -159,4 +183,3 @@ function internalTransferToken(
 
   
 }
-

@@ -51,6 +51,7 @@ describe("Memberships", () => {
       balance1.owner = org;
       balance1.amountOnSell = 5;
       balance1.isEventOwner = false;
+      balance1.ticketIdentifiersIds = [];
       balance1.save();
 
       let user2 = new User(address2);

@@ -164,7 +164,7 @@ export function handleTicketPublished(event: TicketPublished2): void {
     ticketBalance.owner = event.params.organizer.toHex();
     ticketBalance.isEventOwner = true;
     ticketBalance.paymentTokenAddress = event.params.saleInfo.paymentTokenAddress.toHex();
-
+    ticketBalance.ticketIdentifiersIds = [];
     ticketBalance.save();
   } else {
     log.error("Error parsing metadata on handleTicketPublished, metadata hash is: {}", [event.params.uri])
@@ -345,7 +345,7 @@ export function handleTicketPublishedLegacyLegacy(event: TicketPublished): void 
     ticketBalance.owner = event.params.organizer.toHex();
     ticketBalance.isEventOwner = true;
     ticketBalance.paymentTokenAddress = '0x0000000000000000000000000000000000000000';
-
+    ticketBalance.ticketIdentifiersIds = [];
     ticketBalance.save();
   } else {
     log.error("Error parsing metadata on handleTicketPublishedLegacy, metadata hash is: {}", [event.params.uri])
@@ -392,6 +392,7 @@ export function handleTicketPublishedLegacy(event: TicketPublished1): void {
     ticketBalance.owner = event.params.organizer.toHex();
     ticketBalance.isEventOwner = true;
     ticketBalance.paymentTokenAddress = '0x0000000000000000000000000000000000000000';
+    ticketBalance.ticketIdentifiersIds = [];
 
     ticketBalance.save();
   } else {

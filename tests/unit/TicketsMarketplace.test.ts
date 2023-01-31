@@ -53,6 +53,7 @@ describe("TicketsMarketplace", () => {
       balance1.ticket = ticket.id;
       balance1.owner = org;
       balance1.isEventOwner = false;
+      balance1.ticketIdentifiersIds = [];
       balance1.save();
 
       let user2 = new User(address2);
@@ -461,6 +462,7 @@ describe("TicketsMarketplace", () => {
     balance.amountOnSell = 3;
     balance.isEventOwner = false;
     balance.type = 'Ticket';
+    balance.ticketIdentifiersIds = [];
     balance.save();
     
     let mockEvent = newMockEvent();
@@ -509,6 +511,7 @@ describe("TicketsMarketplace", () => {
     balance.askingPrice = BigInt.fromString('10');
     balance.isEventOwner = false;
     balance.type = 'Ticket';
+    balance.ticketIdentifiersIds = [];
     balance.save();
     
     let mockEvent = newMockEvent();
@@ -559,6 +562,7 @@ describe("TicketsMarketplace", () => {
     balance.amountOnSell = 0;
     balance.isEventOwner = false;
     balance.type = 'Ticket';
+    balance.ticketIdentifiersIds = [];
     balance.save();
     
     let mockEvent = newMockEvent();
@@ -610,6 +614,7 @@ describe("TicketsMarketplace", () => {
     balance.isEventOwner = false;
     balance.type = 'Ticket';
     balance.paymentTokenAddress = '0x0000000000000000000000000000000000000000';
+    balance.ticketIdentifiersIds = [];
     balance.save();
     
     let mockEvent = newMockEvent();
@@ -660,6 +665,7 @@ describe("TicketsMarketplace", () => {
     balance.amountOnSell = 3;
     balance.isEventOwner = false;
     balance.type = 'Ticket';
+    balance.ticketIdentifiersIds = [];
     balance.save();
     
     let mockEvent = newMockEvent();
@@ -706,6 +712,7 @@ describe("TicketsMarketplace", () => {
     balance.amountOnSell = 3;
     balance.isEventOwner = false;
     balance.type = 'Ticket';
+    balance.ticketIdentifiersIds = [];
     balance.save();
     
     let mockEvent = newMockEvent();

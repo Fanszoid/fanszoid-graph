@@ -72,6 +72,7 @@ export function parseMetadata(uri: string, entity: Entity, attrs: string[]): boo
           else if( attrs[i] == "socials") {
             if( aux.kind === JSONValueKind.ARRAY ) {
               let socials = aux.toArray();
+              var socialIdxCounts = new Map<string,number>()
 
             for( let i=0; i< socials.length ; i++) {
               let social = socials[i];
@@ -89,12 +90,20 @@ export function parseMetadata(uri: string, entity: Entity, attrs: string[]): boo
                 }
               }
                 
-                let socialNetwork = new SocialNetwork(entity.getString("id") + '-' + name + '-' + i.toString());
+                let idx = socialIdxCounts.has(name) ? socialIdxCounts.get(name) : 0
+                if(!socialIdxCounts.has(name)) {
+                  socialIdxCounts.set(name, 0);
+                }
+
+                let socialNetwork = new SocialNetwork(entity.getString("id") + '-' + name + '-' + idx!.toString());
                 socialNetwork.name = name;
                 socialNetwork.url = url;
                 socialNetwork.event = entity.getString("id");
 
+                socialIdxCounts.set(name, idx! + 1)
+
                 socialNetwork.save();
+                
               }
             }
           }
@@ -132,7 +141,11 @@ export function parseJSONValueToString(value: JSONValue): string{
       case JSONValueKind.STRING:
         return value.toString();
       case JSONValueKind.NUMBER:
-        return value.toBigInt().toString();
+        let str = value.toF64().toString();
+        if( str[str.length-1] == "0" && str[str.length-2] == "." ) {
+          str = str.substring(0, str.length-2);
+        }
+        return str
       case JSONValueKind.BOOL:
         return value.toBool().toString();
       case JSONValueKind.OBJECT:

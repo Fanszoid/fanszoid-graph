@@ -73,6 +73,10 @@ type Event @entity {
   updatedAt: String
   image: String
   timezone: String
+  fullAddress: String
+  latitude: String
+  longitude: String
+  mapUrl: String
   startDateUTC: BigInt
   endDateUTC: BigInt
 }

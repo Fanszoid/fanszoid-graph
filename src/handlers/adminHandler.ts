@@ -26,6 +26,7 @@ import { membershipContractAddressMATIC, membershipContractAddressMUMBAI } from 
 import { store, log, BigInt, dataSource } from "@graphprotocol/graph-ts";
 import { parseMetadata } from "./utils"
 import { getTicketId } from "../modules/Ticket"
+import { getIndexedItemId, loadOrCreateIndexedItem } from "../modules/IndexedItems";
 
 export function handleEventPaused(event: EventPaused): void {
   let eventEntity = Event.load(getEventId(event.params.eventId));
@@ -88,16 +89,24 @@ export function handleCollaboratorRemoved(event: CollaboratorRemoved): void {
 }
 
 export function handleEventUriModification(event: EventEdited): void {
-  let eventEntity = Event.load(getEventId(event.params.eventId));
+  let eventEntity = loadOrCreateEvent(event.params.eventId);
   if (!eventEntity) {
     log.error("Event Not Found on handleEventUriModification. id : {}", [event.params.eventId.toString()]);
     return;
   }
   let parsed = parseMetadata(event.params.newUri, eventEntity, eventAttrs);
-  
+
+  let indexedItemId = getIndexedItemId(event.params.eventId, 'event');
+  let indexedItem = loadOrCreateIndexedItem(indexedItemId);
+  indexedItem.wasIndexed = !!parsed;
+  indexedItem.save()
+
   if( parsed ) {
     eventEntity.metadata = event.params.newUri;
     eventEntity.save();
+
+    indexedItem.wasIndexed = true;
+    indexedItem.save()
   } else {
     log.error("Error parsing metadata on handleEventUriModification, metadata hash is: {}", [event.params.newUri])
   }
@@ -111,6 +120,11 @@ export function handleEventCreated(event: EventCreated): void {
 
   eventEntity.metadata = event.params.uri;
   let parsed = parseMetadata(event.params.uri, eventEntity, eventAttrs);
+
+  let indexedItemId = getIndexedItemId(event.params.eventId, 'event');
+  let indexedItem = loadOrCreateIndexedItem(indexedItemId);
+  indexedItem.wasIndexed = !!parsed;
+  indexedItem.save()
     
   if( parsed ) {
     eventEntity.organizer = organizerUser.address;

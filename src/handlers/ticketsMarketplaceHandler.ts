@@ -35,6 +35,7 @@ import {
 import { store, log, Address } from "@graphprotocol/graph-ts";
 import { parseMetadata } from "./utils";
 import { createRestrictionForTicketForMetadata } from "../modules/Restriction";
+import { getIndexedItemId, loadOrCreateIndexedItem } from "../modules/IndexedItems";
 
 export function handleAllowanceAdded(event: AllowanceAdded): void {
   let allowance = new Allowance(getAllowanceId(event.params.allowanceId, false));
@@ -105,17 +106,19 @@ export function handleAllowanceRemoved(event: AllowanceRemoved): void {
 }
 
 export function handleTicketUriModification(event: TicketEdited): void {
-  let ticketEntity = Ticket.load(getTicketId(event.params.ticketId));
-  if (!ticketEntity) {
-    log.error("Ticket Not Found on handleTicketUriModification. id : {}", [event.params.ticketId.toString()]);
-    return;
-  }
+  let ticketEntity = loadOrCreateTicket(event.params.ticketId);
+
   let parsed = parseMetadata(event.params.newUri, ticketEntity, ticketAttrs);
   let parsedRestrictions = createRestrictionForTicketForMetadata(ticketEntity, event.params.newUri);
   if(!parsedRestrictions) {
     ticketEntity.minRestrictionAmount = 0;
     ticketEntity.restrictions = [];
   }
+
+  let indexedItemId = getIndexedItemId(event.params.ticketId, 'ticketId');
+  let indexedItem = loadOrCreateIndexedItem(indexedItemId);
+  indexedItem.wasIndexed = !!parsed;
+  indexedItem.save()
 
   if(parsed) { 
     ticketEntity.metadata = event.params.newUri;
@@ -145,6 +148,11 @@ export function handleTicketPublished(event: TicketPublished2): void {
     ticket.minRestrictionAmount = 0;
     ticket.restrictions = [];
   }
+
+  let indexedItemId = getIndexedItemId(event.params.ticketId, 'ticketId');
+  let indexedItem = loadOrCreateIndexedItem(indexedItemId);
+  indexedItem.wasIndexed = !!parsed;
+  indexedItem.save()
   
   if(parsed) {
     ticket.save();
@@ -328,6 +336,11 @@ export function handleTicketPublishedLegacyLegacy(event: TicketPublished): void 
     ticket.restrictions = [];
   }
 
+  let indexedItemId = getIndexedItemId(event.params.ticketId, 'ticketId');
+  let indexedItem = loadOrCreateIndexedItem(indexedItemId);
+  indexedItem.wasIndexed = !!parsed;
+  indexedItem.save()
+
   if(parsed) {
     ticket.save();
     let ticketBalance = Balance.load(getBalanceId(event.params.ticketId, event.params.organizer, false));
@@ -372,6 +385,11 @@ export function handleTicketPublishedLegacy(event: TicketPublished1): void {
     ticket.minRestrictionAmount = 0;
     ticket.restrictions = [];
   }
+
+  let indexedItemId = getIndexedItemId(event.params.ticketId, 'ticketId');
+  let indexedItem = loadOrCreateIndexedItem(indexedItemId);
+  indexedItem.wasIndexed = !!parsed;
+  indexedItem.save()
 
   
   if(parsed) {

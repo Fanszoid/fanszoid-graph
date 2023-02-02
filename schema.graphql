@@ -208,3 +208,8 @@ type Restriction @entity {
   name: String
   imageUrl: String
 }
+
+type IndexedItem @entity {
+  id: ID!
+  wasIndexed: Boolean!
+}

@@ -90,10 +90,7 @@ export function handleCollaboratorRemoved(event: CollaboratorRemoved): void {
 
 export function handleEventUriModification(event: EventEdited): void {
   let eventEntity = loadOrCreateEvent(event.params.eventId);
-  if (!eventEntity) {
-    log.error("Event Not Found on handleEventUriModification. id : {}", [event.params.eventId.toString()]);
-    return;
-  }
+
   let parsed = parseMetadata(event.params.newUri, eventEntity, eventAttrs);
 
   let indexedItemId = getIndexedItemId(event.params.eventId, 'event');

@@ -115,7 +115,7 @@ export function handleTicketUriModification(event: TicketEdited): void {
     ticketEntity.restrictions = [];
   }
 
-  let indexedItemId = getIndexedItemId(event.params.ticketId, 'ticketId');
+  let indexedItemId = getIndexedItemId(event.params.ticketId, 'ticket');
   let indexedItem = loadOrCreateIndexedItem(indexedItemId);
   indexedItem.wasIndexed = !!parsed;
   indexedItem.save()
@@ -149,7 +149,7 @@ export function handleTicketPublished(event: TicketPublished2): void {
     ticket.restrictions = [];
   }
 
-  let indexedItemId = getIndexedItemId(event.params.ticketId, 'ticketId');
+  let indexedItemId = getIndexedItemId(event.params.ticketId, 'ticket');
   let indexedItem = loadOrCreateIndexedItem(indexedItemId);
   indexedItem.wasIndexed = !!parsed;
   indexedItem.save()
@@ -336,7 +336,7 @@ export function handleTicketPublishedLegacyLegacy(event: TicketPublished): void 
     ticket.restrictions = [];
   }
 
-  let indexedItemId = getIndexedItemId(event.params.ticketId, 'ticketId');
+  let indexedItemId = getIndexedItemId(event.params.ticketId, 'ticket');
   let indexedItem = loadOrCreateIndexedItem(indexedItemId);
   indexedItem.wasIndexed = !!parsed;
   indexedItem.save()
@@ -386,7 +386,7 @@ export function handleTicketPublishedLegacy(event: TicketPublished1): void {
     ticket.restrictions = [];
   }
 
-  let indexedItemId = getIndexedItemId(event.params.ticketId, 'ticketId');
+  let indexedItemId = getIndexedItemId(event.params.ticketId, 'ticket');
   let indexedItem = loadOrCreateIndexedItem(indexedItemId);
   indexedItem.wasIndexed = !!parsed;
   indexedItem.save()

@@ -115,17 +115,17 @@ export function handleTicketUriModification(event: TicketEdited): void {
     ticketEntity.restrictions = [];
   }
 
-  let indexedItemId = getIndexedItemId(event.params.ticketId, 'ticket');
-  let indexedItem = loadOrCreateIndexedItem(indexedItemId);
-  indexedItem.wasIndexed = !!parsed;
-  indexedItem.save()
-
   if(parsed) { 
     ticketEntity.metadata = event.params.newUri;
     ticketEntity.save();
   } else {
     log.error("Error parsing metadata on handleTicketUriModification, metadata hash is: ", [event.params.newUri])
   }
+
+  let indexedItemId = getIndexedItemId(event.params.ticketId, 'ticket');
+  let indexedItem = loadOrCreateIndexedItem(indexedItemId);
+  indexedItem.wasIndexed = !!parsed;
+  indexedItem.save()
 }
 
 export function handleTicketPublished(event: TicketPublished2): void {
@@ -148,11 +148,6 @@ export function handleTicketPublished(event: TicketPublished2): void {
     ticket.minRestrictionAmount = 0;
     ticket.restrictions = [];
   }
-
-  let indexedItemId = getIndexedItemId(event.params.ticketId, 'ticket');
-  let indexedItem = loadOrCreateIndexedItem(indexedItemId);
-  indexedItem.wasIndexed = !!parsed;
-  indexedItem.save()
   
   if(parsed) {
     ticket.save();
@@ -177,6 +172,11 @@ export function handleTicketPublished(event: TicketPublished2): void {
   } else {
     log.error("Error parsing metadata on handleTicketPublished, metadata hash is: {}", [event.params.uri])
   }
+
+  let indexedItemId = getIndexedItemId(event.params.ticketId, 'ticket');
+  let indexedItem = loadOrCreateIndexedItem(indexedItemId);
+  indexedItem.wasIndexed = !!parsed;
+  indexedItem.save()
 }
 
 export function handleTicketDeleted(event: TicketsDeleted): void {
@@ -336,11 +336,6 @@ export function handleTicketPublishedLegacyLegacy(event: TicketPublished): void 
     ticket.restrictions = [];
   }
 
-  let indexedItemId = getIndexedItemId(event.params.ticketId, 'ticket');
-  let indexedItem = loadOrCreateIndexedItem(indexedItemId);
-  indexedItem.wasIndexed = !!parsed;
-  indexedItem.save()
-
   if(parsed) {
     ticket.save();
     let ticketBalance = Balance.load(getBalanceId(event.params.ticketId, event.params.organizer, false));
@@ -363,6 +358,11 @@ export function handleTicketPublishedLegacyLegacy(event: TicketPublished): void 
   } else {
     log.error("Error parsing metadata on handleTicketPublishedLegacy, metadata hash is: {}", [event.params.uri])
   }
+
+  let indexedItemId = getIndexedItemId(event.params.ticketId, 'ticket');
+  let indexedItem = loadOrCreateIndexedItem(indexedItemId);
+  indexedItem.wasIndexed = !!parsed;
+  indexedItem.save()
   
 }
 
@@ -385,12 +385,6 @@ export function handleTicketPublishedLegacy(event: TicketPublished1): void {
     ticket.minRestrictionAmount = 0;
     ticket.restrictions = [];
   }
-
-  let indexedItemId = getIndexedItemId(event.params.ticketId, 'ticket');
-  let indexedItem = loadOrCreateIndexedItem(indexedItemId);
-  indexedItem.wasIndexed = !!parsed;
-  indexedItem.save()
-
   
   if(parsed) {
     ticket.save();
@@ -416,6 +410,12 @@ export function handleTicketPublishedLegacy(event: TicketPublished1): void {
   } else {
     log.error("Error parsing metadata on handleTicketPublished, metadata hash is: {}", [event.params.uri])
   }
+
+  let indexedItemId = getIndexedItemId(event.params.ticketId, 'ticket');
+  let indexedItem = loadOrCreateIndexedItem(indexedItemId);
+  indexedItem.wasIndexed = !!parsed;
+  indexedItem.save()
+  
 }
 
 export function handleAskSettedLegacy(event: AskSetted): void {

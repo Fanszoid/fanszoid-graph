@@ -1,15 +1,17 @@
 import { Address, BigInt } from "@graphprotocol/graph-ts";
 import { IndexedItem } from "../../../build/generated/schema";
+import { getEventId } from "../Event";
+import { getTicketId } from "../Ticket";
 
 export function getIndexedItemId(
     id: BigInt,
     itemType: string
 ): string {
     if(itemType == 'ticket') {
-        return "ii-tt" + id.toHex();
+        return "ii-" + getTicketId(id);
     }
     else if(itemType == 'event') {
-        return "ii-e" + id.toHex();
+        return "ii-" + getEventId(id);
     }
     throw new Error('Invalid item type');
 }

@@ -93,20 +93,18 @@ export function handleEventUriModification(event: EventEdited): void {
 
   let parsed = parseMetadata(event.params.newUri, eventEntity, eventAttrs);
 
+  if( parsed ) {
+    eventEntity.metadata = event.params.newUri;
+    eventEntity.save();
+  } else {
+    log.error("Error parsing metadata on handleEventUriModification, metadata hash is: {}", [event.params.newUri])
+  }
+
   let indexedItemId = getIndexedItemId(event.params.eventId, 'event');
   let indexedItem = loadOrCreateIndexedItem(indexedItemId);
   indexedItem.wasIndexed = !!parsed;
   indexedItem.save()
 
-  if( parsed ) {
-    eventEntity.metadata = event.params.newUri;
-    eventEntity.save();
-
-    indexedItem.wasIndexed = true;
-    indexedItem.save()
-  } else {
-    log.error("Error parsing metadata on handleEventUriModification, metadata hash is: {}", [event.params.newUri])
-  }
 }
 
 export function handleEventCreated(event: EventCreated): void {
@@ -117,11 +115,6 @@ export function handleEventCreated(event: EventCreated): void {
 
   eventEntity.metadata = event.params.uri;
   let parsed = parseMetadata(event.params.uri, eventEntity, eventAttrs);
-
-  let indexedItemId = getIndexedItemId(event.params.eventId, 'event');
-  let indexedItem = loadOrCreateIndexedItem(indexedItemId);
-  indexedItem.wasIndexed = !!parsed;
-  indexedItem.save()
     
   if( parsed ) {
     eventEntity.organizer = organizerUser.address;
@@ -130,6 +123,12 @@ export function handleEventCreated(event: EventCreated): void {
   } else {
     log.error("Error parsing metadata on handleEventCreated, metadata hash is: {}", [event.params.uri])
   }
+
+  let indexedItemId = getIndexedItemId(event.params.eventId, 'event');
+  let indexedItem = loadOrCreateIndexedItem(indexedItemId);
+  indexedItem.wasIndexed = !!parsed;
+  indexedItem.save()
+  
 }
 
 export function handleEventDeleted(event: EventDeleted): void {

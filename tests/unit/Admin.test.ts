@@ -62,6 +62,34 @@ describe("Admin", () => {
     assert.fieldEquals('Event', 'e0x1', 'id', 'e0x1');
     assert.fieldEquals('Event', 'e0x1', 'organizer', '0xa16081f360e3847006db660bae1c6d1b2e17ec2a');
     assert.fieldEquals('Event', 'e0x1', 'metadata', 'FAKE_URI');
+    assert.fieldEquals('IndexedItem', 'ii-e0x1', 'wasIndexed', 'true')
+  })
+
+  test("Handle event creation with not valid ipfs", () => {
+    let mockEvent = newMockEvent();
+    
+    let event = new EventCreated(
+      mockEvent.address,
+      mockEvent.logIndex,
+      mockEvent.transactionLogIndex,
+      mockEvent.logType,
+      mockEvent.block,
+      mockEvent.transaction,
+      mockEvent.parameters,
+      mockEvent.receipt
+    )
+    
+    event.parameters = [
+      param('eventId', BigInt.fromString('1')),
+      param('organizer', '0xa16081f360e3847006db660bae1c6d1b2e17ec2a'),
+      param('uri', 'FAKE_URI')
+    ];
+
+    mockIpfsFile('FAKE_URI', 'tests/ipfs/not_valid.txt');
+
+    handleEventCreated(event);
+
+    assert.fieldEquals('IndexedItem', 'ii-e0x1', 'wasIndexed', 'false')
   })
 
   test("Handle event deleted", () => {
@@ -184,6 +212,39 @@ describe("Admin", () => {
     handleEventUriModification(event)
     assert.fieldEquals('Event', 'e0x0', 'title', 'FAKE');
     assert.fieldEquals('Event', 'e0x0', 'metadata', 'FAKE_2_URI');
+    assert.fieldEquals('IndexedItem', 'ii-e0x0', 'wasIndexed', 'true')
+  });
+
+  test("Handle event modified with invalid ipfs", () => {
+    let entity = Event.load('e0x0');
+    if(!entity) throw Error('Event not found');
+    entity.metadata = 'FAKE_URI';
+    entity.title = "Metaverse";
+    entity.save();
+    mockIpfsFile('FAKE_2_URI', 'tests/ipfs/fake_2_event_metadata.json');
+    mockIpfsFile('newUriNotValid', 'tests/ipfs/not_valid.txt')
+
+    let mockEvent = newMockEvent();
+    let event = new EventEdited(
+      mockEvent.address,
+      mockEvent.logIndex,
+      mockEvent.transactionLogIndex,
+      mockEvent.logType,
+      mockEvent.block,
+      mockEvent.transaction,
+      mockEvent.parameters,
+      mockEvent.receipt
+    )
+    
+    event.parameters = [
+      param('eventId', BigInt.fromString('0')),
+      param('newUri', 'newUriNotValid')
+    ];
+
+    assert.fieldEquals('Event', 'e0x0', 'metadata', 'FAKE_URI');
+    assert.fieldEquals('Event', 'e0x0', 'title', 'Metaverse');
+    handleEventUriModification(event)
+    assert.fieldEquals('IndexedItem', 'ii-e0x0', 'wasIndexed', 'false')
   });
 
   test("Handle collaborator added", () => {

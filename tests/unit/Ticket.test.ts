@@ -33,6 +33,7 @@ describe("Tickets", () => {
       event.category = 'art'
       event.startDateUTC = BigInt.fromString('0');
       event.endDateUTC = BigInt.fromString('0');
+      event.indexStatus = 'PARSED'
       event.save();
 
       let user1 = new User(address1);
@@ -45,6 +46,7 @@ describe("Tickets", () => {
       ticket.totalAmount = 10;
       ticket.minRestrictionAmount = 0;
       ticket.restrictions = [];
+      ticket.indexStatus = 'PARSED'
       ticket.save();
       let balance1 = new Balance(getBalanceId(new BigInt(0), Address.fromString(address1), false));;
       balance1.type = 'Ticket';

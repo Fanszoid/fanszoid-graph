@@ -21,21 +21,24 @@ export function loadOrCreateRestriction(conditionType: string, condition: string
     return restriction;
 }
 
-export function createRestrictionForTicketForMetadata(ticket: Ticket, uri: string) : boolean {
+export function createRestrictionForTicketForMetadata(ticket: Ticket, uri: string) : string {
     let value = loadMetadata(uri)
     
-    if(!value) {
-        return false;
+    if(value == null) {
+        return 'NOT_REACHABLE';
+    }
+    else if(value.entries.length == 0) {
+        return 'NOT_VALID';
     }
 
     if(!value.get('minRestrictionAmount') || (value.get('minRestrictionAmount') as JSONValue).kind != JSONValueKind.NUMBER) {
-        return false;
+        return 'NOT_VALID';
     }
     
     ticket.minRestrictionAmount = (value.get('minRestrictionAmount') as JSONValue).toBigInt().toI32();
 
     if(!value.get('restrictions') || (value.get('restrictions') as JSONValue).kind != JSONValueKind.ARRAY) {
-        return false;
+        return 'NOT_VALID';
     }
 
     let restrictionListArray = (value.get('restrictions') as JSONValue).toArray() as Array<JSONValue>;
@@ -65,5 +68,5 @@ export function createRestrictionForTicketForMetadata(ticket: Ticket, uri: strin
 
     ticket.restrictions = finalRestrictionList;
 
-    return restrictionListArray.length > 0;
+    return (restrictionListArray.length > 0) ? 'PARSED' : 'NOT_VALID';
 }

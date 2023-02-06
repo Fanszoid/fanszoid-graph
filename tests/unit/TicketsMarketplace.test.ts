@@ -32,6 +32,7 @@ describe("TicketsMarketplace", () => {
       event.category = 'art'
       event.startDateUTC = BigInt.fromString('0');
       event.endDateUTC = BigInt.fromString('0');
+      event.indexStatus = 'PARSED'
       event.save();
 
       let user1 = new User(address1);
@@ -44,6 +45,7 @@ describe("TicketsMarketplace", () => {
       ticket.totalAmount = 10;
       ticket.minRestrictionAmount = 0;
       ticket.restrictions = [];
+      ticket.indexStatus = 'PARSED'
       ticket.save();
       let balance1 = new Balance("t0x0-".concat(address1));
       balance1.type = 'Ticket';
@@ -132,6 +134,7 @@ describe("TicketsMarketplace", () => {
     ticket.allowances = ['ta-0x1'];
     ticket.minRestrictionAmount = 0;
     ticket.restrictions = [];
+    ticket.indexStatus = 'PARSED'
     ticket.save(); 
     
     let mockEvent = newMockEvent();
@@ -166,6 +169,7 @@ describe("TicketsMarketplace", () => {
     ticket.name = 'NAME';
     ticket.minRestrictionAmount = 0;
     ticket.restrictions = [];
+    ticket.indexStatus = 'PARSED';
     ticket.save(); 
     
     let mockEvent = newMockEvent();
@@ -191,7 +195,7 @@ describe("TicketsMarketplace", () => {
     assert.fieldEquals('Ticket', 'tt0x1', 'name', 'FAKE')
     assert.fieldEquals('Ticket', 'tt0x1', 'restrictions', '[]')
     assert.fieldEquals('Ticket', 'tt0x1', 'minRestrictionAmount', '0')
-    assert.fieldEquals('IndexedItem', 'ii-tt0x1', 'wasIndexed', 'true')
+    assert.fieldEquals('Ticket', 'tt0x1', 'indexStatus', 'PARSED')
   });
 
   test("Handle ticket uri modification with not valid ipfs", () => {
@@ -203,6 +207,7 @@ describe("TicketsMarketplace", () => {
     ticket.name = 'NAME';
     ticket.minRestrictionAmount = 0;
     ticket.restrictions = [];
+    ticket.indexStatus = 'PARSED'
     ticket.save(); 
     
     let mockEvent = newMockEvent();
@@ -225,7 +230,7 @@ describe("TicketsMarketplace", () => {
     ];
     assert.fieldEquals('Ticket', 'tt0x1', 'name', 'NAME')
     handleTicketUriModification(event)
-    assert.fieldEquals('IndexedItem', 'ii-tt0x1', 'wasIndexed', 'false')
+    assert.fieldEquals('Ticket', 'tt0x1', 'indexStatus', 'NOT_VALID')
   });
 
   test("Handle ticket published", () => {   
@@ -239,6 +244,7 @@ describe("TicketsMarketplace", () => {
     eventInStorage.category = 'art'
     eventInStorage.startDateUTC = BigInt.fromString('0');
     eventInStorage.endDateUTC = BigInt.fromString('0');
+    eventInStorage.indexStatus = 'PARSED'
     eventInStorage.save();
   
     let mockEvent = newMockEvent();
@@ -286,7 +292,7 @@ describe("TicketsMarketplace", () => {
     assert.fieldEquals('Ticket', 'tt0x1', 'restrictions', '[]')
     assert.fieldEquals('Ticket', 'tt0x1', 'minRestrictionAmount', '0')
     assert.fieldEquals('Ticket', 'tt0x1', 'name', 'FAKE')
-    assert.fieldEquals('IndexedItem', 'ii-tt0x1', 'wasIndexed', 'true')
+    assert.fieldEquals('Ticket', 'tt0x1', 'indexStatus', 'PARSED')
     let balanceId = getBalanceId(BigInt.fromString('1'), Address.fromString('0x87d250a5c9674788F946F10E95641bba4DEa838f'), false);
     assert.fieldEquals('Balance', balanceId, 'amountOwned', '10')
     assert.fieldEquals('Balance', balanceId, 'paymentTokenAddress', '0x87d250a5c9674788f946f10e95641bba4dea838f')
@@ -303,6 +309,7 @@ describe("TicketsMarketplace", () => {
     eventInStorage.category = 'art'
     eventInStorage.startDateUTC = BigInt.fromString('0');
     eventInStorage.endDateUTC = BigInt.fromString('0');
+    eventInStorage.indexStatus = 'PARSED'
     eventInStorage.save();
   
     let mockEvent = newMockEvent();
@@ -345,7 +352,7 @@ describe("TicketsMarketplace", () => {
 
     assert.notInStore('Ticket', 'tt0x1')
     handleTicketPublished(event)
-    assert.fieldEquals('IndexedItem', 'ii-tt0x1', 'wasIndexed', 'false')
+    assert.fieldEquals('Ticket', 'tt0x1', 'indexStatus', 'NOT_VALID')
   });
 
   test("Handle ticket published with extra requirement", () => {   
@@ -359,6 +366,7 @@ describe("TicketsMarketplace", () => {
     eventInStorage.category = 'art'
     eventInStorage.startDateUTC = BigInt.fromString('0');
     eventInStorage.endDateUTC = BigInt.fromString('0');
+    eventInStorage.indexStatus = 'PARSED'
     eventInStorage.save();
   
     let mockEvent = newMockEvent();
@@ -419,6 +427,7 @@ describe("TicketsMarketplace", () => {
     eventInStorage.category = 'art'
     eventInStorage.startDateUTC = BigInt.fromString('0');
     eventInStorage.endDateUTC = BigInt.fromString('0');
+    eventInStorage.indexStatus = 'PARSED'
     eventInStorage.save();
   
     let mockEvent = newMockEvent();
@@ -479,6 +488,7 @@ describe("TicketsMarketplace", () => {
     eventInStorage.category = 'art'
     eventInStorage.startDateUTC = BigInt.fromString('0');
     eventInStorage.endDateUTC = BigInt.fromString('0');
+    eventInStorage.indexStatus = 'PARSED'
     eventInStorage.save();
   
     let mockEvent = newMockEvent();
@@ -540,6 +550,7 @@ describe("TicketsMarketplace", () => {
     ticket.name = 'NAME';
     ticket.minRestrictionAmount = 0;
     ticket.restrictions = [];
+    ticket.indexStatus = 'PARSED';
     ticket.save(); 
     let balanceId = getBalanceId(
       BigInt.fromString('1'), 
@@ -589,6 +600,7 @@ describe("TicketsMarketplace", () => {
     ticket.name = 'NAME';
     ticket.minRestrictionAmount = 0;
     ticket.restrictions = [];
+    ticket.indexStatus = 'PARSED'
     ticket.save(); 
     let balanceId = getBalanceId(
       BigInt.fromString('1'), 
@@ -641,6 +653,7 @@ describe("TicketsMarketplace", () => {
     ticket.name = 'NAME';
     ticket.minRestrictionAmount = 0;
     ticket.restrictions = [];
+    ticket.indexStatus = 'PARSED'
     ticket.save(); 
     let balanceId = getBalanceId(
       BigInt.fromString('1'), 
@@ -692,6 +705,7 @@ describe("TicketsMarketplace", () => {
     ticket.minRestrictionAmount = 0;
     ticket.restrictions = [];
     ticket.extraRequirement = 'none';
+    ticket.indexStatus = 'PARSED'
     ticket.save(); 
     let balanceId = getBalanceId(
       BigInt.fromString('1'), 
@@ -744,6 +758,7 @@ describe("TicketsMarketplace", () => {
     ticket.name = 'NAME';
     ticket.minRestrictionAmount = 0;
     ticket.restrictions = [];
+    ticket.indexStatus = 'PARSED'
     ticket.save(); 
     let balanceId = getBalanceId(
       BigInt.fromString('1'), 
@@ -791,6 +806,7 @@ describe("TicketsMarketplace", () => {
     ticket.totalAmount = 10;
     ticket.minRestrictionAmount = 0;
     ticket.restrictions = [];
+    ticket.indexStatus = 'PARSED'
     ticket.save(); 
     let balanceId = getBalanceId(
       BigInt.fromString('1'), 

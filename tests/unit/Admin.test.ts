@@ -31,6 +31,7 @@ describe("Admin", () => {
       event.category = 'art'
       event.startDateUTC = BigInt.fromString('0');
       event.endDateUTC = BigInt.fromString('0');
+      event.indexStatus = 'PARSED'
       event.save();
   });
   
@@ -62,7 +63,7 @@ describe("Admin", () => {
     assert.fieldEquals('Event', 'e0x1', 'id', 'e0x1');
     assert.fieldEquals('Event', 'e0x1', 'organizer', '0xa16081f360e3847006db660bae1c6d1b2e17ec2a');
     assert.fieldEquals('Event', 'e0x1', 'metadata', 'FAKE_URI');
-    assert.fieldEquals('IndexedItem', 'ii-e0x1', 'wasIndexed', 'true')
+    assert.fieldEquals('Event', 'e0x1', 'indexStatus', 'PARSED')
   })
 
   test("Handle event creation with not valid ipfs", () => {
@@ -78,6 +79,7 @@ describe("Admin", () => {
       mockEvent.parameters,
       mockEvent.receipt
     )
+    mockIpfsFile('FAKE_URI', 'tests/ipfs/not_valid.txt');
     
     event.parameters = [
       param('eventId', BigInt.fromString('1')),
@@ -85,11 +87,9 @@ describe("Admin", () => {
       param('uri', 'FAKE_URI')
     ];
 
-    mockIpfsFile('FAKE_URI', 'tests/ipfs/not_valid.txt');
-
     handleEventCreated(event);
 
-    assert.fieldEquals('IndexedItem', 'ii-e0x1', 'wasIndexed', 'false')
+    assert.fieldEquals('Event', 'e0x1', 'indexStatus', 'NOT_VALID')
   })
 
   test("Handle event deleted", () => {
@@ -152,6 +152,7 @@ describe("Admin", () => {
     ticket.event = 'e0x0';
     ticket.minRestrictionAmount = 0;
     ticket.restrictions = [];
+    ticket.indexStatus = 'PARSED';
     ticket.save(); 
 
     let entity = Event.load('e0x0');
@@ -212,7 +213,7 @@ describe("Admin", () => {
     handleEventUriModification(event)
     assert.fieldEquals('Event', 'e0x0', 'title', 'FAKE');
     assert.fieldEquals('Event', 'e0x0', 'metadata', 'FAKE_2_URI');
-    assert.fieldEquals('IndexedItem', 'ii-e0x0', 'wasIndexed', 'true')
+    assert.fieldEquals('Event', 'e0x0', 'indexStatus', 'PARSED')
   });
 
   test("Handle event modified with invalid ipfs", () => {
@@ -244,7 +245,7 @@ describe("Admin", () => {
     assert.fieldEquals('Event', 'e0x0', 'metadata', 'FAKE_URI');
     assert.fieldEquals('Event', 'e0x0', 'title', 'Metaverse');
     handleEventUriModification(event)
-    assert.fieldEquals('IndexedItem', 'ii-e0x0', 'wasIndexed', 'false')
+    assert.fieldEquals('Event', 'e0x0', 'indexStatus', 'NOT_VALID')
   });
 
   test("Handle collaborator added", () => {
@@ -358,6 +359,7 @@ describe("Admin", () => {
     ticket.event = 'e0x0';
     ticket.minRestrictionAmount = 0;
     ticket.restrictions = [];
+    ticket.indexStatus = 'PARSED';
     ticket.save(); 
 
     let entity = Event.load('e0x0');
@@ -399,6 +401,7 @@ describe("Admin", () => {
     ticket.event = 'e0x0';
     ticket.minRestrictionAmount = 0;
     ticket.restrictions = [];
+    ticket.indexStatus = 'PARSED';
     ticket.save(); 
 
     let contractAddress = '0xa16081f360e3847006db660bae1c6d1b2e17ec2a';
@@ -440,6 +443,7 @@ describe("Admin", () => {
     ticket.event = 'e0x0';
     ticket.minRestrictionAmount = 0;
     ticket.restrictions = [];
+    ticket.indexStatus = 'PARSED'
     ticket.save(); 
 
     let contractAddress = '0xa16081f360e3847006db660bae1c6d1b2e17ec2a';

@@ -31,6 +31,7 @@ describe("MembershipsMarketplace", () => {
       event.category = 'art'
       event.startDateUTC = BigInt.fromString('0');
       event.endDateUTC = BigInt.fromString('0');
+      event.indexStatus = 'PARSED'
       event.save();
 
       let user1 = new User(address1);
@@ -203,6 +204,7 @@ describe("MembershipsMarketplace", () => {
     eventInStorage.category = 'art'
     eventInStorage.startDateUTC = BigInt.fromString('0');
     eventInStorage.endDateUTC = BigInt.fromString('0');
+    eventInStorage.indexStatus = 'PARSED'
     eventInStorage.save();
   
     let mockEvent = newMockEvent();

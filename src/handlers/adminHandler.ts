@@ -26,7 +26,6 @@ import { membershipContractAddressMATIC, membershipContractAddressMUMBAI } from 
 import { store, log, BigInt, dataSource } from "@graphprotocol/graph-ts";
 import { parseMetadata } from "./utils"
 import { getTicketId } from "../modules/Ticket"
-import { getIndexedItemId, loadOrCreateIndexedItem } from "../modules/IndexedItems";
 
 export function handleEventPaused(event: EventPaused): void {
   let eventEntity = Event.load(getEventId(event.params.eventId));
@@ -92,18 +91,15 @@ export function handleEventUriModification(event: EventEdited): void {
   let eventEntity = loadOrCreateEvent(event.params.eventId);
 
   let parsed = parseMetadata(event.params.newUri, eventEntity, eventAttrs);
+  eventEntity.indexStatus = parsed;
 
-  if( parsed ) {
+  if( parsed == 'PARSED') {
     eventEntity.metadata = event.params.newUri;
-    eventEntity.save();
   } else {
     log.error("Error parsing metadata on handleEventUriModification, metadata hash is: {}", [event.params.newUri])
   }
 
-  let indexedItemId = getIndexedItemId(event.params.eventId, 'event');
-  let indexedItem = loadOrCreateIndexedItem(indexedItemId);
-  indexedItem.wasIndexed = !!parsed;
-  indexedItem.save()
+  eventEntity.save();
 
 }
 
@@ -115,20 +111,16 @@ export function handleEventCreated(event: EventCreated): void {
 
   eventEntity.metadata = event.params.uri;
   let parsed = parseMetadata(event.params.uri, eventEntity, eventAttrs);
+  eventEntity.indexStatus = parsed;
     
-  if( parsed ) {
-    eventEntity.organizer = organizerUser.address;
-    eventEntity.attendees = BigInt.fromI32(0);
-    eventEntity.save();
-  } else {
+  if( parsed != 'PARSED' ) {
     log.error("Error parsing metadata on handleEventCreated, metadata hash is: {}", [event.params.uri])
   }
 
-  let indexedItemId = getIndexedItemId(event.params.eventId, 'event');
-  let indexedItem = loadOrCreateIndexedItem(indexedItemId);
-  indexedItem.wasIndexed = !!parsed;
-  indexedItem.save()
-  
+  eventEntity.organizer = organizerUser.address;
+  eventEntity.attendees = BigInt.fromI32(0);
+  eventEntity.save();
+
 }
 
 export function handleEventDeleted(event: EventDeleted): void {

@@ -10,7 +10,8 @@ import {
   EventPaused,
   EventUnpaused,
   CollaboratorAdded,
-  CollaboratorRemoved
+  CollaboratorRemoved,
+  MetadataCancelation
 } from "../../build/generated/Admin/Admin";
 import { Event, Ticket, Balance, AllowedMembership, Membership, User } from "../../build/generated/schema";
 import {
@@ -249,5 +250,24 @@ export function handleCreatorRoyaltyModifiedOnEvent(event: CreatorRoyaltyModifie
     
     ticket.creatorRoyalty = event.params.newRoyalty.toI32();
     ticket.save();
+  }
+}
+
+export function handleMetadataCancelation(event: MetadataCancelation) : void {
+  if(event.params.entityType == 'TICKET') {
+    let entity = Ticket.load(getTicketId(event.params.id))
+
+    if(entity) {
+      entity.indexStatus = 'NOT_VALID';
+      entity.save()
+    }
+  }
+  else if(event.params.entityType == 'EVENT') {
+    let entity = Event.load(getTicketId(event.params.id))
+
+    if(entity) {
+      entity.indexStatus = 'NOT_VALID';
+      entity.save()
+    }
   }
 }

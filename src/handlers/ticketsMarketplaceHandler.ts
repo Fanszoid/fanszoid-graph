@@ -119,7 +119,7 @@ export function handleTicketUriModification(event: TicketEdited): void {
     ticketEntity.restrictions = [];
   }
 
-  if(parsed) { 
+  if(parsed == 'PARSED') { 
     ticketEntity.metadata = event.params.newUri;
   } else {
     log.error("Error parsing metadata on handleTicketUriModification, metadata hash is: ", [event.params.newUri])

@@ -91,25 +91,6 @@
         {
           "indexed": true,
           "internalType": "uint256",
-          "name": "id",
-          "type": "uint256"
-        },
-        {
-          "indexed": false,
-          "internalType": "string",
-          "name": "entityType",
-          "type": "string"
-        }
-      ],
-      "name": "MetadataCancelation",
-      "type": "event"
-    },
-    {
-      "anonymous": false,
-      "inputs": [
-        {
-          "indexed": true,
-          "internalType": "uint256",
           "name": "eventId",
           "type": "uint256"
         }
@@ -325,6 +306,25 @@
         }
       ],
       "name": "SecondaryMarketRoyaltyModified",
+      "type": "event"
+    },
+    {
+      "anonymous": false,
+      "inputs": [
+        {
+          "indexed": true,
+          "internalType": "uint256",
+          "name": "id",
+          "type": "uint256"
+        },
+        {
+          "indexed": false,
+          "internalType": "string",
+          "name": "entityType",
+          "type": "string"
+        }
+      ],
+      "name": "MetadataCancelation",
       "type": "event"
     },
     {

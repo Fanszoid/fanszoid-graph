@@ -105,7 +105,11 @@ export function handleAllowanceRemoved(event: AllowanceRemoved): void {
 }
 
 export function handleTicketUriModification(event: TicketEdited): void {
-  let ticketEntity = loadOrCreateTicket(event.params.ticketId);
+  let ticketEntity = Ticket.load(getTicketId(event.params.ticketId));
+
+  if(!ticketEntity) {
+    return;
+  }
 
   let parsed = parseMetadata(event.params.newUri, ticketEntity, ticketAttrs);
   ticketEntity.indexStatus = parsed;

@@ -89,7 +89,11 @@ export function handleCollaboratorRemoved(event: CollaboratorRemoved): void {
 }
 
 export function handleEventUriModification(event: EventEdited): void {
-  let eventEntity = loadOrCreateEvent(event.params.eventId);
+  let eventEntity = Event.load(getEventId(event.params.eventId));
+
+  if(!eventEntity) {
+    return;
+  }
 
   let parsed = parseMetadata(event.params.newUri, eventEntity, eventAttrs);
   eventEntity.indexStatus = parsed;

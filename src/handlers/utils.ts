@@ -20,7 +20,7 @@ export function loadMetadata(uri: string) : TypedMap<string, JSONValue> | null {
   let jsonParsed = json.try_fromBytes(data);
 
   if(!jsonParsed.isOk) {
-    return null;
+    return new TypedMap();
   }
   
   let value: TypedMap<string, JSONValue>;
@@ -33,25 +33,29 @@ export function loadMetadata(uri: string) : TypedMap<string, JSONValue> | null {
       value = jsonObject.toObject();
     } else {
       log.error("parseMetadata: Invalid metadata obj kind {}", [jsonObject.kind.toString()]);
-      return null;
+      return new TypedMap();
     }
   } else {
     log.error("parseMetadata: Invalid metadata kind {}", [jsonParsed.value.kind.toString()]);
-    return null;
+    return new TypedMap();
   }
 
   if(!value) {
     log.error("parseMetadata: value is null, data: {}", [data.toString()]);
+    return new TypedMap();
   }
 
   return value;
 }
 
-export function parseMetadata(uri: string, entity: Entity, attrs: string[]): boolean {
+export function parseMetadata(uri: string, entity: Entity, attrs: string[]): string {
     let valueWithNull = loadMetadata(uri)
 
-    if(!valueWithNull) {
-      return false
+    if(valueWithNull == null) {
+      return 'NOT_REACHABLE'
+    }
+    else if(valueWithNull.entries.length == 0) {
+      return 'NOT_VALID'
     }
 
     let value = valueWithNull as TypedMap<string, JSONValue>
@@ -130,10 +134,10 @@ export function parseMetadata(uri: string, entity: Entity, attrs: string[]): boo
       }
     } 
     else {
-      return false
+      return 'NOT_VALID'
     }
 
-    return true
+    return 'PARSED'
   }
   
 export function parseJSONValueToString(value: JSONValue): string{

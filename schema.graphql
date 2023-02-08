@@ -53,9 +53,9 @@ type Event @entity {
   paused: Boolean
   collaborators: [User!]! 
   
-  title: String!
+  title: String
   description: String
-  type: String!
+  type: String
   category: String
   dclX: String
   dclY: String
@@ -79,6 +79,8 @@ type Event @entity {
   mapUrl: String
   startDateUTC: BigInt
   endDateUTC: BigInt
+
+  indexStatus: String!
 }
 
 type Ticket @entity {
@@ -103,6 +105,8 @@ type Ticket @entity {
   extraRequirement: String
   minRestrictionAmount: Int!
   restrictions: [Restriction!]!
+
+  indexStatus: String!
 }
 
 type Membership @entity {

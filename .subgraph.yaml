@@ -200,5 +200,7 @@ dataSources:
           handler: handleCollaboratorAdded
         - event: CollaboratorRemoved(indexed uint256,indexed address)
           handler: handleCollaboratorRemoved
+        - event: MetadataCancelation(indexed uint256,string)
+          handler: handleMetadataCancelation
 
       file: ./src/handlers/adminHandler.ts

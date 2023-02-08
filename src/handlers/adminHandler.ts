@@ -10,7 +10,8 @@ import {
   EventPaused,
   EventUnpaused,
   CollaboratorAdded,
-  CollaboratorRemoved
+  CollaboratorRemoved,
+  MetadataCancelation
 } from "../../build/generated/Admin/Admin";
 import { Event, Ticket, Balance, AllowedMembership, Membership, User } from "../../build/generated/schema";
 import {
@@ -89,18 +90,22 @@ export function handleCollaboratorRemoved(event: CollaboratorRemoved): void {
 
 export function handleEventUriModification(event: EventEdited): void {
   let eventEntity = Event.load(getEventId(event.params.eventId));
-  if (!eventEntity) {
-    log.error("Event Not Found on handleEventUriModification. id : {}", [event.params.eventId.toString()]);
+
+  if(!eventEntity) {
     return;
   }
+
   let parsed = parseMetadata(event.params.newUri, eventEntity, eventAttrs);
-  
-  if( parsed ) {
+  eventEntity.indexStatus = parsed;
+
+  if( parsed == 'PARSED') {
     eventEntity.metadata = event.params.newUri;
-    eventEntity.save();
   } else {
     log.error("Error parsing metadata on handleEventUriModification, metadata hash is: {}", [event.params.newUri])
   }
+
+  eventEntity.save();
+
 }
 
 export function handleEventCreated(event: EventCreated): void {
@@ -111,14 +116,16 @@ export function handleEventCreated(event: EventCreated): void {
 
   eventEntity.metadata = event.params.uri;
   let parsed = parseMetadata(event.params.uri, eventEntity, eventAttrs);
+  eventEntity.indexStatus = parsed;
     
-  if( parsed ) {
-    eventEntity.organizer = organizerUser.address;
-    eventEntity.attendees = BigInt.fromI32(0);
-    eventEntity.save();
-  } else {
+  if( parsed != 'PARSED' ) {
     log.error("Error parsing metadata on handleEventCreated, metadata hash is: {}", [event.params.uri])
   }
+
+  eventEntity.organizer = organizerUser.address;
+  eventEntity.attendees = BigInt.fromI32(0);
+  eventEntity.save();
+
 }
 
 export function handleEventDeleted(event: EventDeleted): void {
@@ -247,5 +254,24 @@ export function handleCreatorRoyaltyModifiedOnEvent(event: CreatorRoyaltyModifie
     
     ticket.creatorRoyalty = event.params.newRoyalty.toI32();
     ticket.save();
+  }
+}
+
+export function handleMetadataCancelation(event: MetadataCancelation) : void {
+  if(event.params.entityType == 'TICKET') {
+    let entity = Ticket.load(getTicketId(event.params.id))
+
+    if(entity) {
+      entity.indexStatus = 'NOT_VALID';
+      entity.save()
+    }
+  }
+  else if(event.params.entityType == 'EVENT') {
+    let entity = Event.load(getTicketId(event.params.id))
+
+    if(entity) {
+      entity.indexStatus = 'NOT_VALID';
+      entity.save()
+    }
   }
 }

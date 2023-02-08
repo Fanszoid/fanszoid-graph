@@ -30,6 +30,7 @@ describe("Memberships", () => {
       event.category = 'art'
       event.startDateUTC = BigInt.fromString('0');
       event.endDateUTC = BigInt.fromString('0');
+      event.indexStatus = 'PARSED'
       event.save();
 
       let user1 = new User(address1);

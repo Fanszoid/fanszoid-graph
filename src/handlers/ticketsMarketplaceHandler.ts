@@ -107,23 +107,25 @@ export function handleAllowanceRemoved(event: AllowanceRemoved): void {
 
 export function handleTicketUriModification(event: TicketEdited): void {
   let ticketEntity = Ticket.load(getTicketId(event.params.ticketId));
-  if (!ticketEntity) {
-    log.error("Ticket Not Found on handleTicketUriModification. id : {}", [event.params.ticketId.toString()]);
+
+  if(!ticketEntity) {
     return;
   }
+
   let parsed = parseMetadata(event.params.newUri, ticketEntity, ticketAttrs);
+  ticketEntity.indexStatus = parsed;
   let parsedRestrictions = createRestrictionForTicketForMetadata(ticketEntity, event.params.newUri);
-  if(!parsedRestrictions) {
+  if(parsedRestrictions != 'PARSED') {
     ticketEntity.minRestrictionAmount = 0;
     ticketEntity.restrictions = [];
   }
 
-  if(parsed) { 
+  if(parsed == 'PARSED') { 
     ticketEntity.metadata = event.params.newUri;
-    ticketEntity.save();
   } else {
     log.error("Error parsing metadata on handleTicketUriModification, metadata hash is: ", [event.params.newUri])
   }
+  ticketEntity.save();
 }
 
 export function handleTicketPublished(event: TicketPublished2): void {
@@ -140,36 +142,37 @@ export function handleTicketPublished(event: TicketPublished2): void {
   ticket.isPrivate = event.params.saleInfo.isPrivate;
   
   let parsed = parseMetadata(event.params.uri, ticket, ticketAttrs);
+  ticket.indexStatus = parsed;
 
   let parsedRestrictions = createRestrictionForTicketForMetadata(ticket, event.params.uri);
-  if(!parsedRestrictions) {
+  if(parsedRestrictions != 'PARSED') {
     ticket.minRestrictionAmount = 0;
     ticket.restrictions = [];
   }
   
-  if(parsed) {
-    ticket.save();
-    
-    let ticketBalance = Balance.load(getBalanceId(event.params.ticketId, event.params.organizer, false));
-    if( ticketBalance !== null ){
-      log.error("handleTicketPublished: Balance already existed, id : {}", [getBalanceId(event.params.ticketId, event.params.organizer, false)]);
-      return;
-    }
-    ticketBalance = new Balance(getBalanceId(event.params.ticketId, event.params.organizer, false));
-    ticketBalance.type = 'Ticket';
-    ticketBalance.ticket = ticket.id;
-    ticketBalance.event = eventEntity.id;
-    ticketBalance.askingPrice = event.params.saleInfo.price;
-    ticketBalance.amountOnSell = event.params.saleInfo.amountToSell.toI32();
-    ticketBalance.amountOwned = event.params.amount.toI32();
-    ticketBalance.owner = event.params.organizer.toHex();
-    ticketBalance.isEventOwner = true;
-    ticketBalance.paymentTokenAddress = event.params.saleInfo.paymentTokenAddress.toHex();
-    ticketBalance.ticketIdentifiersIds = [];
-    ticketBalance.save();
-  } else {
+  ticket.save();
+  if(parsed != 'PARSED') {
     log.error("Error parsing metadata on handleTicketPublished, metadata hash is: {}", [event.params.uri])
   }
+
+      
+  let ticketBalance = Balance.load(getBalanceId(event.params.ticketId, event.params.organizer, false));
+  if( ticketBalance !== null ){
+    log.error("handleTicketPublished: Balance already existed, id : {}", [getBalanceId(event.params.ticketId, event.params.organizer, false)]);
+    return;
+  }
+  ticketBalance = new Balance(getBalanceId(event.params.ticketId, event.params.organizer, false));
+  ticketBalance.type = 'Ticket';
+  ticketBalance.ticket = ticket.id;
+  ticketBalance.event = eventEntity.id;
+  ticketBalance.askingPrice = event.params.saleInfo.price;
+  ticketBalance.amountOnSell = event.params.saleInfo.amountToSell.toI32();
+  ticketBalance.amountOwned = event.params.amount.toI32();
+  ticketBalance.owner = event.params.organizer.toHex();
+  ticketBalance.isEventOwner = true;
+  ticketBalance.paymentTokenAddress = event.params.saleInfo.paymentTokenAddress.toHex();
+  ticketBalance.ticketIdentifiersIds = [];
+  ticketBalance.save();
 }
 
 export function handleTicketDeleted(event: TicketsDeleted): void {
@@ -323,34 +326,37 @@ export function handleTicketPublishedLegacyLegacy(event: TicketPublished): void 
   ticket.isPrivate = false;
 
   let parsed = parseMetadata(event.params.uri, ticket, ticketAttrs);
+  ticket.indexStatus = parsed;
+
   let parsedRestrictions = createRestrictionForTicketForMetadata(ticket, event.params.uri);
-  if(!parsedRestrictions) {
+  if(parsedRestrictions != 'PARSED') {
     ticket.minRestrictionAmount = 0;
     ticket.restrictions = [];
   }
 
-  if(parsed) {
-    ticket.save();
-    let ticketBalance = Balance.load(getBalanceId(event.params.ticketId, event.params.organizer, false));
-    if( ticketBalance !== null ){
-      log.error("handleTicketPublished: Balance already existed, id : {}", [getBalanceId(event.params.ticketId, event.params.organizer, false)]);
-      return;
-    }
-    ticketBalance = new Balance(getBalanceId(event.params.ticketId, event.params.organizer, false));
-    ticketBalance.type = 'Ticket';
-    ticketBalance.ticket = ticketId;
-    ticketBalance.event = eventEntity.id;
-    ticketBalance.askingPrice = event.params.price;
-    ticketBalance.amountOnSell = event.params.amountToSell.toI32();
-    ticketBalance.amountOwned = event.params.amount.toI32();
-    ticketBalance.owner = event.params.organizer.toHex();
-    ticketBalance.isEventOwner = true;
-    ticketBalance.paymentTokenAddress = '0x0000000000000000000000000000000000000000';
-    ticketBalance.ticketIdentifiersIds = [];
-    ticketBalance.save();
-  } else {
+  ticket.save()
+
+  if(parsed != 'PARSED') {
     log.error("Error parsing metadata on handleTicketPublishedLegacy, metadata hash is: {}", [event.params.uri])
   }
+
+  let ticketBalance = Balance.load(getBalanceId(event.params.ticketId, event.params.organizer, false));
+  if( ticketBalance !== null ){
+    log.error("handleTicketPublished: Balance already existed, id : {}", [getBalanceId(event.params.ticketId, event.params.organizer, false)]);
+    return;
+  }
+  ticketBalance = new Balance(getBalanceId(event.params.ticketId, event.params.organizer, false));
+  ticketBalance.type = 'Ticket';
+  ticketBalance.ticket = ticketId;
+  ticketBalance.event = eventEntity.id;
+  ticketBalance.askingPrice = event.params.price;
+  ticketBalance.amountOnSell = event.params.amountToSell.toI32();
+  ticketBalance.amountOwned = event.params.amount.toI32();
+  ticketBalance.owner = event.params.organizer.toHex();
+  ticketBalance.isEventOwner = true;
+  ticketBalance.paymentTokenAddress = '0x0000000000000000000000000000000000000000';
+  ticketBalance.ticketIdentifiersIds = [];
+  ticketBalance.save();
   
 }
 
@@ -368,37 +374,39 @@ export function handleTicketPublishedLegacy(event: TicketPublished1): void {
   ticket.isPrivate = event.params.saleInfo.isPrivate;
   
   let parsed = parseMetadata(event.params.uri, ticket, ticketAttrs);
+  ticket.indexStatus = parsed;
+  
   let parsedRestrictions = createRestrictionForTicketForMetadata(ticket, event.params.uri);
-  if(!parsedRestrictions) {
+  if(parsedRestrictions != 'PARSED') {
     ticket.minRestrictionAmount = 0;
     ticket.restrictions = [];
   }
-
   
-  if(parsed) {
-    ticket.save();
-    
-    let ticketBalance = Balance.load(getBalanceId(event.params.ticketId, event.params.organizer, false));
-    if( ticketBalance !== null ){
-      log.error("handleTicketPublished: Balance already existed, id : {}", [getBalanceId(event.params.ticketId, event.params.organizer, false)]);
-      return;
-    }
-    ticketBalance = new Balance(getBalanceId(event.params.ticketId, event.params.organizer, false));
-    ticketBalance.type = 'Ticket';
-    ticketBalance.ticket = ticket.id;
-    ticketBalance.event = eventEntity.id;
-    ticketBalance.askingPrice = event.params.saleInfo.price;
-    ticketBalance.amountOnSell = event.params.saleInfo.amountToSell.toI32();
-    ticketBalance.amountOwned = event.params.amount.toI32();
-    ticketBalance.owner = event.params.organizer.toHex();
-    ticketBalance.isEventOwner = true;
-    ticketBalance.paymentTokenAddress = '0x0000000000000000000000000000000000000000';
-    ticketBalance.ticketIdentifiersIds = [];
-
-    ticketBalance.save();
-  } else {
+  if(parsed != 'PARSED') {
     log.error("Error parsing metadata on handleTicketPublished, metadata hash is: {}", [event.params.uri])
   }
+
+  ticket.save();
+
+  let ticketBalance = Balance.load(getBalanceId(event.params.ticketId, event.params.organizer, false));
+  if( ticketBalance !== null ){
+    log.error("handleTicketPublished: Balance already existed, id : {}", [getBalanceId(event.params.ticketId, event.params.organizer, false)]);
+    return;
+  }
+  ticketBalance = new Balance(getBalanceId(event.params.ticketId, event.params.organizer, false));
+  ticketBalance.type = 'Ticket';
+  ticketBalance.ticket = ticket.id;
+  ticketBalance.event = eventEntity.id;
+  ticketBalance.askingPrice = event.params.saleInfo.price;
+  ticketBalance.amountOnSell = event.params.saleInfo.amountToSell.toI32();
+  ticketBalance.amountOwned = event.params.amount.toI32();
+  ticketBalance.owner = event.params.organizer.toHex();
+  ticketBalance.isEventOwner = true;
+  ticketBalance.paymentTokenAddress = '0x0000000000000000000000000000000000000000';
+  ticketBalance.ticketIdentifiersIds = [];
+
+  ticketBalance.save(); 
+
 }
 
 export function handleAskSettedLegacy(event: AskSetted): void {

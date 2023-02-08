@@ -54,7 +54,8 @@ export function handleAllowanceAdded(event: AllowanceAdded): void {
     ticketEntity.allowances = [allowance.id];
     ticketEntity.minRestrictionAmount = 0;
     ticketEntity.restrictions = [];
-    
+    ticketEntity.indexStatus = 'PARSED';
+
   } else {
     let allowances = ticketEntity.allowances || []
     if(allowances && allowances.length > 0) {

@@ -350,6 +350,87 @@
       "anonymous": false,
       "inputs": [
         {
+          "indexed": true,
+          "internalType": "address",
+          "type": "address",
+          "name": "eventId"
+        },
+        {
+          "indexed": false,
+          "internalType": "address",
+          "type": "address",
+          "name": "ticketOwner"
+        },
+        {
+          "indexed": false,
+          "internalType": "address",
+          "type": "address",
+          "name": "ticketBuyer"
+        },
+        {
+          "indexed": false,
+          "internalType": "uint256",
+          "type": "uint256",
+          "name": "amount"
+        }
+      ],
+      "name": "BookedTicket",
+      "type": "event"
+    },
+    {
+      "anonymous": false,
+      "inputs": [
+        {
+          "indexed": true,
+          "internalType": "address",
+          "type": "address",
+          "name": "eventId"
+        },
+        {
+          "indexed": false,
+          "internalType": "address",
+          "type": "address",
+          "name": "ticketOwner"
+        },
+        {
+          "indexed": false,
+          "internalType": "address",
+          "type": "address",
+          "name": "ticketBuyer"
+        }
+      ],
+      "name": "BookedTicketTransfered",
+      "type": "event"
+    },
+    {
+      "anonymous": false,
+      "inputs": [
+        {
+          "indexed": true,
+          "internalType": "address",
+          "type": "address",
+          "name": "eventId"
+        },
+        {
+          "indexed": false,
+          "internalType": "address",
+          "type": "address",
+          "name": "ticketOwner"
+        },
+        {
+          "indexed": false,
+          "internalType": "address",
+          "type": "address",
+          "name": "ticketBuyer"
+        }
+      ],
+      "name": "CancelTicketBooking",
+      "type": "event"
+    },
+    {
+      "anonymous": false,
+      "inputs": [
+        {
           "indexed": false,
           "internalType": "address",
           "name": "account",

@@ -351,8 +351,8 @@
       "inputs": [
         {
           "indexed": true,
-          "internalType": "address",
-          "type": "address",
+          "internalType": "uint256",
+          "type": "uint256",
           "name": "eventId"
         },
         {
@@ -382,8 +382,8 @@
       "inputs": [
         {
           "indexed": true,
-          "internalType": "address",
-          "type": "address",
+          "internalType": "uint256",
+          "type": "uint256",
           "name": "eventId"
         },
         {
@@ -407,8 +407,8 @@
       "inputs": [
         {
           "indexed": true,
-          "internalType": "address",
-          "type": "address",
+          "internalType": "uint256",
+          "type": "uint256",
           "name": "eventId"
         },
         {

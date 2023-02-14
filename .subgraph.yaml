@@ -202,5 +202,12 @@ dataSources:
           handler: handleCollaboratorRemoved
         - event: MetadataCancelation(indexed uint256,string)
           handler: handleMetadataCancelation
+        - event: BookedTicket(indexed uint256,address,address,uint256)
+          handler: handleBookedTicket
+        - event: BookedTicketTransfered(indexed uint256,address,address)
+          handler: handleBookedTicketTransfered
+        - event: CancelTicketBooking(indexed uint256,address,address)
+          handler: handleBookedTicketCanceled
+
 
       file: ./src/handlers/adminHandler.ts

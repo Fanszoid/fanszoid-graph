@@ -11,7 +11,10 @@ import {
   EventUnpaused,
   CollaboratorAdded,
   CollaboratorRemoved,
-  MetadataCancelation
+  MetadataCancelation,
+  BookedTicket,
+  BookedTicketTransfered,
+  CancelTicketBooking
 } from "../../build/generated/Admin/Admin";
 import { Event, Ticket, Balance, AllowedMembership, Membership, User } from "../../build/generated/schema";
 import {
@@ -274,4 +277,16 @@ export function handleMetadataCancelation(event: MetadataCancelation) : void {
       entity.save()
     }
   }
+}
+
+export function handleBookedTicket(event: BookedTicket) : void {
+
+}
+
+export function handleBookedTicketTransfered(event: BookedTicketTransfered) : void {
+  
+}
+
+export function handleBookedTicketCanceled(event: CancelTicketBooking) : void {
+  
 }

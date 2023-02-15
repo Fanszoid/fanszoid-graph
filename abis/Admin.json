@@ -353,7 +353,7 @@
           "indexed": true,
           "internalType": "uint256",
           "type": "uint256",
-          "name": "eventId"
+          "name": "ticketId"
         },
         {
           "indexed": false,
@@ -384,7 +384,7 @@
           "indexed": true,
           "internalType": "uint256",
           "type": "uint256",
-          "name": "eventId"
+          "name": "ticketId"
         },
         {
           "indexed": false,
@@ -409,7 +409,7 @@
           "indexed": true,
           "internalType": "uint256",
           "type": "uint256",
-          "name": "eventId"
+          "name": "ticketId"
         },
         {
           "indexed": false,

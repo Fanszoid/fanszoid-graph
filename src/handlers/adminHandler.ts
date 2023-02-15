@@ -16,7 +16,7 @@ import {
   BookedTicketTransfered,
   CancelTicketBooking
 } from "../../build/generated/Admin/Admin";
-import { Event, Ticket, Balance, AllowedMembership, Membership, User } from "../../build/generated/schema";
+import { Event, Ticket, Balance, AllowedMembership, Membership, User, Reservation } from "../../build/generated/schema";
 import {
   getAllowedMembershipId, getMembershipId, membershipAttrs,
 } from "../modules/Membership";
@@ -30,6 +30,8 @@ import { membershipContractAddressMATIC, membershipContractAddressMUMBAI } from 
 import { store, log, BigInt, dataSource } from "@graphprotocol/graph-ts";
 import { parseMetadata } from "./utils"
 import { getTicketId } from "../modules/Ticket"
+import { getBalanceId } from "../modules/Balance";
+import { getReservationId } from "../modules/Reservations";
 
 export function handleEventPaused(event: EventPaused): void {
   let eventEntity = Event.load(getEventId(event.params.eventId));
@@ -280,13 +282,74 @@ export function handleMetadataCancelation(event: MetadataCancelation) : void {
 }
 
 export function handleBookedTicket(event: BookedTicket) : void {
+  let ticket = Ticket.load(getTicketId(event.params.ticketId));
 
+  if(ticket) {
+    let balance = Balance.load(getBalanceId(event.params.ticketId, event.params.ticketOwner, false));
+
+    if(balance) {
+      balance.amountOnSell -= event.params.amount.toI32();
+      let reservation = new Reservation(getReservationId(event.params.ticketId, event.params.ticketOwner.toString(), event.params.ticketBuyer.toString()))
+
+      reservation.amount = event.params.amount.toI32();
+      reservation.ticketBuyer = event.params.ticketBuyer.toString();
+      reservation.ticketOwner = event.params.ticketOwner.toString();
+      reservation.ticket = event.params.ticketId.toString();
+  
+      balance.save()
+      reservation.save()
+    }
+    else {
+      log.error('Balance dont exist', [])
+    }
+  }
+  else {
+    log.error('Ticket id dont exist', [])
+  }
 }
 
 export function handleBookedTicketTransfered(event: BookedTicketTransfered) : void {
+  let ticket = Ticket.load(getTicketId(event.params.ticketId));
+
+  if(ticket) {
+    let reservationId = getReservationId(event.params.ticketId, event.params.ticketOwner.toString(), event.params.ticketBuyer.toString());
+    let reservation = Reservation.load(reservationId);
+
+    if(reservation) {
+      store.remove("Reservation", reservationId);
+    }
+    else {
+      log.error('Reservation dont exist', [])
+    }
   
+  }
+  else {
+    log.error('Ticket id dont exist', [])
+  }
 }
 
 export function handleBookedTicketCanceled(event: CancelTicketBooking) : void {
+  let ticket = Ticket.load(getTicketId(event.params.ticketId));
+
+  if(ticket) {
+    let balance = Balance.load(getBalanceId(event.params.ticketId, event.params.ticketOwner, false));
+    let reservationId = getReservationId(event.params.ticketId, event.params.ticketOwner.toString(), event.params.ticketBuyer.toString());
+    let reservation = Reservation.load(reservationId);
+
+    if(balance && reservation) {
+      balance.amountOnSell += reservation.amount.toI32();
   
+      balance.save()
+      store.remove('Reservation', reservationId);
+    }
+    else{
+      if(reservation) {
+        store.remove('Reservation', reservationId);
+      }
+      log.error('Balance or Reservation dont exist', [])
+    }
+  }
+  else {
+    log.error('Ticket id dont exist', [])
+  }
 }

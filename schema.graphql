@@ -212,3 +212,11 @@ type Restriction @entity {
   name: String
   imageUrl: String
 }
+
+type Reservation @entity {
+  id: ID!
+  ticket: Ticket!
+  ticketOwner: User!
+  ticketBuyer: User!
+  amount: Int!
+}

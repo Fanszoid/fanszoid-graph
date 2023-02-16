@@ -1,13 +1,14 @@
 import { Address, BigInt, ethereum } from "@graphprotocol/graph-ts";
 import { assert, beforeAll, beforeEach, clearStore, describe, mockIpfsFile, newMockEvent, test } from "matchstick-as"
-import { Admin, CollaboratorAdded, CollaboratorRemoved, CreatorRoyaltyModifiedOnEvent, EventCreated, EventDeleted, EventEdited, EventOwnershipTransferred, EventPaused, EventUnpaused, MembershipAssignedToTicket, MembershipRemovedFromTicket, MembershipTokenIdRemovedFromTicket } from "../../build/generated/Admin/Admin";
+import { Admin, BookedTicket, BookedTicketTransfered, CancelTicketBooking, CollaboratorAdded, CollaboratorRemoved, CreatorRoyaltyModifiedOnEvent, EventCreated, EventDeleted, EventEdited, EventOwnershipTransferred, EventPaused, EventUnpaused, MembershipAssignedToTicket, MembershipRemovedFromTicket, MembershipTokenIdRemovedFromTicket } from "../../build/generated/Admin/Admin";
 import { AllowedMembership, Event, Ticket, User } from "../../build/generated/schema";
-import { handleCollaboratorAdded, handleCollaboratorRemoved, handleCreatorRoyaltyModifiedOnEvent, handleDisallowMembership, handleDisallowMembershipTokenId, handleEventCreated, handleEventDeleted, handleEventOwnershipTransferred, handleEventPaused, handleEventUnpaused, handleEventUriModification, handleMembershipsAssigned } from "../../src/handlers/adminHandler";
+import { handleBookedTicket, handleBookedTicketCanceled, handleBookedTicketTransfered, handleCollaboratorAdded, handleCollaboratorRemoved, handleCreatorRoyaltyModifiedOnEvent, handleDisallowMembership, handleDisallowMembershipTokenId, handleEventCreated, handleEventDeleted, handleEventOwnershipTransferred, handleEventPaused, handleEventUnpaused, handleEventUriModification, handleMembershipsAssigned } from "../../src/handlers/adminHandler";
 import { log } from "matchstick-as/assembly/log";
 import { param } from "../utils";
 import { loadOrCreateUser } from "../../src/modules/User";
 import { getTicketId } from "../../src/modules/Ticket";
 import { getAllowedMembershipId } from "../../src/modules/Membership";
+import { getReservationId } from "../../src/modules/Reservations";
 
 let org: string = '';
 
@@ -477,6 +478,129 @@ describe("Admin", () => {
     assert.fieldEquals('AllowedMembership', membershipId, 'tokenIds', '[]');
   });
 
+  test("Handle book ticket and cancel it", () => {
+    let ticket = new Ticket(getTicketId(BigInt.fromString('1')));
+    ticket.creatorRoyalty = 10;
+    ticket.isResellable = false;
+    ticket.isPrivate = false;
+    ticket.totalAmount = 10;
+    ticket.event = 'e0x0';
+    ticket.minRestrictionAmount = 0;
+    ticket.restrictions = [];
+    ticket.indexStatus = 'PARSED'
+    ticket.save(); 
+
+    let mockEvent = newMockEvent();
+    let event = new BookedTicket(
+      mockEvent.address,
+      mockEvent.logIndex,
+      mockEvent.transactionLogIndex,
+      mockEvent.logType,
+      mockEvent.block,
+      mockEvent.transaction,
+      mockEvent.parameters,
+      mockEvent.receipt
+    )
+    
+    let owner = '0x87d250a5c9674788F946F10E95641bba4DEa838f'.toLowerCase();
+    let buyer = '0xB8dF7E9Beb10F5154eE98bd1c75f1F6BDDE94154'.toLowerCase();
+
+    event.parameters = [
+      param('ticketId', BigInt.fromString('1')),
+      param('ticketOwner', Address.fromString(owner).toHex()),
+      param('ticketBuyer', Address.fromString(buyer).toHex()),
+      param('amount', BigInt.fromString('10')),
+    ];
+
+    handleBookedTicket(event);
+    assert.fieldEquals('Reservation', getReservationId(BigInt.fromString('1'), Address.fromString(owner), Address.fromString(buyer)), 'ticketBuyer', buyer)
+    assert.fieldEquals('Reservation', getReservationId(BigInt.fromString('1'), Address.fromString(owner), Address.fromString(buyer)), 'ticketOwner', owner)
+    assert.fieldEquals('Reservation', getReservationId(BigInt.fromString('1'), Address.fromString(owner), Address.fromString(buyer)), 'amount', '10')
+    assert.fieldEquals('Reservation', getReservationId(BigInt.fromString('1'), Address.fromString(owner), Address.fromString(buyer)), 'ticket', 'tt0x1')
+    
+
+    let event2 = new CancelTicketBooking(
+      mockEvent.address,
+      mockEvent.logIndex,
+      mockEvent.transactionLogIndex,
+      mockEvent.logType,
+      mockEvent.block,
+      mockEvent.transaction,
+      mockEvent.parameters,
+      mockEvent.receipt
+    )
+
+    event2.parameters = [
+      param('ticketId', BigInt.fromString('1')),
+      param('ticketOwner', Address.fromString(owner).toHex()),
+      param('ticketBuyer',  Address.fromString(buyer).toHex()),
+    ];
+
+    handleBookedTicketCanceled(event2)
+    assert.notInStore('Reservation', getReservationId(BigInt.fromString('1'), Address.fromString(owner), Address.fromString(buyer)))
+  })
+
+  test("Handle book ticket and transfer it", () => {
+    let ticket = new Ticket(getTicketId(BigInt.fromString('1')));
+    ticket.creatorRoyalty = 10;
+    ticket.isResellable = false;
+    ticket.isPrivate = false;
+    ticket.totalAmount = 10;
+    ticket.event = 'e0x0';
+    ticket.minRestrictionAmount = 0;
+    ticket.restrictions = [];
+    ticket.indexStatus = 'PARSED'
+    ticket.save(); 
+
+    let mockEvent = newMockEvent();
+    let event = new BookedTicket(
+      mockEvent.address,
+      mockEvent.logIndex,
+      mockEvent.transactionLogIndex,
+      mockEvent.logType,
+      mockEvent.block,
+      mockEvent.transaction,
+      mockEvent.parameters,
+      mockEvent.receipt
+    )
+    
+    let owner = '0x87d250a5c9674788F946F10E95641bba4DEa838f'.toLowerCase();
+    let buyer = '0xB8dF7E9Beb10F5154eE98bd1c75f1F6BDDE94154'.toLowerCase();
+
+    event.parameters = [
+      param('ticketId', BigInt.fromString('1')),
+      param('ticketOwner', Address.fromString(owner).toHex()),
+      param('ticketBuyer', Address.fromString(buyer).toHex()),
+      param('amount', BigInt.fromString('10')),
+    ];
+
+    handleBookedTicket(event);
+    assert.fieldEquals('Reservation', getReservationId(BigInt.fromString('1'), Address.fromString(owner), Address.fromString(buyer)), 'ticketBuyer', buyer)
+    assert.fieldEquals('Reservation', getReservationId(BigInt.fromString('1'), Address.fromString(owner), Address.fromString(buyer)), 'ticketOwner', owner)
+    assert.fieldEquals('Reservation', getReservationId(BigInt.fromString('1'), Address.fromString(owner), Address.fromString(buyer)), 'amount', '10')
+    assert.fieldEquals('Reservation', getReservationId(BigInt.fromString('1'), Address.fromString(owner), Address.fromString(buyer)), 'ticket', 'tt0x1')
+    
+
+    let event2 = new BookedTicketTransfered(
+      mockEvent.address,
+      mockEvent.logIndex,
+      mockEvent.transactionLogIndex,
+      mockEvent.logType,
+      mockEvent.block,
+      mockEvent.transaction,
+      mockEvent.parameters,
+      mockEvent.receipt
+    )
+
+    event2.parameters = [
+      param('ticketId', BigInt.fromString('1')),
+      param('ticketOwner', Address.fromString(owner).toHex()),
+      param('ticketBuyer',  Address.fromString(buyer).toHex()),
+    ];
+
+    handleBookedTicketTransfered(event2)
+    assert.notInStore('Reservation', getReservationId(BigInt.fromString('1'), Address.fromString(owner), Address.fromString(buyer)))
+  })
 })
 
 

@@ -284,15 +284,16 @@ export function handleMetadataCancelation(event: MetadataCancelation) : void {
 export function handleBookedTicket(event: BookedTicket) : void {
   let ticket = Ticket.load(getTicketId(event.params.ticketId));
 
-  if(ticket) {
-    let reservation = new Reservation(getReservationId(event.params.ticketId, event.params.ticketOwner.toString(), event.params.ticketBuyer.toString()))
+  if(ticket) {  
+    let reservation = new Reservation(getReservationId(event.params.ticketId, event.params.ticketOwner, event.params.ticketBuyer))
 
     reservation.amount = event.params.amount.toI32();
-    reservation.ticketBuyer = event.params.ticketBuyer.toString();
-    reservation.ticketOwner = event.params.ticketOwner.toString();
-    reservation.ticket = event.params.ticketId.toString();
+    reservation.ticketBuyer = event.params.ticketBuyer.toHex();
+    reservation.ticketOwner = event.params.ticketOwner.toHex();
+    reservation.ticket = getTicketId(event.params.ticketId);
   
     reservation.save()
+    log.debug(reservation.id, [])
   }
   else {
     log.error('Ticket id dont exist', [])
@@ -303,7 +304,7 @@ export function handleBookedTicketTransfered(event: BookedTicketTransfered) : vo
   let ticket = Ticket.load(getTicketId(event.params.ticketId));
 
   if(ticket) {
-    let reservationId = getReservationId(event.params.ticketId, event.params.ticketOwner.toString(), event.params.ticketBuyer.toString());
+    let reservationId = getReservationId(event.params.ticketId, event.params.ticketOwner, event.params.ticketBuyer);
     let reservation = Reservation.load(reservationId);
 
     if(reservation) {
@@ -323,7 +324,7 @@ export function handleBookedTicketCanceled(event: CancelTicketBooking) : void {
   let ticket = Ticket.load(getTicketId(event.params.ticketId));
 
   if(ticket) {
-    let reservationId = getReservationId(event.params.ticketId, event.params.ticketOwner.toString(), event.params.ticketBuyer.toString());
+    let reservationId = getReservationId(event.params.ticketId, event.params.ticketOwner, event.params.ticketBuyer);
     let reservation = Reservation.load(reservationId);
 
     if(reservation) {

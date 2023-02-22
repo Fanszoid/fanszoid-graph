@@ -154,6 +154,8 @@ describe("Admin", () => {
     ticket.minRestrictionAmount = 0;
     ticket.restrictions = [];
     ticket.indexStatus = 'PARSED';
+    ticket.primaryMarketplaceRoyalty = 1500;
+    ticket.secondaryMarketplaceRoyalty = 750;
     ticket.save(); 
 
     let entity = Event.load('e0x0');
@@ -361,6 +363,8 @@ describe("Admin", () => {
     ticket.minRestrictionAmount = 0;
     ticket.restrictions = [];
     ticket.indexStatus = 'PARSED';
+    ticket.primaryMarketplaceRoyalty = 1500;
+    ticket.secondaryMarketplaceRoyalty = 750;
     ticket.save(); 
 
     let entity = Event.load('e0x0');
@@ -403,6 +407,8 @@ describe("Admin", () => {
     ticket.minRestrictionAmount = 0;
     ticket.restrictions = [];
     ticket.indexStatus = 'PARSED';
+    ticket.primaryMarketplaceRoyalty = 1500;
+    ticket.secondaryMarketplaceRoyalty = 750;
     ticket.save(); 
 
     let contractAddress = '0xa16081f360e3847006db660bae1c6d1b2e17ec2a';
@@ -445,6 +451,8 @@ describe("Admin", () => {
     ticket.minRestrictionAmount = 0;
     ticket.restrictions = [];
     ticket.indexStatus = 'PARSED'
+    ticket.primaryMarketplaceRoyalty = 1500;
+    ticket.secondaryMarketplaceRoyalty = 750;
     ticket.save(); 
 
     let contractAddress = '0xa16081f360e3847006db660bae1c6d1b2e17ec2a';
@@ -488,6 +496,8 @@ describe("Admin", () => {
     ticket.minRestrictionAmount = 0;
     ticket.restrictions = [];
     ticket.indexStatus = 'PARSED'
+    ticket.primaryMarketplaceRoyalty = 1500;
+    ticket.secondaryMarketplaceRoyalty = 750;
     ticket.save(); 
 
     let mockEvent = newMockEvent();
@@ -550,6 +560,8 @@ describe("Admin", () => {
     ticket.minRestrictionAmount = 0;
     ticket.restrictions = [];
     ticket.indexStatus = 'PARSED'
+    ticket.primaryMarketplaceRoyalty = 1500;
+    ticket.secondaryMarketplaceRoyalty = 750;
     ticket.save(); 
 
     let mockEvent = newMockEvent();

@@ -5,6 +5,8 @@ import {
   AskRemoved,
   TicketBought,
   CreatorRoyaltyModifiedOnTicket,
+  PrimaryMarketRoyaltyModifiedOnTicket,
+  SecondaryMarketRoyaltyModifiedOnTicket,
   TicketEdited,
   AllowanceAdded,
   AllowanceConsumed,
@@ -14,7 +16,7 @@ import {
   AskSetted1,
   TicketPublished2
 } from "../../build/generated/TicketsMarketplace/TicketsMarketplace";
-import { Ticket, Balance, Allowance } from "../../build/generated/schema";
+import { Ticket, Balance, Allowance, MarketplaceFees } from "../../build/generated/schema";
 import { 
   loadOrCreateEvent,
 } from "../modules/Event";
@@ -35,6 +37,7 @@ import {
 import { store, log, Address } from "@graphprotocol/graph-ts";
 import { parseMetadata } from "./utils";
 import { createRestrictionForTicketForMetadata } from "../modules/Restriction";
+import { marketplaceFeesEntityId, primaryMarketplaceRoyaltyDefault, secondaryMarketplaceRoyaltyDefault } from "../modules/MarketplaceFees";
 
 export function handleAllowanceAdded(event: AllowanceAdded): void {
   let allowance = new Allowance(getAllowanceId(event.params.allowanceId, false));
@@ -140,6 +143,16 @@ export function handleTicketPublished(event: TicketPublished2): void {
   ticket.metadata = event.params.uri;
   ticket.totalAmount = event.params.amount.toI32();
   ticket.isPrivate = event.params.saleInfo.isPrivate;
+  
+  let marketFees = MarketplaceFees.load(marketplaceFeesEntityId)
+  if(!marketFees) {
+    // default value on marketplace
+    ticket.primaryMarketplaceRoyalty = primaryMarketplaceRoyaltyDefault.toI32()
+    ticket.secondaryMarketplaceRoyalty = secondaryMarketplaceRoyaltyDefault.toI32() 
+  } else {
+    ticket.primaryMarketplaceRoyalty = marketFees.primaryMarketplaceRoyalty
+    ticket.secondaryMarketplaceRoyalty = marketFees.secondaryMarketplaceRoyalty
+  }
   
   let parsed = parseMetadata(event.params.uri, ticket, ticketAttrs);
   ticket.indexStatus = parsed;
@@ -274,6 +287,28 @@ export function handleCreatorRoyaltyModifiedOnTicket(event: CreatorRoyaltyModifi
   ticket.save();
 }
 
+export function handlePrimaryMarketRoyaltyModifiedOnTicket(event: PrimaryMarketRoyaltyModifiedOnTicket): void {
+  let ticket = Ticket.load(getTicketId(event.params.ticketId));
+  if(ticket == null ) {
+    log.error("Ticket not found on handlePrimaryMarketRoyaltyModifiedOnTicket. id : {}", [event.params.ticketId.toHex()]);
+    return;
+  }
+
+  ticket.primaryMarketplaceRoyalty = event.params.newRoyalty.toI32();
+  ticket.save();
+}
+
+export function handleSecondaryMarketRoyaltyModifiedOnTicket(event: SecondaryMarketRoyaltyModifiedOnTicket): void {
+  let ticket = Ticket.load(getTicketId(event.params.ticketId));
+  if(ticket == null ) {
+    log.error("Ticket not found on handleSecondaryMarketRoyaltyModifiedOnTicket. id : {}", [event.params.ticketId.toHex()]);
+    return;
+  }
+
+  ticket.secondaryMarketplaceRoyalty = event.params.newRoyalty.toI32();
+  ticket.save();
+}
+
 
 
 
@@ -325,6 +360,16 @@ export function handleTicketPublishedLegacyLegacy(event: TicketPublished): void 
   ticket.totalAmount = event.params.amount.toI32();
   ticket.isPrivate = false;
 
+  let marketFees = MarketplaceFees.load(marketplaceFeesEntityId)
+  if(!marketFees) {
+    // default value on marketplace
+    ticket.primaryMarketplaceRoyalty = primaryMarketplaceRoyaltyDefault.toI32()
+    ticket.secondaryMarketplaceRoyalty = secondaryMarketplaceRoyaltyDefault.toI32()
+  } else {
+    ticket.primaryMarketplaceRoyalty = marketFees.primaryMarketplaceRoyalty
+    ticket.secondaryMarketplaceRoyalty = marketFees.secondaryMarketplaceRoyalty
+  }
+
   let parsed = parseMetadata(event.params.uri, ticket, ticketAttrs);
   ticket.indexStatus = parsed;
 
@@ -373,6 +418,16 @@ export function handleTicketPublishedLegacy(event: TicketPublished1): void {
   ticket.totalAmount = event.params.amount.toI32();
   ticket.isPrivate = event.params.saleInfo.isPrivate;
   
+  let marketFees = MarketplaceFees.load(marketplaceFeesEntityId)
+  if(!marketFees) {
+    // default value on marketplace
+    ticket.primaryMarketplaceRoyalty = primaryMarketplaceRoyaltyDefault.toI32()
+    ticket.secondaryMarketplaceRoyalty = secondaryMarketplaceRoyaltyDefault.toI32()
+  } else {
+    ticket.primaryMarketplaceRoyalty = marketFees.primaryMarketplaceRoyalty
+    ticket.secondaryMarketplaceRoyalty = marketFees.secondaryMarketplaceRoyalty
+  }
+
   let parsed = parseMetadata(event.params.uri, ticket, ticketAttrs);
   ticket.indexStatus = parsed;
   

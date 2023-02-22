@@ -14,9 +14,12 @@ import {
   MetadataCancelation,
   BookedTicket,
   BookedTicketTransfered,
-  CancelTicketBooking
+  CancelTicketBooking,
+  FixedFeeForERC20Setted,
+  SecondaryMarketRoyaltyModified,
+  PrimaryMarketRoyaltyModified
 } from "../../build/generated/Admin/Admin";
-import { Event, Ticket, Balance, AllowedMembership, Membership, User, Reservation } from "../../build/generated/schema";
+import { Event, Ticket, Balance, AllowedMembership, Membership, User, Reservation, Erc20TokenAddress, MarketplaceFees } from "../../build/generated/schema";
 import {
   getAllowedMembershipId, getMembershipId, membershipAttrs,
 } from "../modules/Membership";
@@ -32,6 +35,7 @@ import { parseMetadata } from "./utils"
 import { getTicketId } from "../modules/Ticket"
 import { getBalanceId } from "../modules/Balance";
 import { getReservationId } from "../modules/Reservations";
+import { marketplaceFeesEntityId, primaryMarketplaceRoyaltyDefault, secondaryMarketplaceRoyaltyDefault } from "../modules/MarketplaceFees";
 
 export function handleEventPaused(event: EventPaused): void {
   let eventEntity = Event.load(getEventId(event.params.eventId));
@@ -337,4 +341,47 @@ export function handleBookedTicketCanceled(event: CancelTicketBooking) : void {
   else {
     log.error('Ticket id dont exist', [])
   }
+}
+
+export function handleFixedFeeForERC20Setted(event: FixedFeeForERC20Setted) : void {
+  let addr = Erc20TokenAddress.load(event.params.addr.toHex());
+
+  if(addr) {
+    addr.fixedFee = event.params.fee;
+    addr.save()
+  } else {
+    let newAddr = new Erc20TokenAddress(event.params.addr.toHex())
+
+    newAddr.address = event.params.addr.toHex();
+    newAddr.fixedFee = event.params.fee;
+
+    newAddr.save()
+  }
+}
+
+export function handlePrimaryMarketRoyaltyModified(event: PrimaryMarketRoyaltyModified) : void {
+  let marketplaceFees = MarketplaceFees.load("MarketplaceFees");
+
+  if(!marketplaceFees) {
+    marketplaceFees = new MarketplaceFees("MarketplaceFees")
+    marketplaceFees.secondaryMarketplaceRoyalty = secondaryMarketplaceRoyaltyDefault; // default value on marketplace
+  }
+
+  marketplaceFees.primaryMarketplaceRoyalty = event.params.newRoyalty;
+
+  marketplaceFees.save()
+}
+
+
+export function handleSecondaryMarketRoyaltyModified(event: SecondaryMarketRoyaltyModified) : void {
+  let marketplaceFees = MarketplaceFees.load(marketplaceFeesEntityId);
+
+  if(!marketplaceFees) {
+    marketplaceFees = new MarketplaceFees(marketplaceFeesEntityId);
+    marketplaceFees.primaryMarketplaceRoyalty = primaryMarketplaceRoyaltyDefault; // default value on marketplace
+  }
+
+  marketplaceFees.secondaryMarketplaceRoyalty = event.params.newRoyalty;
+
+  marketplaceFees.save()
 }

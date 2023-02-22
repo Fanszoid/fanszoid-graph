@@ -102,6 +102,10 @@ dataSources:
           handler: handleAskRemoved
         - event: CreatorRoyaltyModifiedOnTicket(indexed uint256,uint256)
           handler: handleCreatorRoyaltyModifiedOnTicket
+        - event: PrimaryMarketRoyaltyModifiedOnTicket(indexed uint256,uint256)
+          handler: handlePrimaryMarketRoyaltyModifiedOnTicket
+        - event: SecondaryMarketRoyaltyModifiedOnTicket(indexed uint256,uint256)
+          handler: handleSecondaryMarketRoyaltyModifiedOnTicket
         - event: AllowanceAdded(indexed uint256,indexed uint256,(uint256,address[]))
           handler: handleAllowanceAdded
         - event: AllowanceConsumed(indexed uint256)
@@ -208,6 +212,10 @@ dataSources:
           handler: handleBookedTicketTransfered
         - event: CancelTicketBooking(indexed uint256,address,address)
           handler: handleBookedTicketCanceled
-
-
+        - event: FixedFeeForERC20Setted(indexed address,indexed uint256)
+          handler: handleFixedFeeForERC20Setted
+        - event: PrimaryMarketRoyaltyModified(uint256)
+          handler: handlePrimaryMarketRoyaltyModified
+        - event: SecondaryMarketRoyaltyModified(uint256)
+          handler: handleSecondaryMarketRoyaltyModified
       file: ./src/handlers/adminHandler.ts

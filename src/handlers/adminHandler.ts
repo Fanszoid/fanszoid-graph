@@ -119,6 +119,9 @@ export function handleEventCreated(event: EventCreated): void {
   eventEntity.indexStatus = parsed;
     
   if( parsed != 'PARSED' ) {
+    if(eventEntity.title) {
+      eventEntity.eventFanzUri = eventEntity.title.toString().normalize("NFD").replace('/[\u0300-\u036f]/g', "").replace('/\s+/g', '-').toLowerCase() + '-' + eventEntity.id;
+    }
     log.error("Error parsing metadata on handleEventCreated, metadata hash is: {}", [event.params.uri])
   }
 

@@ -208,8 +208,8 @@ export function normalizeString(value: string) : string {
     else if(value.charAt(i) == 'ñ' || value.charAt(i) == 'ń') {
       newString += 'n'
     }
-    else {
-      newString += value.charAt(i)
+    else if((value.charAt(i) >= '0' && value.charAt(i) <= '9') || (value.charAt(i) >= 'a' && value.charAt(i) <= 'z') || value.charAt(i) == '-') {
+      newString += value.charAt(i);
     }
   }
   return newString;

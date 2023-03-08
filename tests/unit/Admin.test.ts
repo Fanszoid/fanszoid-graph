@@ -64,6 +64,7 @@ describe("Admin", () => {
     assert.fieldEquals('Event', 'e0x1', 'organizer', '0xa16081f360e3847006db660bae1c6d1b2e17ec2a');
     assert.fieldEquals('Event', 'e0x1', 'metadata', 'FAKE_URI');
     assert.fieldEquals('Event', 'e0x1', 'indexStatus', 'PARSED')
+    assert.fieldEquals('Event', 'e0x1', 'eventFanzUri', 'metaverse-lollapalooza-2022-e0x1')
   })
 
   test("Handle event creation with not valid ipfs", () => {

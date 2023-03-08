@@ -25,7 +25,7 @@ import {
 } from "../modules/Event";
 import { membershipContractAddressMATIC, membershipContractAddressMUMBAI } from "../modules/Membership";
 import { store, log, BigInt, dataSource } from "@graphprotocol/graph-ts";
-import { parseMetadata } from "./utils"
+import { normalizeString, parseMetadata } from "./utils"
 import { getTicketId } from "../modules/Ticket"
 
 export function handleEventPaused(event: EventPaused): void {
@@ -120,6 +120,9 @@ export function handleEventCreated(event: EventCreated): void {
     
   if( parsed != 'PARSED' ) {
     log.error("Error parsing metadata on handleEventCreated, metadata hash is: {}", [event.params.uri])
+  }
+  else {
+    eventEntity.eventFanzUri = normalizeString((eventEntity.title as string).split(" ").filter(txt => txt.length > 0).join('-').toLowerCase()) + '-' + eventEntity.id;
   }
 
   eventEntity.organizer = organizerUser.address;

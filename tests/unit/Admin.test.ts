@@ -67,6 +67,38 @@ describe("Admin", () => {
     assert.fieldEquals('Event', 'e0x1', 'eventFanzUri', 'metaverse-lollapalooza-2022-e0x1')
   })
 
+  test("Handle event creation with special chars in title", () => {
+    let mockEvent = newMockEvent();
+    
+    let event = new EventCreated(
+      mockEvent.address,
+      mockEvent.logIndex,
+      mockEvent.transactionLogIndex,
+      mockEvent.logType,
+      mockEvent.block,
+      mockEvent.transaction,
+      mockEvent.parameters,
+      mockEvent.receipt
+    )
+    
+    event.parameters = [
+      param('eventId', BigInt.fromString('1')),
+      param('organizer', '0xa16081f360e3847006db660bae1c6d1b2e17ec2a'),
+      param('uri', 'FAKE_URI')
+    ];
+
+    mockIpfsFile('FAKE_URI', 'tests/ipfs/fake_2_event_metadata_specials_chars.json');
+
+    handleEventCreated(event);
+
+    // Test agains storage [Entity, id, attr, expected_value]
+    assert.fieldEquals('Event', 'e0x1', 'id', 'e0x1');
+    assert.fieldEquals('Event', 'e0x1', 'organizer', '0xa16081f360e3847006db660bae1c6d1b2e17ec2a');
+    assert.fieldEquals('Event', 'e0x1', 'metadata', 'FAKE_URI');
+    assert.fieldEquals('Event', 'e0x1', 'indexStatus', 'PARSED')
+    assert.fieldEquals('Event', 'e0x1', 'eventFanzUri', 'metaverse-lollapalooza-2022-e0x1')
+  })
+
   test("Handle event creation with not valid ipfs", () => {
     let mockEvent = newMockEvent();
     

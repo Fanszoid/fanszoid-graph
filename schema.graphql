@@ -51,7 +51,8 @@ type Event @entity {
   metadata: String
   attendees: BigInt!
   paused: Boolean
-  collaborators: [User!]! 
+  collaborators: [User!]!
+  eventFanzUri: String
   
   title: String
   description: String

@@ -171,3 +171,46 @@ export function isStringAnInteger(value: String): boolean {
   }
   return true;
 }
+
+export function normalizeString(value: string) : string {
+  let newString = '';
+  for(let i = 0; i < value.length; i++) {
+    if(value.charAt(i) == 'è' || value.charAt(i) == 'é' || value.charAt(i) == 'ê' || value.charAt(i) == 'ë' || value.charAt(i) == 'ē' || value.charAt(i) == 'ė' || value.charAt(i) == 'ę') {
+      newString += 'e'
+    }
+    else if(value.charAt(i) == 'ÿ') {
+      newString += 'y'
+    } 
+    else if (value.charAt(i) == 'û' || value.charAt(i) == 'ü' || value.charAt(i) == 'ü' || value.charAt(i) == 'ù' || value.charAt(i) == 'ú' || value.charAt(i) == 'ú' || value.charAt(i) == 'ū') {
+      newString += 'u'
+    }
+    else if(value.charAt(i) == 'î' || value.charAt(i) == 'ï' || value.charAt(i) == 'í' || value.charAt(i) == 'ī' || value.charAt(i) == 'į' || value.charAt(i) == 'ì') {
+      newString += 'i'
+    }
+    else if(value.charAt(i) == 'ô' || value.charAt(i) == 'ö' || value.charAt(i) == 'ò' || value.charAt(i) == 'ó' || value.charAt(i) == 'œ' || value.charAt(i) == 'ø' || value.charAt(i) == 'ō' || value.charAt(i) == 'õ') {
+      newString += 'o'
+    }
+    else if(value.charAt(i) == 'à' || value.charAt(i) == 'á' || value.charAt(i) == 'â' || value.charAt(i) == 'ä' || value.charAt(i) == 'æ' || value.charAt(i) == 'ã' || value.charAt(i) == 'å' || value.charAt(i) == 'ā') {
+      newString += 'a'
+    }
+    else if(value.charAt(i) == 'ś' || value.charAt(i) == 'š') {
+      newString += 's'
+    }
+    else if(value.charAt(i) == 'ł') {
+      newString += 'l'
+    }
+    else if(value.charAt(i) == 'ž' || value.charAt(i) == 'ź' || value.charAt(i) == 'ż') {
+      newString += 'z'
+    }
+    else if(value.charAt(i) == 'ç' || value.charAt(i) == 'ć' || value.charAt(i) == 'č') {
+      newString += 'c'
+    }
+    else if(value.charAt(i) == 'ñ' || value.charAt(i) == 'ń') {
+      newString += 'n'
+    }
+    else if((value.charAt(i) >= '0' && value.charAt(i) <= '9') || (value.charAt(i) >= 'a' && value.charAt(i) <= 'z') || value.charAt(i) == '-') {
+      newString += value.charAt(i);
+    }
+  }
+  return newString;
+}

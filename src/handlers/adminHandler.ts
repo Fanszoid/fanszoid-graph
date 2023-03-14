@@ -367,10 +367,10 @@ export function handlePrimaryMarketRoyaltyModified(event: PrimaryMarketRoyaltyMo
 
   if(!marketplaceFees) {
     marketplaceFees = new MarketplaceFees("MarketplaceFees")
-    marketplaceFees.secondaryMarketplaceRoyalty = secondaryMarketplaceRoyaltyDefault; // default value on marketplace
+    marketplaceFees.secondaryMarketplaceRoyalty = secondaryMarketplaceRoyaltyDefault.toI32(); // default value on marketplace
   }
 
-  marketplaceFees.primaryMarketplaceRoyalty = event.params.newRoyalty;
+  marketplaceFees.primaryMarketplaceRoyalty = event.params.newRoyalty.toI32();
 
   marketplaceFees.save()
 }
@@ -381,10 +381,10 @@ export function handleSecondaryMarketRoyaltyModified(event: SecondaryMarketRoyal
 
   if(!marketplaceFees) {
     marketplaceFees = new MarketplaceFees(marketplaceFeesEntityId);
-    marketplaceFees.primaryMarketplaceRoyalty = primaryMarketplaceRoyaltyDefault; // default value on marketplace
+    marketplaceFees.primaryMarketplaceRoyalty = primaryMarketplaceRoyaltyDefault.toI32(); // default value on marketplace
   }
 
-  marketplaceFees.secondaryMarketplaceRoyalty = event.params.newRoyalty;
+  marketplaceFees.secondaryMarketplaceRoyalty = event.params.newRoyalty.toI32();
 
   marketplaceFees.save()
 }

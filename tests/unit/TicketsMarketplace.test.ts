@@ -46,6 +46,8 @@ describe("TicketsMarketplace", () => {
       ticket.minRestrictionAmount = 0;
       ticket.restrictions = [];
       ticket.indexStatus = 'PARSED'
+      ticket.primaryMarketplaceRoyalty = 1500
+      ticket.secondaryMarketplaceRoyalty = 750
       ticket.save();
       let balance1 = new Balance("t0x0-".concat(address1));
       balance1.type = 'Ticket';
@@ -135,6 +137,8 @@ describe("TicketsMarketplace", () => {
     ticket.minRestrictionAmount = 0;
     ticket.restrictions = [];
     ticket.indexStatus = 'PARSED'
+    ticket.primaryMarketplaceRoyalty = 1500
+    ticket.secondaryMarketplaceRoyalty = 750
     ticket.save(); 
     
     let mockEvent = newMockEvent();
@@ -170,6 +174,8 @@ describe("TicketsMarketplace", () => {
     ticket.minRestrictionAmount = 0;
     ticket.restrictions = [];
     ticket.indexStatus = 'PARSED';
+    ticket.primaryMarketplaceRoyalty = 1500
+    ticket.secondaryMarketplaceRoyalty = 750
     ticket.save(); 
     
     let mockEvent = newMockEvent();
@@ -208,6 +214,8 @@ describe("TicketsMarketplace", () => {
     ticket.minRestrictionAmount = 0;
     ticket.restrictions = [];
     ticket.indexStatus = 'PARSED'
+    ticket.primaryMarketplaceRoyalty = 1500;
+    ticket.secondaryMarketplaceRoyalty = 750;
     ticket.save(); 
     
     let mockEvent = newMockEvent();
@@ -551,6 +559,8 @@ describe("TicketsMarketplace", () => {
     ticket.minRestrictionAmount = 0;
     ticket.restrictions = [];
     ticket.indexStatus = 'PARSED';
+    ticket.primaryMarketplaceRoyalty = 1500;
+    ticket.secondaryMarketplaceRoyalty = 750;
     ticket.save(); 
     let balanceId = getBalanceId(
       BigInt.fromString('1'), 
@@ -601,6 +611,8 @@ describe("TicketsMarketplace", () => {
     ticket.minRestrictionAmount = 0;
     ticket.restrictions = [];
     ticket.indexStatus = 'PARSED'
+    ticket.primaryMarketplaceRoyalty = 1500;
+    ticket.secondaryMarketplaceRoyalty = 750;
     ticket.save(); 
     let balanceId = getBalanceId(
       BigInt.fromString('1'), 
@@ -654,6 +666,8 @@ describe("TicketsMarketplace", () => {
     ticket.minRestrictionAmount = 0;
     ticket.restrictions = [];
     ticket.indexStatus = 'PARSED'
+    ticket.primaryMarketplaceRoyalty = 1500;
+    ticket.secondaryMarketplaceRoyalty = 750;
     ticket.save(); 
     let balanceId = getBalanceId(
       BigInt.fromString('1'), 
@@ -706,6 +720,8 @@ describe("TicketsMarketplace", () => {
     ticket.restrictions = [];
     ticket.extraRequirement = 'none';
     ticket.indexStatus = 'PARSED'
+    ticket.primaryMarketplaceRoyalty = 1500;
+    ticket.secondaryMarketplaceRoyalty = 750;
     ticket.save(); 
     let balanceId = getBalanceId(
       BigInt.fromString('1'), 
@@ -759,6 +775,8 @@ describe("TicketsMarketplace", () => {
     ticket.minRestrictionAmount = 0;
     ticket.restrictions = [];
     ticket.indexStatus = 'PARSED'
+    ticket.primaryMarketplaceRoyalty = 1500;
+    ticket.secondaryMarketplaceRoyalty = 750;
     ticket.save(); 
     let balanceId = getBalanceId(
       BigInt.fromString('1'), 
@@ -807,6 +825,8 @@ describe("TicketsMarketplace", () => {
     ticket.minRestrictionAmount = 0;
     ticket.restrictions = [];
     ticket.indexStatus = 'PARSED'
+    ticket.primaryMarketplaceRoyalty = 1500;
+    ticket.secondaryMarketplaceRoyalty = 750;
     ticket.save(); 
     let balanceId = getBalanceId(
       BigInt.fromString('1'), 

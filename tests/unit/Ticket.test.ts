@@ -47,6 +47,8 @@ describe("Tickets", () => {
       ticket.minRestrictionAmount = 0;
       ticket.restrictions = [];
       ticket.indexStatus = 'PARSED'
+      ticket.primaryMarketplaceRoyalty = 1500;
+      ticket.secondaryMarketplaceRoyalty = 750;
       ticket.save();
       let balance1 = new Balance(getBalanceId(new BigInt(0), Address.fromString(address1), false));;
       balance1.type = 'Ticket';

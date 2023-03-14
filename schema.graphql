@@ -88,6 +88,8 @@ type Ticket @entity {
   id: ID!
   event: Event
   creatorRoyalty: Int!
+  primaryMarketplaceRoyalty: Int!
+  secondaryMarketplaceRoyalty: Int!
   isResellable: Boolean!
   totalAmount: Int!
   ticketBalances: [Balance!]! @derivedFrom(field: "ticket")
@@ -212,4 +214,24 @@ type Restriction @entity {
   conditionType: String!
   name: String
   imageUrl: String
+}
+
+type Reservation @entity {
+  id: ID!
+  ticket: Ticket!
+  ticketOwner: User!
+  ticketBuyer: User!
+  amount: Int!
+}
+
+type Erc20TokenAddress @entity {
+  id: ID! # ETH addr
+  address: String!
+  fixedFee: BigInt!
+}
+
+type MarketplaceFees @entity {
+  id: ID!
+  primaryMarketplaceRoyalty: Int!
+  secondaryMarketplaceRoyalty: Int!
 }

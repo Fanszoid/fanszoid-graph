@@ -231,7 +231,7 @@ type Erc20TokenAddress @entity {
   fixedFee: BigInt!
 }
 
-type MarketplaceFees @entity {
+type MarketplaceFee @entity {
   id: ID!
   primaryMarketplaceRoyalty: Int!
   secondaryMarketplaceRoyalty: Int!

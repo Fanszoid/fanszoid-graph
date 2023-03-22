@@ -19,7 +19,7 @@ import {
   SecondaryMarketRoyaltyModified,
   PrimaryMarketRoyaltyModified
 } from "../../build/generated/Admin/Admin";
-import { Event, Ticket, Balance, AllowedMembership, Membership, User, Reservation, Erc20TokenAddress, MarketplaceFees } from "../../build/generated/schema";
+import { Event, Ticket, Balance, AllowedMembership, Membership, User, Reservation, Erc20TokenAddress, MarketplaceFee } from "../../build/generated/schema";
 import {
   getAllowedMembershipId, getMembershipId, membershipAttrs,
 } from "../modules/Membership";
@@ -35,7 +35,7 @@ import { normalizeString, parseMetadata } from "./utils"
 import { getTicketId } from "../modules/Ticket"
 import { getBalanceId } from "../modules/Balance";
 import { getReservationId } from "../modules/Reservations";
-import { marketplaceFeesEntityId, primaryMarketplaceRoyaltyDefault, secondaryMarketplaceRoyaltyDefault } from "../modules/MarketplaceFees";
+import { MarketplaceFeeEntityId, primaryMarketplaceRoyaltyDefault, secondaryMarketplaceRoyaltyDefault } from "../modules/MarketplaceFees";
 
 export function handleEventPaused(event: EventPaused): void {
   let eventEntity = Event.load(getEventId(event.params.eventId));
@@ -363,28 +363,28 @@ export function handleFixedFeeForERC20Setted(event: FixedFeeForERC20Setted) : vo
 }
 
 export function handlePrimaryMarketRoyaltyModified(event: PrimaryMarketRoyaltyModified) : void {
-  let marketplaceFees = MarketplaceFees.load("MarketplaceFees");
+  let MarketplaceFeeEntity = MarketplaceFee.load("MarketplaceFee");
 
-  if(!marketplaceFees) {
-    marketplaceFees = new MarketplaceFees("MarketplaceFees")
-    marketplaceFees.secondaryMarketplaceRoyalty = secondaryMarketplaceRoyaltyDefault.toI32(); // default value on marketplace
+  if(!MarketplaceFeeEntity) {
+    MarketplaceFeeEntity = new MarketplaceFee("MarketplaceFee")
+    MarketplaceFeeEntity.secondaryMarketplaceRoyalty = secondaryMarketplaceRoyaltyDefault.toI32(); // default value on marketplace
   }
 
-  marketplaceFees.primaryMarketplaceRoyalty = event.params.newRoyalty.toI32();
+  MarketplaceFeeEntity.primaryMarketplaceRoyalty = event.params.newRoyalty.toI32();
 
-  marketplaceFees.save()
+  MarketplaceFeeEntity.save()
 }
 
 
 export function handleSecondaryMarketRoyaltyModified(event: SecondaryMarketRoyaltyModified) : void {
-  let marketplaceFees = MarketplaceFees.load(marketplaceFeesEntityId);
+  let MarketplaceFeeEntity = MarketplaceFee.load(MarketplaceFeeEntityId);
 
-  if(!marketplaceFees) {
-    marketplaceFees = new MarketplaceFees(marketplaceFeesEntityId);
-    marketplaceFees.primaryMarketplaceRoyalty = primaryMarketplaceRoyaltyDefault.toI32(); // default value on marketplace
+  if(!MarketplaceFeeEntity) {
+    MarketplaceFeeEntity = new MarketplaceFee(MarketplaceFeeEntityId);
+    MarketplaceFeeEntity.primaryMarketplaceRoyalty = primaryMarketplaceRoyaltyDefault.toI32(); // default value on marketplace
   }
 
-  marketplaceFees.secondaryMarketplaceRoyalty = event.params.newRoyalty.toI32();
+  MarketplaceFeeEntity.secondaryMarketplaceRoyalty = event.params.newRoyalty.toI32();
 
-  marketplaceFees.save()
+  MarketplaceFeeEntity.save()
 }

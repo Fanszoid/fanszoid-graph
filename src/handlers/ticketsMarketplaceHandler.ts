@@ -16,7 +16,7 @@ import {
   AskSetted1,
   TicketPublished2
 } from "../../build/generated/TicketsMarketplace/TicketsMarketplace";
-import { Ticket, Balance, Allowance, MarketplaceFees } from "../../build/generated/schema";
+import { Ticket, Balance, Allowance, MarketplaceFee } from "../../build/generated/schema";
 import { 
   loadOrCreateEvent,
 } from "../modules/Event";
@@ -37,7 +37,7 @@ import {
 import { store, log, Address } from "@graphprotocol/graph-ts";
 import { parseMetadata } from "./utils";
 import { createRestrictionForTicketForMetadata } from "../modules/Restriction";
-import { marketplaceFeesEntityId, primaryMarketplaceRoyaltyDefault, secondaryMarketplaceRoyaltyDefault } from "../modules/MarketplaceFees";
+import { MarketplaceFeeEntityId, primaryMarketplaceRoyaltyDefault, secondaryMarketplaceRoyaltyDefault } from "../modules/MarketplaceFees";
 
 export function handleAllowanceAdded(event: AllowanceAdded): void {
   let allowance = new Allowance(getAllowanceId(event.params.allowanceId, false));
@@ -58,6 +58,17 @@ export function handleAllowanceAdded(event: AllowanceAdded): void {
     ticketEntity.minRestrictionAmount = 0;
     ticketEntity.restrictions = [];
     ticketEntity.indexStatus = 'NOT_VALID';
+
+    let marketFees = MarketplaceFee.load(MarketplaceFeeEntityId)
+    if(!marketFees) {
+      // default value on marketplace
+      ticketEntity.primaryMarketplaceRoyalty = primaryMarketplaceRoyaltyDefault.toI32()
+      ticketEntity.secondaryMarketplaceRoyalty = secondaryMarketplaceRoyaltyDefault.toI32() 
+    } else {
+      ticketEntity.primaryMarketplaceRoyalty = marketFees.primaryMarketplaceRoyalty
+      ticketEntity.secondaryMarketplaceRoyalty = marketFees.secondaryMarketplaceRoyalty
+    }
+  
 
   } else {
     let allowances = ticketEntity.allowances || []
@@ -144,7 +155,7 @@ export function handleTicketPublished(event: TicketPublished2): void {
   ticket.totalAmount = event.params.amount.toI32();
   ticket.isPrivate = event.params.saleInfo.isPrivate;
   
-  let marketFees = MarketplaceFees.load(marketplaceFeesEntityId)
+  let marketFees = MarketplaceFee.load(MarketplaceFeeEntityId)
   if(!marketFees) {
     // default value on marketplace
     ticket.primaryMarketplaceRoyalty = primaryMarketplaceRoyaltyDefault.toI32()
@@ -360,7 +371,7 @@ export function handleTicketPublishedLegacyLegacy(event: TicketPublished): void 
   ticket.totalAmount = event.params.amount.toI32();
   ticket.isPrivate = false;
 
-  let marketFees = MarketplaceFees.load(marketplaceFeesEntityId)
+  let marketFees = MarketplaceFee.load(MarketplaceFeeEntityId)
   if(!marketFees) {
     // default value on marketplace
     ticket.primaryMarketplaceRoyalty = primaryMarketplaceRoyaltyDefault.toI32()
@@ -418,7 +429,7 @@ export function handleTicketPublishedLegacy(event: TicketPublished1): void {
   ticket.totalAmount = event.params.amount.toI32();
   ticket.isPrivate = event.params.saleInfo.isPrivate;
   
-  let marketFees = MarketplaceFees.load(marketplaceFeesEntityId)
+  let marketFees = MarketplaceFee.load(MarketplaceFeeEntityId)
   if(!marketFees) {
     // default value on marketplace
     ticket.primaryMarketplaceRoyalty = primaryMarketplaceRoyaltyDefault.toI32()

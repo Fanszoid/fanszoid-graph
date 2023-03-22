@@ -80,6 +80,7 @@ type Event @entity {
   mapUrl: String
   startDateUTC: BigInt
   endDateUTC: BigInt
+  organizerLocation: String
 
   indexStatus: String!
 }

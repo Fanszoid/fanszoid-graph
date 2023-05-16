@@ -81,6 +81,7 @@ type Event @entity {
   startDateUTC: BigInt
   endDateUTC: BigInt
   organizerLocation: String
+  locationName: String
 
   indexStatus: String!
 }

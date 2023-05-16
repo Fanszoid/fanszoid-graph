@@ -5,7 +5,7 @@ export var eventAttrs: string[] = [
   'title', 'description', 'type', 'category', 'dclX', 'dclY', 'city', 
   'postalCode', 'address', 'socials', 'email', 'website', 'isAvailable', 'status', 
   'inStock', 'createdAt', 'updatedAt', 'image', 'startDateUTC', 'endDateUTC', 'location', 'timezone',
-  'fullAddress', 'latitude', 'longitude', 'mapUrl', 'organizerLocation'
+  'fullAddress', 'latitude', 'longitude', 'mapUrl', 'organizerLocation', 'locationName'
 ];
 
 export var bigIntEventAttrs: string[] = [

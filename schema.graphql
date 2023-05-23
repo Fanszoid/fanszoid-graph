@@ -82,6 +82,7 @@ type Event @entity {
   endDateUTC: BigInt
   organizerLocation: String
   locationName: String
+  pixelCode: String
 
   indexStatus: String!
 }

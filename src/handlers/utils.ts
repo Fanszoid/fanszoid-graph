@@ -122,21 +122,21 @@ export function parseMetadata(
                 }
               }
 
-              let idx = socialIdxCounts.has(name)
-                ? socialIdxCounts.get(name)
-                : 0;
+              
               if (!socialIdxCounts.has(name)) {
                 socialIdxCounts.set(name, 0);
               }
 
+              let idx = socialIdxCounts.get(name)
+
               let socialNetwork = new SocialNetwork(
-                entity.getString("id") + "-" + name + "-" + idx!.toString()
+                entity.getString("id") + "-" + name + "-" + idx.toString()
               );
               socialNetwork.name = name;
               socialNetwork.url = url;
               socialNetwork.event = entity.getString("id");
 
-              socialIdxCounts.set(name, idx! + 1);
+              socialIdxCounts.set(name, idx + 1);
 
               socialNetwork.save();
             }
@@ -147,7 +147,7 @@ export function parseMetadata(
 
             for (let i = 0; i < questions.length; i++) {
               let questionEvent = new Question(
-                "Q" + "-" + entity.getString("id") + "-" + i
+                "Q" + "-" + entity.getString("id") + "-" + i.toString()
               );
 
               questionEvent.event = entity.getString("id");

@@ -194,7 +194,6 @@ describe("Admin", () => {
     let entity = Event.load('e0x0');
     if(!entity) throw Error('Event not found');
     entity.description = 'asd';
-    entity.tickets = ['tt0x1'];
     entity.save();
 
     let mockEvent = newMockEvent();

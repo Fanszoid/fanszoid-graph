@@ -20,6 +20,7 @@ import {
   Question,
 } from "../../build/generated/schema";
 import { loadOrCreateRestriction } from "../modules/Restriction";
+import { getQuestionId } from "../modules/Question";
 
 export function loadMetadata(uri: string): TypedMap<string, JSONValue> | null {
   let uriParts = uri.split("/");
@@ -145,13 +146,26 @@ export function parseMetadata(
           if (aux.kind === JSONValueKind.ARRAY) {
             let questions = aux.toArray();
 
+            let description: string = "";
+
             for (let i = 0; i < questions.length; i++) {
+              let question = questions[i];
+
+              let questionValues = question.toObject().entries;
+
+              for (let i = 0; i < questionValues.length; i++) {
+                let questionValue = questionValues[i];
+                if (questionValue.key.toString() == "description") {
+                  description = questionValue.value.toString();
+                }
+              }
+
               let questionEvent = new Question(
-                "Q" + "-" + entity.getString("id") + "-" + i
+                getQuestionId(entity.getString("id"), i.toString())
               );
 
               questionEvent.event = entity.getString("id");
-              questionEvent.description = questions[i].toString();
+              questionEvent.description = description;
 
               questionEvent.save();
             }

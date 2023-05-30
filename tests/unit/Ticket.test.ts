@@ -221,14 +221,14 @@ describe("Tickets", () => {
     //log.info(" b3: {}", b3!.ticketIdentifiers!)
     if( b3 != null && b3.ticketIdentifiers != null ) {
 
-      assert.bigIntEquals(new BigInt(b3.ticketIdentifiers!.length), new BigInt(2))
+      assert.bigIntEquals(new BigInt(b3.ticketIdentifiers.length), new BigInt(2))
     }
     assert.assertNotNull(b)
     
     //log.info(" b: {}", [b!.id])
     //log.info(" b: {}", b!.ticketIdentifiers!)
     if( b != null  && b.ticketIdentifiers != null) {
-      assert.bigIntEquals(new BigInt(b.ticketIdentifiers!.length), new BigInt(1))
+      assert.bigIntEquals(new BigInt(b.ticketIdentifiers.length), new BigInt(1))
     }
 
 

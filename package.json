@@ -5,7 +5,7 @@
   "main": "index.js",
   "scripts": {
     "test": "graph test",
-    "codegen": "graph codegen --debug --output-dir build/generated/",
+    "codegen": "graph codegen --output-dir build/generated/",
     "build-data": "ts-node ./scripts/completeSubgraph.ts --network mumbai",
     "deploy:mumbai": "ts-node ./scripts/completeSubgraph.ts --network mumbai && graph deploy --product hosted-service fanz-events/fanz-events-mumbai  --ipfs https://ipfs.fanz.events/",
     "deploy:matic": "ts-node ./scripts/completeSubgraph.ts --network matic && graph deploy --product hosted-service fanz-events/fanz-events-matic  --ipfs https://ipfs.fanz.events/"
@@ -21,11 +21,11 @@
   },
   "homepage": "https://github.com/Fanszoid/fanszoid-graph#readme",
   "dependencies": {
-    "@graphprotocol/graph-cli": "0.32.0",
+    "@graphprotocol/graph-cli": "^0.50.1",
     "@graphprotocol/graph-ts": "0.27.0",
     "@types/node": "^17.0.21",
-    "ts-node": "10.8.2",
     "assemblyscript-regex": "^1.6.4",
-    "matchstick-as": "^0.5.0"
+    "matchstick-as": "^0.5.0",
+    "ts-node": "10.8.2"
   }
 }

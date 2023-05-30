@@ -268,7 +268,6 @@ describe("Admin", () => {
     let entity = Event.load("e0x0");
     if (!entity) throw Error("Event not found");
     entity.description = "asd";
-    entity.tickets = ["tt0x1"];
     entity.save();
 
     let mockEvent = newMockEvent();
@@ -845,6 +844,7 @@ describe("Admin", () => {
     handleEventCreated(event);
 
     assert.fieldEquals("Question", "qe0x1-0", "description", "Lorem ipsum");
+    assert.fieldEquals("Question", "qe0x1-1", "description", "Lorem ipsum 2");
   });
 });
 

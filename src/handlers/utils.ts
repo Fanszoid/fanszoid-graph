@@ -160,11 +160,8 @@ export function parseMetadata(
                   description = questionValue.value.toString();
                 } else if (questionValue.key.toString() == "responseType") {
                   responseType = questionValue.value.toString();
-                } else if (questionValue.key.toString() == "required") {
-                  required =
-                    questionValue.value == null
-                      ? false
-                      : questionValue.value.toString() == "true";
+                } else if (questionValue.key.toString() === "required") {
+                  required = questionValue.value.toString() == "true";
                 }
               }
 

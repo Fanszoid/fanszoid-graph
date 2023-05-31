@@ -145,34 +145,36 @@ export function parseMetadata(
           if (aux.kind === JSONValueKind.ARRAY) {
             let questions = aux.toArray();
 
-              for (let i = 0; i < questions.length; i++) {
-                let question = questions[i];
-              
-                let questionValues = question.toObject().entries;
+            let description: string = "";
+            let responseType: string = "SHORT";
+            let required: boolean = false;
 
-                let description: string = "";
-                let responseType: string = "SHORT";
-                let required: boolean = false;
-              
-                for (let j = 0; j < questionValues.length; j++) {
-                  let questionValue = questionValues[j];
-                  if (questionValue.key.toString() == "description") {
-                    description = questionValue.value.toString();
-                  } else if (questionValue.key.toString() == "responseType") {
-                    responseType = questionValue.value.toString();
-                  } else if (questionValue.key.toString() == "required") {
-                    required = !!questionValue.value;
-                  }
+            for (let i = 0; i < questions.length; i++) {
+              let question = questions[i];
+
+              let questionValues = question.toObject().entries;
+
+              for (let i = 0; i < questionValues.length; i++) {
+                let questionValue = questionValues[i];
+                if (questionValue.key.toString() == "description") {
+                  description = questionValue.value.toString();
+                } else if (questionValue.key.toString() == "responseType") {
+                  responseType = questionValue.value.toString();
+                } else if (questionValue.key.toString() == "required") {
+                  required = !!questionValue.value;
                 }
-              
-                let questionEvent = new Question(getQuestionId(entity.getString("id"), i.toString()));
-                questionEvent.event = entity.getString("id");
-                questionEvent.description = description;
-                questionEvent.responseType = responseType;
-                questionEvent.required = required;
-              
-                questionEvent.save();
               }
+
+              let questionEvent = new Question(
+                getQuestionId(entity.getString("id"), i.toString())
+              );
+
+              questionEvent.event = entity.getString("id");
+              questionEvent.description = description;
+              questionEvent.responseType = responseType;
+              questionEvent.required = required;
+
+              questionEvent.save();
             }
           }
         }

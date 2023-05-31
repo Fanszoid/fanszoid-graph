@@ -224,13 +224,9 @@ export function handleTicketDeleted(event: TicketsDeleted): void {
     } else {
       ticketBalance.save()
     }
-
   }
 }
 
-/* 
-  the handling on transferSingle/transferBatch does most of the entity updating for the ticket balances.
-*/
 export function handleTicketBought(event: TicketBought): void {
   let amount = event.params.amount.toI32();
 
@@ -244,11 +240,7 @@ export function handleTicketBought(event: TicketBought): void {
     log.error("sellerBalance.amountOnSell not enough on internalTransferToken. balance amount: {}, transfer value: {}", [sellerBalance.amountOnSell.toString(), amount.toString()]);
     return;
   }
-  if( !balancePriceMatches(event.params.price, sellerBalance) ) {
-    log.error("sellerBalance incongruent price on handleTicketBought. id : {}, tx price: {}", [getBalanceId(event.params.ticketId, event.params.seller, false), event.params.price.toHex()]);
-    return;
-  }
-
+  
   sellerBalance.amountOnSell = sellerBalance.amountOnSell - amount;
 
   sellerBalance.save();

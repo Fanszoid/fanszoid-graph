@@ -207,10 +207,6 @@ export function handleMembershipBought(event: MembershipBought): void {
     log.error("sellerBalance.amountOnSell not enough on internalTransferToken. balance amount: {}, transfer value: {}", [sellerBalance.amountOnSell.toString(), amount.toString()]);
     return;
   }
-  if( !balancePriceMatches(event.params.price, sellerBalance) ) {
-    log.error("sellerBalance incongruent price on handleMembershipBought. id : {}, tx price: {}", [getBalanceId(event.params.membershipId, event.params.seller, true), event.params.price.toHex()]);
-    return;
-  }
 
   sellerBalance.amountOnSell = sellerBalance.amountOnSell - amount;
 

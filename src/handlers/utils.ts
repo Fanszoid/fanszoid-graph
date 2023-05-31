@@ -145,17 +145,17 @@ export function parseMetadata(
           if (aux.kind === JSONValueKind.ARRAY) {
             let questions = aux.toArray();
 
-            let description: string = "";
-            let responseType: string = "SHORT";
-            let required: boolean = false;
-
             for (let i = 0; i < questions.length; i++) {
               let question = questions[i];
 
               let questionValues = question.toObject().entries;
 
-              for (let i = 0; i < questionValues.length; i++) {
-                let questionValue = questionValues[i];
+              let description: string = "";
+              let responseType: string = "SHORT";
+              let required: boolean = false;
+
+              for (let j = 0; j < questionValues.length; j++) {
+                let questionValue = questionValues[j];
                 if (questionValue.key.toString() == "description") {
                   description = questionValue.value.toString();
                 } else if (questionValue.key.toString() == "responseType") {
@@ -168,7 +168,6 @@ export function parseMetadata(
               let questionEvent = new Question(
                 getQuestionId(entity.getString("id"), i.toString())
               );
-
               questionEvent.event = entity.getString("id");
               questionEvent.description = description;
               questionEvent.responseType = responseType;

@@ -845,6 +845,12 @@ describe("Admin", () => {
 
     assert.fieldEquals("Question", "qe0x1-0", "description", "Lorem ipsum");
     assert.fieldEquals("Question", "qe0x1-1", "description", "Lorem ipsum 2");
+
+    assert.fieldEquals("Question", "qe0x1-0", "responseType", "SHORT");
+    assert.fieldEquals("Question", "qe0x1-1", "responseType", "CHECKBOX");
+
+    assert.fieldEquals("Question", "qe0x1-0", "required", "true");
+    assert.fieldEquals("Question", "qe0x1-1", "required", "false");
   });
 });
 

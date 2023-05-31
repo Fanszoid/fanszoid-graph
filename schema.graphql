@@ -70,7 +70,7 @@ type Event @entity {
   organizerLocation: String
   locationName: String
   pixelCode: String
-
+  questions: [Question!] @derivedFrom(field: "event")
   indexStatus: String!
 }
 
@@ -230,4 +230,6 @@ type Question @entity {
   id: ID!
   event: Event!
   description: String!
+  responseType: String!
+  required: Boolean!
 }

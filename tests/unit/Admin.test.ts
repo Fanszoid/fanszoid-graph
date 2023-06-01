@@ -30,6 +30,7 @@ import {
 import {
   AllowedMembership,
   Event,
+  Question,
   Ticket,
   User,
 } from "../../build/generated/schema";
@@ -843,10 +844,42 @@ describe("Admin", () => {
 
     handleEventCreated(event);
 
-    assert.fieldEquals("Question", "qe0x1-0", "description", "Lorem ipsum");
-    assert.fieldEquals("Question", "qe0x1-1", "description", "Lorem ipsum 2");
+    assert.fieldEquals("Question", "qe0x1-0", "description", "Lorem ipsum 0");
+    assert.fieldEquals("Question", "qe0x1-1", "description", "Lorem ipsum 1");
+
+    assert.fieldEquals("Question", "qe0x1-0", "responseType", "CHECKBOX");
+    assert.fieldEquals("Question", "qe0x1-1", "responseType", "LONG");
+
+    assert.fieldEquals("Question", "qe0x1-0", "required", "true");
+    assert.fieldEquals("Question", "qe0x1-1", "required", "false");
+
+    let question = Question.load("qe0x1-0");
+
+    assert.assertNotNull(question);
+    if (question != null && question.responseOptions != null) {
+      assert.bigIntEquals(
+        new BigInt(question.responseOptions.length),
+        new BigInt(3)
+      );
+
+      let expectedResponses: string[] = ["Respuesta1", "Respuesta asd", "t"];
+
+      for (let i = 0; i < question.responseOptions.length; i++) {
+        assertStringsEqual(question.responseOptions[i], expectedResponses[i]);
+      }
+    }
+
+    assert.fieldEquals("Question", "qe0x1-1", "responseOptions", "[]");
   });
 });
+
+function assertStringsEqual(actual: string, expected: string): void {
+  if (actual != expected) {
+    throw new Error(
+      `The values ​​are different. Actual: ${actual}, Expected: ${expected}`
+    );
+  }
+}
 
 // For coverage analysis
 // Include all handlers beign tested

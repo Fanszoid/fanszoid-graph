@@ -40,7 +40,6 @@ type Event @entity {
   paused: Boolean
   collaborators: [User!]!
   eventFanzUri: String
-
   title: String
   description: String
   type: String
@@ -71,8 +70,9 @@ type Event @entity {
   locationName: String
   pixelCode: String
   questions: [Question!] @derivedFrom(field: "event")
-
   indexStatus: String!
+  askBuyerName: Boolean
+  askBuyerId: Boolean
 }
 
 type Ticket @entity {
@@ -231,4 +231,7 @@ type Question @entity {
   id: ID!
   event: Event!
   description: String!
+  responseType: String!
+  required: Boolean!
+  responseOptions: [String!]!
 }

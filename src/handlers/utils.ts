@@ -163,17 +163,17 @@ export function parseMetadata(
               for (let j = 0; j < questionValues.length; j++) {
                 let questionValue = questionValues[j];
                 if (questionValue.key.toString() == "description") {
-                  questionEvent.description = questionValue.value.toString();
+                  description = questionValue.value.toString();
                 } else if (questionValue.key.toString() == "responseType") {
-                  questionEvent.responseType = questionValue.value.toString();
+                  responseType = questionValue.value.toString();
                   log.debug(responseType.toString(), []);
                 } else if (questionValue.key.toString() == "required") {
-                  questionEvent.required =
+                  required =
                     questionValue.value.kind == JSONValueKind.BOOL
                       ? questionValue.value.toBool()
                       : false;
                 } else if (questionValue.key.toString() == "responseOptions") {
-                  questionEvent.responseOptions = questionValue.value
+                  responseOptions = questionValue.value
                     .toArray()
                     .map<string>((option: JSONValue) =>
                       parseJSONValueToString(option)
@@ -182,12 +182,16 @@ export function parseMetadata(
                 }
               }
 
-              if ((questionEvent.responseType == "CHECKBOX" || questionEvent.responseType == "RADIO BUTTON") && questionEvent.responseOptions.length == 0) {
-                log.debug("Invalid option in response " + questionEvent.responseType + " " + questionEvent.responseOptions.length.toString(), []);
+              if ((responseType == "CHECKBOX" || responseType == "RADIO BUTTON") && responseOptions.length == 0) {
                 validQuestion = false;
               }
 
               if(validQuestion) {
+                questionEvent.responseType = responseType
+                questionEvent.description = description
+                questionEvent.required = required
+                questionEvent.responseOptions
+
                 questionEvent.save();
               }
             }

@@ -163,6 +163,7 @@ export function parseMetadata(
                   description = questionValue.value.toString();
                 } else if (questionValue.key.toString() == "responseType") {
                   responseType = questionValue.value.toString();
+                  log.debug(responseType.toString(), []);
                 } else if (questionValue.key.toString() == "required") {
                   required =
                     questionValue.value.kind == JSONValueKind.BOOL
@@ -171,14 +172,15 @@ export function parseMetadata(
                 } else if (questionValue.key.toString() === "responseOptions") {
                   responseOptions = questionValue.value
                     .toArray()
-                    .map<string>((option: JSONValue) =>
+                    .map((option: JSONValue) =>
                       parseJSONValueToString(option)
                     );
+                    log.debug(responseOptions.length.toString(), []);
                 }
               }
 
               if ((responseType == "CHECKBOX" || responseType == "RADIO BUTTON") && responseOptions.length == 0) {
-                log.debug("Invalid option in response " + responseType + " " + responseOptions.length, []);
+                log.debug("Invalid option in response " + responseType + " " + responseOptions.length.toString(), []);
                 validQuestion = false;
               }
 

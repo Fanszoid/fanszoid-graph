@@ -156,21 +156,24 @@ export function parseMetadata(
               let responseOptions: string[] = [];
 
               let validQuestion = true;
+              let questionEvent = new Question(
+                getQuestionId(entity.getString("id"), i.toString())
+              );
 
               for (let j = 0; j < questionValues.length; j++) {
                 let questionValue = questionValues[j];
                 if (questionValue.key.toString() == "description") {
-                  description = questionValue.value.toString();
+                  questionEvent.description = questionValue.value.toString();
                 } else if (questionValue.key.toString() == "responseType") {
-                  responseType = questionValue.value.toString();
+                  questionEvent.responseType = questionValue.value.toString();
                   log.debug(responseType.toString(), []);
                 } else if (questionValue.key.toString() == "required") {
-                  required =
+                  questionEvent.required =
                     questionValue.value.kind == JSONValueKind.BOOL
                       ? questionValue.value.toBool()
                       : false;
                 } else if (questionValue.key.toString() === "responseOptions") {
-                  responseOptions = questionValue.value
+                  questionEvent.responseOptions = questionValue.value
                     .toArray()
                     .map<string>((option: JSONValue) =>
                       parseJSONValueToString(option)
@@ -179,21 +182,12 @@ export function parseMetadata(
                 }
               }
 
-              if ((responseType == "CHECKBOX" || responseType == "RADIO BUTTON") && responseOptions.length == 0) {
-                log.debug("Invalid option in response " + responseType + " " + responseOptions.length.toString(), []);
+              if ((questionEvent.responseType == "CHECKBOX" || questionEvent.responseType == "RADIO BUTTON") && questionEvent.responseOptions.length == 0) {
+                log.debug("Invalid option in response " + questionEvent.responseType + " " + questionEvent.responseOptions.length.toString(), []);
                 validQuestion = false;
               }
 
               if(validQuestion) {
-                let questionEvent = new Question(
-                  getQuestionId(entity.getString("id"), i.toString())
-                );
-                questionEvent.event = entity.getString("id");
-                questionEvent.description = description;
-                questionEvent.responseType = responseType;
-                questionEvent.required = required;
-                questionEvent.responseOptions = responseOptions;
-  
                 questionEvent.save();
               }
             }

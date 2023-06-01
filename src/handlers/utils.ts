@@ -161,7 +161,7 @@ export function parseMetadata(
                 } else if (questionValue.key.toString() == "responseType") {
                   responseType = questionValue.value.toString();
                 } else if (questionValue.key.toString() == "required") {
-                  required = questionValue.value.toString() == "true";
+                  required = (questionValue.value.kind == JSONValueKind.BOOL) ? questionValue.value.toBool() : false;
                 }
               }
 

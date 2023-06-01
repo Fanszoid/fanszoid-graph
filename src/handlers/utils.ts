@@ -177,24 +177,22 @@ export function parseMetadata(
                 }
               }
 
-              //if (
-              //  (responseType == "CHECKBOX" ||
-              //    responseType == "RADIO BUTTON") &&
-              //  responseOptions.length == 0
-              //) {
-              //  validQuestion = false;
-              //}
+              if ((responseType == "CHECKBOX" || responseType == "RADIO BUTTON") && responseOptions.length == 0) {
+                validQuestion = false;
+              }
 
-              let questionEvent = new Question(
-                getQuestionId(entity.getString("id"), i.toString())
-              );
-              questionEvent.event = entity.getString("id");
-              questionEvent.description = description;
-              questionEvent.responseType = responseType;
-              questionEvent.required = required;
-              questionEvent.responseOptions = responseOptions;
-
-              questionEvent.save();
+              if(validQuestion) {
+                let questionEvent = new Question(
+                  getQuestionId(entity.getString("id"), i.toString())
+                );
+                questionEvent.event = entity.getString("id");
+                questionEvent.description = description;
+                questionEvent.responseType = responseType;
+                questionEvent.required = required;
+                questionEvent.responseOptions = responseOptions;
+  
+                questionEvent.save();
+              }
             }
           }
         }

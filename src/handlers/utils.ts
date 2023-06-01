@@ -172,7 +172,7 @@ export function parseMetadata(
                     questionValue.value.kind == JSONValueKind.BOOL
                       ? questionValue.value.toBool()
                       : false;
-                } else if (questionValue.key.toString() === "responseOptions") {
+                } else if (questionValue.key.toString() == "responseOptions") {
                   questionEvent.responseOptions = questionValue.value
                     .toArray()
                     .map<string>((option: JSONValue) =>

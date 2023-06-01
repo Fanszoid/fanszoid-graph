@@ -169,7 +169,9 @@ export function parseMetadata(
                 } else if (questionValue.key.toString() === "responseOptions") {
                   responseOptions = questionValue.value
                     .toArray()
-                    .map((option) => option.toString());
+                    .map<string>((option: JSONValue) =>
+                      parseJSONValueToString(option)
+                    );
                 }
               }
 

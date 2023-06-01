@@ -168,7 +168,7 @@ export function parseMetadata(
                     questionValue.value.kind == JSONValueKind.BOOL
                       ? questionValue.value.toBool()
                       : false;
-                } else if (questionValue.key.toString() === "responseOptions") {
+                } else if (questionValue.key.toString() == "responseOptions") {
                   responseOptions = questionValue.value
                     .toArray()
                     .map<string>((option: JSONValue) =>
@@ -177,24 +177,22 @@ export function parseMetadata(
                 }
               }
 
-              //if (
-              //  (responseType == "CHECKBOX" ||
-              //    responseType == "RADIO BUTTON") &&
-              //  responseOptions.length == 0
-              //) {
-              //  validQuestion = false;
-              //}
+              if ((responseType == "CHECKBOX" || responseType == "RADIO BUTTON") && responseOptions.length == 0) {
+                validQuestion = false;
+              }
 
-              let questionEvent = new Question(
-                getQuestionId(entity.getString("id"), i.toString())
-              );
-              questionEvent.event = entity.getString("id");
-              questionEvent.description = description;
-              questionEvent.responseType = responseType;
-              questionEvent.required = required;
-              questionEvent.responseOptions = responseOptions;
+              if(!validQuestion) {
+                let questionEvent = new Question(
+                  getQuestionId(entity.getString("id"), i.toString())
+                );
+                questionEvent.event = entity.getString("id");
+                questionEvent.description = description;
+                questionEvent.responseType = responseType;
+                questionEvent.required = required;
+                questionEvent.responseOptions = responseOptions;
 
-              questionEvent.save();
+                questionEvent.save();
+              }
             }
           }
         }

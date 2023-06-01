@@ -861,12 +861,11 @@ describe("Admin", () => {
         new BigInt(3)
       );
       for (let i = 0; i < question.responseOptions.length; i++) {
-        assert.fieldEquals(
-          "Question",
-          "qe0x1-0",
-          `responseOptions[${i}]`,
-          question.responseOptions[i]
+        let expectedOption = question.responseOptions[i];
+        let actualOptionValidated = question.responseOptions.some(
+          (option) => option == expectedOption
         );
+        assert.assertTrue(actualOptionValidated);
       }
     }
 

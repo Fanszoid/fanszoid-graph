@@ -181,7 +181,7 @@ export function parseMetadata(
                 validQuestion = false;
               }
 
-              if(!validQuestion) {
+              if(validQuestion) {
                 let questionEvent = new Question(
                   getQuestionId(entity.getString("id"), i.toString())
                 );

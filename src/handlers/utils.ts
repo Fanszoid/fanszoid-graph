@@ -166,7 +166,6 @@ export function parseMetadata(
                   description = questionValue.value.toString();
                 } else if (questionValue.key.toString() == "responseType") {
                   responseType = questionValue.value.toString();
-                  log.debug(responseType.toString(), []);
                 } else if (questionValue.key.toString() == "required") {
                   required =
                     questionValue.value.kind == JSONValueKind.BOOL
@@ -178,7 +177,6 @@ export function parseMetadata(
                     .map<string>((option: JSONValue) =>
                       parseJSONValueToString(option)
                     );
-                    log.debug(responseOptions.length.toString(), []);
                 }
               }
 
@@ -190,7 +188,7 @@ export function parseMetadata(
                 questionEvent.responseType = responseType
                 questionEvent.description = description
                 questionEvent.required = required
-                questionEvent.responseOptions
+                questionEvent.responseOptions = questionEvent.responseOptions
 
                 questionEvent.save();
               }

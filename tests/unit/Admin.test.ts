@@ -860,9 +860,21 @@ describe("Admin", () => {
         new BigInt(question.responseOptions.length),
         new BigInt(3)
       );
+      assert.fieldEquals(
+        "Question",
+        "qe0x1-0",
+        "responseOptions",
+        JSON.stringify(["Respuesta1", "Respuesta asd", "t"])
+      );
     }
 
     assert.fieldEquals("Question", "qe0x1-1", "responseOptions", "[]");
+    assert.fieldEquals(
+      "Question",
+      "qe0x1-1",
+      "responseOptions",
+      JSON.stringify([])
+    );
   });
 });
 

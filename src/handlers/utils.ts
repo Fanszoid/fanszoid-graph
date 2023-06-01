@@ -155,6 +155,8 @@ export function parseMetadata(
               let required: boolean = false;
               let responseOptions: string[] = [];
 
+              let validQuestion = true;
+
               for (let j = 0; j < questionValues.length; j++) {
                 let questionValue = questionValues[j];
                 if (questionValue.key.toString() == "description") {
@@ -175,16 +177,26 @@ export function parseMetadata(
                 }
               }
 
-              let questionEvent = new Question(
-                getQuestionId(entity.getString("id"), i.toString())
-              );
-              questionEvent.event = entity.getString("id");
-              questionEvent.description = description;
-              questionEvent.responseType = responseType;
-              questionEvent.required = required;
-              questionEvent.responseOptions = responseOptions;
+              if (
+                (responseType == "CHECKBOX" ||
+                  responseType == "RADIO BUTTON") &&
+                responseOptions.length == 0
+              ) {
+                validQuestion = false;
+              }
 
-              questionEvent.save();
+              if (validQuestion) {
+                let questionEvent = new Question(
+                  getQuestionId(entity.getString("id"), i.toString())
+                );
+                questionEvent.event = entity.getString("id");
+                questionEvent.description = description;
+                questionEvent.responseType = responseType;
+                questionEvent.required = required;
+                questionEvent.responseOptions = responseOptions;
+
+                questionEvent.save();
+              }
             }
           }
         }

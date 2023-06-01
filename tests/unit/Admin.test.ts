@@ -860,18 +860,25 @@ describe("Admin", () => {
         new BigInt(question.responseOptions.length),
         new BigInt(3)
       );
+
+      let expectedResponses: string[] = ["Respuesta1", "Respuesta asd", "t"];
+
       for (let i = 0; i < question.responseOptions.length; i++) {
-        let expectedOption = question.responseOptions[i];
-        let actualOptionValidated = question.responseOptions.some(
-          (option) => option == expectedOption
-        );
-        assert.assertTrue(actualOptionValidated);
+        assertStringsEqual(question.responseOptions[i], expectedResponses[i]);
       }
     }
 
     assert.fieldEquals("Question", "qe0x1-1", "responseOptions", "[]");
   });
 });
+
+function assertStringsEqual(actual: string, expected: string): void {
+  if (actual != expected) {
+    throw new Error(
+      `The values ​​are different. Actual: ${actual}, Expected: ${expected}`
+    );
+  }
+}
 
 // For coverage analysis
 // Include all handlers beign tested

@@ -178,6 +178,7 @@ export function parseMetadata(
               }
 
               if ((responseType == "CHECKBOX" || responseType == "RADIO BUTTON") && responseOptions.length == 0) {
+                log.debug("Invalid option in response " + responseType + " " + responseOptions.length, []);
                 validQuestion = false;
               }
 

@@ -33,16 +33,16 @@
   "endDateUTC": 1648801920000,
   "questions": [
     {
-      "description": "Lorem ipsum 2",
+      "description": "Lorem ipsum 0",
       "responseType": "CHECKBOX",
       "required": true,
       "status": "PENDING",
       "responseOptions": ["Respuesta1", "Respuesta asd", "t"]
     },
     {
-      "description": "Lorem ipsum",
+      "description": "Lorem ipsum 1",
       "responseType": "LONG",
-      "required": true,
+      "required": false,
       "status": "PENDING",
       "responseOptions": []
     }

@@ -854,6 +854,7 @@ describe("Admin", () => {
     assert.fieldEquals("Question", "qe0x1-1", "required", "false");
 
     let question = Question.load("qe0x1-0");
+
     assert.assertNotNull(question);
     if (question != null && question.responseOptions != null) {
       assert.bigIntEquals(

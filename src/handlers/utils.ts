@@ -153,6 +153,7 @@ export function parseMetadata(
               let description: string = "";
               let responseType: string = "SHORT";
               let required: boolean = false;
+              let responseOptions: string[] = [];
 
               for (let j = 0; j < questionValues.length; j++) {
                 let questionValue = questionValues[j];
@@ -161,7 +162,14 @@ export function parseMetadata(
                 } else if (questionValue.key.toString() == "responseType") {
                   responseType = questionValue.value.toString();
                 } else if (questionValue.key.toString() == "required") {
-                  required = (questionValue.value.kind == JSONValueKind.BOOL) ? questionValue.value.toBool() : false;
+                  required =
+                    questionValue.value.kind == JSONValueKind.BOOL
+                      ? questionValue.value.toBool()
+                      : false;
+                } else if (questionValue.key.toString() === "responseOptions") {
+                  responseOptions = questionValue.value
+                    .toArray()
+                    .map((option) => option.toString());
                 }
               }
 
@@ -172,6 +180,7 @@ export function parseMetadata(
               questionEvent.description = description;
               questionEvent.responseType = responseType;
               questionEvent.required = required;
+              questionEvent.responseOptions = responseOptions;
 
               questionEvent.save();
             }

@@ -232,4 +232,5 @@ type Question @entity {
   description: String!
   responseType: String!
   required: Boolean!
+  responseOptions: [String!]!
 }

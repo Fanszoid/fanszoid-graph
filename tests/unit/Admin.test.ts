@@ -30,6 +30,7 @@ import {
 import {
   AllowedMembership,
   Event,
+  Question,
   Ticket,
   User,
 } from "../../build/generated/schema";
@@ -851,6 +852,17 @@ describe("Admin", () => {
 
     assert.fieldEquals("Question", "qe0x1-0", "required", "true");
     assert.fieldEquals("Question", "qe0x1-1", "required", "false");
+
+    let question = Question.load("qe0x1-0");
+    assert.assertNotNull(question);
+    if (question != null && question.responseOptions != null) {
+      assert.bigIntEquals(
+        new BigInt(question.responseOptions.length),
+        new BigInt(3)
+      );
+    }
+
+    assert.fieldEquals("Question", "qe0x1-1", "responseOptions", "[]");
   });
 });
 

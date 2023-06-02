@@ -32,6 +32,8 @@ export var eventAttrs: string[] = [
   "locationName",
   "pixelCode",
   "questions",
+  "askBuyerId",
+  "askBuyerName"
 ];
 
 export var bigIntEventAttrs: string[] = ["startDateUTC", "endDateUTC"];

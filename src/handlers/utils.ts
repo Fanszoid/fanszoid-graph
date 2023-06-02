@@ -209,6 +209,8 @@ export function parseMetadata(
           }
         } else if (attrs[i] == "extra_requirement") {
           entity.setString("extraRequirement", parseJSONValueToString(aux));
+        } else if(attrs[i] == "askBuyerId" || attrs[i] == "askBuyerName") {
+            entity.setBoolean(attrs[i], aux.toBool())
         } else {
           entity.setString(attrs[i], parseJSONValueToString(aux));
         }

@@ -73,6 +73,8 @@ type Event @entity {
   indexStatus: String!
   askBuyerName: Boolean
   askBuyerId: Boolean
+  youtubeVideoUrl: String
+  extraImages: [String]
 }
 
 type Ticket @entity {

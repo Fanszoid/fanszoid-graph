@@ -212,7 +212,7 @@ export function parseMetadata(
         } else if(attrs[i] == "askBuyerId" || attrs[i] == "askBuyerName") {
             entity.setBoolean(attrs[i], aux.toBool())
         } else if(attrs[i] == "extraImages") {
-          entity.set(attrs[i], Value.fromStringArray(aux.toArray().map(value => parseJSONValueToString(value))))
+          entity.set(attrs[i], Value.fromStringArray(aux.toArray().map((value: JSONValue) => parseJSONValueToString(value))))
         } else {
           entity.setString(attrs[i], parseJSONValueToString(aux));
         }

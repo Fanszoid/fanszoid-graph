@@ -143,6 +143,7 @@ function internalTransferToken(
     
 
     fromBalance.amountOwned = fromBalance.amountOwned - value.toI32();
+    fromBalance.amountOnSell = Math.min(fromBalance.amountOnSell, fromBalance.amountOwned)
 
     let transfer = loadOrCreateTransfer(txHash);
 

@@ -180,16 +180,20 @@ dataSources:
         - name: Admin
           file: ./abis/Admin.json
       eventHandlers:
-        - event: EventCreated(indexed uint256,address,string)
+        - event: EventCreated(indexed uint256,address,string,bool)
           handler: handleEventCreated
+        - event: EventCreated(indexed uint256,address,string)
+          handler: handleEventCreatedLegacy
         - event: EventDeleted(indexed uint256)
           handler: handleEventDeleted
         - event: EventOwnershipTransferred(indexed uint256,address)
           handler: handleEventOwnershipTransferred
         - event: CreatorRoyaltyModifiedOnEvent(indexed uint256,uint256)
           handler: handleCreatorRoyaltyModifiedOnEvent
-        - event: EventEdited(indexed uint256,string)
+        - event: EventEdited(indexed uint256,string,bool)
           handler: handleEventUriModification
+        - event: EventEdited(indexed uint256,string)
+          handler: handleEventUriModificationLegacy
         - event: MembershipAssignedToTicket(indexed uint256,address,uint256[])
           handler: handleMembershipsAssigned
         - event: MembershipRemovedFromTicket(indexed uint256,address)
@@ -218,4 +222,6 @@ dataSources:
           handler: handlePrimaryMarketRoyaltyModified
         - event: SecondaryMarketRoyaltyModified(uint256)
           handler: handleSecondaryMarketRoyaltyModified
+        - event: ApproveEventForVisualization(indexed uint256)
+          handler: handleApprovedEventFormVisualization
       file: ./src/handlers/adminHandler.ts

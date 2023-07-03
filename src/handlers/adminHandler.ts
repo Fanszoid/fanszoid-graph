@@ -17,7 +17,10 @@ import {
   CancelTicketBooking,
   FixedFeeForERC20Setted,
   SecondaryMarketRoyaltyModified,
-  PrimaryMarketRoyaltyModified
+  PrimaryMarketRoyaltyModified,
+  EventCreated1,
+  EventEdited1,
+  ApproveEventForVisualization
 } from "../../build/generated/Admin/Admin";
 import { Event, Ticket, Balance, AllowedMembership, Membership, User, Reservation, Erc20TokenAddress, MarketplaceFee } from "../../build/generated/schema";
 import {
@@ -97,7 +100,7 @@ export function handleCollaboratorRemoved(event: CollaboratorRemoved): void {
   eventEntity.save();
 }
 
-export function handleEventUriModification(event: EventEdited): void {
+export function handleEventUriModification(event: EventEdited1): void {
   let eventEntity = Event.load(getEventId(event.params.eventId));
 
   if(!eventEntity) {
@@ -105,6 +108,7 @@ export function handleEventUriModification(event: EventEdited): void {
   }
 
   let parsed = parseMetadata(event.params.newUri, eventEntity, eventAttrs);
+  eventEntity.isApproved = event.params.isApproved;
   eventEntity.indexStatus = parsed;
 
   if( parsed == 'PARSED') {
@@ -117,11 +121,56 @@ export function handleEventUriModification(event: EventEdited): void {
 
 }
 
-export function handleEventCreated(event: EventCreated): void {
+export function handleEventUriModificationLegacy(event: EventEdited): void {
+  let eventEntity = Event.load(getEventId(event.params.eventId));
+
+  if(!eventEntity) {
+    return;
+  }
+
+  let parsed = parseMetadata(event.params.newUri, eventEntity, eventAttrs);
+  eventEntity.indexStatus = parsed;
+  eventEntity.isApproved = true;
+
+  if( parsed == 'PARSED') {
+    eventEntity.metadata = event.params.newUri;
+  } else {
+    log.error("Error parsing metadata on handleEventUriModification, metadata hash is: {}", [event.params.newUri])
+  }
+
+  eventEntity.save();
+
+}
+
+export function handleEventCreated(event: EventCreated1): void {
   let organizerUser = loadOrCreateUser(event.params.organizer);
   let eventEntity = loadOrCreateEvent(
     event.params.eventId
   );
+
+  eventEntity.metadata = event.params.uri;
+  let parsed = parseMetadata(event.params.uri, eventEntity, eventAttrs);
+  eventEntity.indexStatus = parsed;
+  eventEntity.isApproved = event.params.isApproved;
+    
+  if( parsed != 'PARSED' ) {
+    log.error("Error parsing metadata on handleEventCreated, metadata hash is: {}", [event.params.uri])
+  }
+  else {
+    eventEntity.eventFanzUri = normalizeString((eventEntity.title as string).split(" ").filter(txt => txt.length > 0).join('-').toLowerCase()) + '-' + eventEntity.id;
+  }
+
+  eventEntity.organizer = organizerUser.address;
+  eventEntity.attendees = BigInt.fromI32(0);
+  eventEntity.save();
+}
+
+export function handleEventCreatedLegacy(event: EventCreated): void {
+  let organizerUser = loadOrCreateUser(event.params.organizer);
+  let eventEntity = loadOrCreateEvent(
+    event.params.eventId
+  );
+  eventEntity.isApproved = true;
 
   eventEntity.metadata = event.params.uri;
   let parsed = parseMetadata(event.params.uri, eventEntity, eventAttrs);
@@ -387,4 +436,15 @@ export function handleSecondaryMarketRoyaltyModified(event: SecondaryMarketRoyal
   MarketplaceFeeEntity.secondaryMarketplaceRoyalty = event.params.newRoyalty.toI32();
 
   MarketplaceFeeEntity.save()
+}
+
+export function handleApprovedEventFormVisualization(event: ApproveEventForVisualization) : void {
+  let eventEntity = Event.load(getEventId(event.params.eventId))
+
+  if(!eventEntity) {
+    return;
+  }
+
+  eventEntity.isApproved = true;
+  eventEntity.save()
 }

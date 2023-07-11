@@ -106,6 +106,7 @@ export function handleEventUriModification(event: EventEdited): void {
 
   let parsed = parseMetadata(event.params.newUri, eventEntity, eventAttrs);
   eventEntity.indexStatus = parsed;
+  eventEntity.showAttendees = (eventEntity.showAttendees) ? true : false;
 
   if( parsed == 'PARSED') {
     eventEntity.metadata = event.params.newUri;
@@ -126,6 +127,7 @@ export function handleEventCreated(event: EventCreated): void {
   eventEntity.metadata = event.params.uri;
   let parsed = parseMetadata(event.params.uri, eventEntity, eventAttrs);
   eventEntity.indexStatus = parsed;
+  eventEntity.showAttendees = (eventEntity.showAttendees) ? true : false;
     
   if( parsed != 'PARSED' ) {
     log.error("Error parsing metadata on handleEventCreated, metadata hash is: {}", [event.params.uri])

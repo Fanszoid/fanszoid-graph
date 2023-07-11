@@ -35,7 +35,8 @@ export var eventAttrs: string[] = [
   "askBuyerId",
   "askBuyerName",
   "youtubeVideoUrl",
-  "extraImages"
+  "extraImages",
+  "showAttendees"
 ];
 
 export var bigIntEventAttrs: string[] = ["startDateUTC", "endDateUTC"];

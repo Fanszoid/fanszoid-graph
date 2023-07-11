@@ -75,6 +75,7 @@ type Event @entity {
   askBuyerId: Boolean
   youtubeVideoUrl: String
   extraImages: [String!]
+  showAttendees: Boolean
 }
 
 type Ticket @entity {

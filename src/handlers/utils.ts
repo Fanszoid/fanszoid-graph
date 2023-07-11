@@ -209,7 +209,7 @@ export function parseMetadata(
           }
         } else if (attrs[i] == "extra_requirement") {
           entity.setString("extraRequirement", parseJSONValueToString(aux));
-        } else if(attrs[i] == "askBuyerId" || attrs[i] == "askBuyerName") {
+        } else if(attrs[i] == "askBuyerId" || attrs[i] == "askBuyerName" || attrs[i] == 'showAttendees') {
             entity.setBoolean(attrs[i], aux.toBool())
         } else if(attrs[i] == "extraImages") {
           entity.set(attrs[i], Value.fromStringArray(aux.toArray().map<string>((value: JSONValue) => parseJSONValueToString(value))))
